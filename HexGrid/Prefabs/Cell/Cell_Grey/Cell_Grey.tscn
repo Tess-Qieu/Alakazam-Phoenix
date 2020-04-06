@@ -1,9 +1,11 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Prefabs/Cell/Cell_Grey/Faces.material" type="Material" id=1]
 [ext_resource path="res://Prefabs/Cell/Cell_Grey/cell_grey.dae" type="PackedScene" id=2]
 [ext_resource path="res://Prefabs/Cell/Cell_Grey/Vertices.material" type="Material" id=3]
 [ext_resource path="res://Prefabs/Cell/Cell.gd" type="Script" id=4]
+
+[sub_resource type="CylinderShape" id=1]
 
 [node name="Cell_Grey" instance=ExtResource( 2 )]
 script = ExtResource( 4 )
@@ -11,3 +13,10 @@ script = ExtResource( 4 )
 [node name="Circle" parent="." index="0"]
 material/0 = ExtResource( 1 )
 material/1 = ExtResource( 3 )
+
+[node name="Area" type="Area" parent="Circle" index="0"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Circle/Area" index="0"]
+transform = Transform( 0.86, 0, 0, 0, 0.25, 0, 0, 0, 0.86, 0, 0.25, 0 )
+shape = SubResource( 1 )
+[connection signal="input_event" from="Circle/Area" to="." method="_on_Area_input_event"]

@@ -23,3 +23,13 @@ func init(_q, _r, _kind, _height):
 	translation.x = q * TRANS_RIGHT[0] + r * TRANS_DOWNRIGHT[0]
 	translation.y = _height * 0.5
 	translation.z = r * TRANS_DOWNRIGHT[1]
+
+
+func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx):
+	if event is InputEventMouseButton:
+		if event.button_index == BUTTON_LEFT and event.pressed == true:
+			print('Cell {0} / {1} clicked !'.format([q, r]))
+	
+	elif event is InputEventMouseMotion:
+		print('Cell {0} / {1} motionned !'.format([q, r]))
+		
