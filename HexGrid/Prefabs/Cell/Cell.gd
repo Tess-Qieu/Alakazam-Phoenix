@@ -10,7 +10,7 @@ var kind
 var materials = []
 
 const CIRCLE_RAY = 1
-const SPACE_BETWEEN = 0.05
+const SPACE_BETWEEN = 0
 const DIST = sqrt(3)*CIRCLE_RAY
 const RATIO = (DIST + SPACE_BETWEEN)/DIST
 
