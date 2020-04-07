@@ -6,6 +6,9 @@ var Cell_Grey = preload("res://Prefabs/Cell/Cell_Grey/Cell_Grey.tscn")
 var rng = RandomNumberGenerator.new()
 var grid = []
 
+# Array of selected cells
+var selected_cells = []
+
 const PROBA_CELL_FULL = 0.15
 const PROBA_CELL_HOLE = 0.15
 const RAY = 6
@@ -15,6 +18,7 @@ func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
+	selected_cells.resize(2)
 
 func random_kind():
 	var value = rng.randf()
@@ -66,6 +70,8 @@ func instance_cell(cell_type, q, r, kind, height=0):
 	var cell = cell_type.instance()
 	cell.init(q, r, kind, height)
 	add_child(cell)
+	if cell.kind == "floor":
+		cell.connect("selected", self, "selected_cell", [cell])
 	
 func instance_map():
 	for line in grid:
@@ -81,3 +87,11 @@ func instance_map():
 			elif kind == 'full':
 				instance_cell(Cell_Grey, q, r, kind)
 				instance_cell(Cell_Grey, q, r, kind, 1)
+
+# Function memorizing the selected tile and unselecting the previous
+func selected_cell(index, cell):
+	if selected_cells.size() > index:
+		if selected_cells[index] != null:
+			selected_cells[index].unselect()
+			
+		selected_cells[index] = cell
