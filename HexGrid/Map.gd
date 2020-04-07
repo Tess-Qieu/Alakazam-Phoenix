@@ -28,9 +28,20 @@ func random_kind():
 	
 func generate_one_line(line_size, q, r):
 	var kind = ''
-	for _i in range(line_size):
+	var half = line_size / 2 if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
+	for _i in range(half):
 		kind = random_kind()
 		grid[r + RAY] += [{'q': q, 'r': r, 'kind': kind}]
+		q += 1
+		
+	var indice_to_copy = half - 1
+	if line_size - half != half:
+		indice_to_copy -= 1
+		
+	for _i in range(half, line_size):
+		kind = grid[r + RAY][indice_to_copy]['kind']
+		grid[r + RAY] += [{'q':q, 'r':r, 'kind':kind}]
+		indice_to_copy -= 1
 		q += 1
 	return q
 
