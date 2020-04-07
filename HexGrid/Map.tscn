@@ -17,17 +17,18 @@ transform = Transform( 0.98834, -0.0113156, -0.15184, 0.152261, 0.0734507, 0.985
 spot_range = 17.9272
 spot_angle = 50.9421
 
-[node name="origin" type="Position3D" parent="."]
+[node name="Origin" type="Position3D" parent="."]
 
-[node name="Camera" type="Camera" parent="origin"]
-transform = Transform( 1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 11.9382, 9.81134 )
+[node name="Camera" type="Camera" parent="Origin"]
+transform = Transform( 1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 12, 10 )
 
-[node name="StaticBody" type="StaticBody" parent="."]
-transform = Transform( 30, 0, 0, 0, 1, 0, 0, 0, 30, 0, -1, 0 )
+[node name="Floor" type="StaticBody" parent="."]
+transform = Transform( 50, 0, 0, 0, 1, 0, 0, 0, 50, 0, -1, 0 )
 
-[node name="CollisionShape" type="CollisionShape" parent="StaticBody"]
+[node name="CollisionShape" type="CollisionShape" parent="Floor"]
 shape = SubResource( 1 )
 
-[node name="MeshInstance" type="MeshInstance" parent="StaticBody"]
+[node name="MeshInstance" type="MeshInstance" parent="Floor"]
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
+[connection signal="input_event" from="Floor" to="." method="_on_Floor_input_event"]

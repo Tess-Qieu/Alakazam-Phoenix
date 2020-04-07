@@ -5,10 +5,13 @@ var Cell_Grey = preload("res://Prefabs/Cell/Cell_Grey/Cell_Grey.tscn")
 
 var rng = RandomNumberGenerator.new()
 var grid = []
+var is_button_right_pressed
 
 const PROBA_CELL_FULL = 0.15
 const PROBA_CELL_HOLE = 0.15
 const RAY = 6
+
+const SPEED_DECREASE = 20000
 
 
 func _ready():
@@ -81,3 +84,44 @@ func instance_map():
 			elif kind == 'full':
 				instance_cell(Cell_Grey, q, r, kind)
 				instance_cell(Cell_Grey, q, r, kind, 1)
+
+
+func _on_Floor_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
+	# Rotate the view around the Origin(0,0)
+	
+	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and event is InputEventMouseMotion:
+		var center_screen = get_viewport().size/2
+		var mouse_position = get_viewport().get_mouse_position()
+		var ratio = 1.1 
+		if event.speed.y != 0 :
+			ratio = event.speed.x / event.speed.y # if > 1 move along x, else along y
+		
+		if mouse_position.x < center_screen.x:
+			if mouse_position.y < center_screen.y:
+				# up left
+				if ratio < 1:
+					$Origin.rotate_y(-event.speed.y/SPEED_DECREASE)
+				else :
+					$Origin.rotate_y(event.speed.x/SPEED_DECREASE)
+			else:
+				# down left
+				if ratio < 1:
+					$Origin.rotate_y(-event.speed.y/SPEED_DECREASE)
+				else:
+					$Origin.rotate_y(-event.speed.x/SPEED_DECREASE)
+		else:
+			if mouse_position.y < center_screen.y:
+				# up right
+				if ratio < 1:
+					$Origin.rotate_y(event.speed.y/SPEED_DECREASE)
+				else:
+					$Origin.rotate_y(event.speed.x/SPEED_DECREASE)
+			else:
+				if ratio < 1:
+					$Origin.rotate_y(event.speed.y/SPEED_DECREASE)
+				else:
+					$Origin.rotate_y(-event.speed.x/SPEED_DECREASE)
+			
+			
+					
+				
