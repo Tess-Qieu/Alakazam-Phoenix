@@ -86,17 +86,17 @@ func generate_bordered_grid():
 	var q
 	var line_length
 	var new_line = []
-	for i in range(LENGTH_BORDER):
+	for i in range(1, LENGTH_BORDER + 1):
 		r -= 1
 		new_line = []
 		line_length = len(grid[0]) - i + 2*LENGTH_BORDER
 		for j in line_length:
-			q = -LENGTH_BORDER + j
+			q = -LENGTH_BORDER + j + 1
 			new_line += [{'q': q, 'r': r, 'kind': 'border'}]
 		grid_bordered += [new_line]
 	
 	r = grid[-1][0]['r']
-	for i in range(LENGTH_BORDER):
+	for i in range(1, LENGTH_BORDER+1):
 		r += 1
 		new_line = []
 		line_length = len(grid[-1]) - i + 2*LENGTH_BORDER
