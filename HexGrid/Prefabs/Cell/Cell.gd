@@ -39,7 +39,7 @@ func unselect():
 	$Circle.set_surface_material(0, materials[0])
 
 
-func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx):
+func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed == true:
 			print('Cell {0} / {1} clicked !'.format([q, r]))
@@ -48,5 +48,6 @@ func _on_Area_input_event(camera, event, click_position, click_normal, shape_idx
 				emit_signal("selected", 0)
 	
 	elif event is InputEventMouseMotion:
-		print('Cell {0} / {1} motionned !'.format([q, r]))
+#		print('Cell {0} / {1} motionned !'.format([q, r]))
+		pass
 		
