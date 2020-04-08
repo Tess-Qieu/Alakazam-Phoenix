@@ -31,4 +31,3 @@ shape = SubResource( 1 )
 [node name="MeshInstance" type="MeshInstance" parent="Floor"]
 mesh = SubResource( 2 )
 material/0 = SubResource( 3 )
-[connection signal="input_event" from="Floor" to="." method="_on_Floor_input_event"]
