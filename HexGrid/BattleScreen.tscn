@@ -56,6 +56,7 @@ handle_input_locally = false
 msaa = 4
 render_target_update_mode = 3
 physics_object_picking = true
+shadow_atlas_size = 10
 
 [node name="Map" parent="HBoxContainer/ViewArena/Viewport" instance=ExtResource( 1 )]
 

@@ -12,12 +12,6 @@ albedo_color = Color( 0.372549, 0.372549, 0.372549, 1 )
 [node name="Map" type="Spatial"]
 script = ExtResource( 1 )
 
-[node name="SpotLight" type="SpotLight" parent="."]
-transform = Transform( 0.98834, -0.0113156, -0.15184, 0.152261, 0.0734507, 0.985607, 5.96046e-08, -0.997235, 0.0743172, -1.86054, 10, 2.14841 )
-visible = false
-spot_range = 17.9272
-spot_angle = 50.9421
-
 [node name="Origin" type="Position3D" parent="."]
 
 [node name="Camera" type="Camera" parent="Origin"]
