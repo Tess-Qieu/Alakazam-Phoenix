@@ -19,6 +19,12 @@ func _ready():
 	generate_grid()
 	generate_bordered_grid()
 	instance_map()
+	
+func _process(_delta):
+	var mouse_position = get_viewport().get_mouse_position()
+	if is_rotation_camera_ask(mouse_position):
+		rotate_camera(mouse_position)
+	last_mouse_position = mouse_position
 
 func random_kind():
 	var value = rng.randf()
@@ -145,9 +151,3 @@ func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true
 	return false
-
-func _physics_process(_delta):
-	var mouse_position = get_viewport().get_mouse_position()
-	if is_rotation_camera_ask(mouse_position):
-		rotate_camera(mouse_position)
-	last_mouse_position = mouse_position
