@@ -11,9 +11,13 @@ const PROBA_CELL_FULL = 0.15
 const PROBA_CELL_HOLE = 0.15
 const RAY = 6
 
+const LENGTH_BORDER = 1
+const BORDER_HEIGHT = 1
+
 func _ready():
 	rng.randomize()
 	generate_grid()
+	generate_bordered_grid()
 	instance_map()
 
 func random_kind():
@@ -43,7 +47,6 @@ func generate_one_line(line_size, q, r):
 		grid[r + RAY] += [{'q':q, 'r':r, 'kind':kind}]
 		indice_to_copy -= 1
 		q += 1
-	return q
 
 func generate_grid():
 	var nb_cell = RAY + 1
@@ -51,22 +54,68 @@ func generate_grid():
 	var r = -RAY
 	for _i in range(RAY) :
 		grid += [[]]
-		q = generate_one_line(nb_cell, q, r)
+		generate_one_line(nb_cell, q, r)
 		nb_cell += 1
 		r += 1
 		q = -RAY -r
 	for _i in range(RAY + 1) :
 		self.grid += [[]]
-		q = generate_one_line(nb_cell, q, r)
+		generate_one_line(nb_cell, q, r)
 		r += 1
 		q = -RAY
 		nb_cell -= 1
 
-func instance_cell(cell_type, q, r, kind, height=0):
-	var cell = cell_type.instance()
-	cell.init(q, r, kind, height)
-	add_child(cell)
+func generate_bordered_line(line):
+	var new_line = []
+	var r = line[0]['r']
+	var q
+	for i in range(1, LENGTH_BORDER + 1):
+		q = line[0]['q'] - i
+		new_line += [{'q': q, 'r': r, 'kind': 'border'}]
+	new_line += line
+	for i in range(1, LENGTH_BORDER + 1):
+		q = line[-1]['q'] + i
+		new_line += [{'q': q, 'r': r, 'kind': 'border'}]
+	return new_line
+
+func generate_bordered_grid():
+	var grid_bordered = []
 	
+	# Create lines borders in r
+	var r = grid[0][0]['r']
+	var q
+	var line_length
+	var new_line = []
+	for i in range(LENGTH_BORDER):
+		r -= 1
+		new_line = []
+		line_length = len(grid[0]) - i + 2*LENGTH_BORDER
+		for j in line_length:
+			q = -LENGTH_BORDER + j
+			new_line += [{'q': q, 'r': r, 'kind': 'border'}]
+		grid_bordered += [new_line]
+	
+	r = grid[-1][0]['r']
+	for i in range(LENGTH_BORDER):
+		r += 1
+		new_line = []
+		line_length = len(grid[-1]) - i + 2*LENGTH_BORDER
+		for j in line_length:
+			q = -LENGTH_BORDER -RAY + j
+			new_line += [{'q': q, 'r': r, 'kind': 'border'}]
+		grid_bordered += [new_line]
+		
+	# Add border to lines in q
+	for line in grid :
+		grid_bordered += [generate_bordered_line(line)]
+	grid = grid_bordered
+
+func instance_cell(cell_type, q, r, kind, height=1):
+	for i in range(height):
+		var cell = cell_type.instance()
+		cell.init(q, r, kind, i)
+		add_child(cell)
+
 func instance_map():
 	for line in grid:
 		for c in line:
@@ -79,8 +128,10 @@ func instance_map():
 			elif kind == 'floor': 
 				instance_cell(Cell_White, q, r, kind)
 			elif kind == 'full':
-				instance_cell(Cell_Grey, q, r, kind)
-				instance_cell(Cell_Grey, q, r, kind, 1)
+				instance_cell(Cell_Grey, q, r, kind, 2)
+			elif kind == 'border':
+				var height = rng.randi() % BORDER_HEIGHT + 2
+				instance_cell(Cell_Grey, q, r, kind, height)
 
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):
@@ -89,7 +140,7 @@ func rotate_camera(mouse_position):
 		var vect_current = center_screen - mouse_position
 		var angle = vect_current.angle_to(vect_last)
 		$Origin.rotate_y(-angle)
-				
+		
 func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true

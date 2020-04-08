@@ -28,7 +28,7 @@ func init(_q, _r, _kind, _height):
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed == true:
-#			print('Cell {0} / {1} clicked !'.format([q, r]))
+			print('Cell {0} / {1} clicked !'.format([q, r]))
 			pass
 	
 	elif event is InputEventMouseMotion:
