@@ -89,7 +89,6 @@ func rotate_camera(mouse_position):
 		var vect_current = center_screen - mouse_position
 		var angle = vect_current.angle_to(vect_last)
 		$Origin.rotate_y(-angle)
-	last_mouse_position = mouse_position
 				
 func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
@@ -100,3 +99,4 @@ func _physics_process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()
 	if is_rotation_camera_ask(mouse_position):
 		rotate_camera(mouse_position)
+	last_mouse_position = mouse_position
