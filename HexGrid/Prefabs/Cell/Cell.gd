@@ -16,8 +16,8 @@ const SPACE_BETWEEN = 0
 const DIST = sqrt(3)*CIRCLE_RAY
 const RATIO = (DIST + SPACE_BETWEEN)/DIST
 
-const TRANS_RIGHT = [DIST*RATIO, 0]
-const TRANS_DOWNRIGHT = [DIST*RATIO/2, 3.0*CIRCLE_RAY*RATIO/2]
+const TRANS_RIGHT = Vector2(DIST*RATIO, 0)
+const TRANS_DOWNRIGHT = Vector2(DIST*RATIO/2, 3.0*CIRCLE_RAY*RATIO/2)
 
 func _ready():
 	pass
@@ -27,9 +27,9 @@ func init(_q, _r, _kind, _height):
 	r = _r
 	kind = _kind
 	
-	translation.x = q * TRANS_RIGHT[0] + r * TRANS_DOWNRIGHT[0]
+	translation.x = q * TRANS_RIGHT.x + r * TRANS_DOWNRIGHT.x
 	translation.y = _height * 0.5
-	translation.z = r * TRANS_DOWNRIGHT[1]
+	translation.z = r * TRANS_DOWNRIGHT.y
 	
 	materials.append(load("res://Prefabs/Cell/Cell_White/Faces.material"))
 	materials.append(load("res://Prefabs/Cell/selected_mat.tres"))
