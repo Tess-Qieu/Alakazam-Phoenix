@@ -12,7 +12,7 @@ const PROBA_CELL_HOLE = 0.15
 const RAY = 6
 
 const LENGTH_BORDER = 1
-const BORDER_HEIGHT = 1
+const BORDER_HEIGHT = 3
 
 func _ready():
 	rng.randomize()
