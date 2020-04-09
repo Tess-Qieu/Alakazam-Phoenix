@@ -33,6 +33,7 @@ func init(_q, _r, _kind, _height):
 	
 	materials.append(load("res://Prefabs/Cell/Cell_White/Faces.material"))
 	materials.append(load("res://Prefabs/Cell/selected_mat.tres"))
+	materials.append(load("res://Prefabs/Cell/selected_mat_2.tres"))
 
 # Function allowing to unselect a tile
 func unselect():
@@ -40,12 +41,16 @@ func unselect():
 
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
-	if event is InputEventMouseButton:
-		if event.button_index == BUTTON_LEFT and event.pressed == true:
-			print('Cell {0} / {1} clicked !'.format([q, r]))
-			if kind == "floor":
+	# If the event is a mouse click
+	if event is InputEventMouseButton and event.pressed:
+		if kind == "floor" :
+			# A different material is applied on each button
+			if event.button_index == BUTTON_LEFT :
 				$Circle.set_surface_material(0, materials[1])
 				emit_signal("selected", 0)
+			elif event.button_index == BUTTON_RIGHT:
+				$Circle.set_surface_material(0, materials[2])
+				emit_signal("selected", 1)
 	
 	elif event is InputEventMouseMotion:
 #		print('Cell {0} / {1} motionned !'.format([q, r]))
