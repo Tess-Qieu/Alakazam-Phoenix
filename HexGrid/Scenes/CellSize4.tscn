@@ -1,0 +1,20 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Prefabs/Cell/cell_size_4.dae" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/Cell.gd" type="Script" id=2]
+
+[sub_resource type="SpatialMaterial" id=2]
+
+[sub_resource type="CylinderShape" id=1]
+
+[node name="CellSize4" instance=ExtResource( 1 )]
+script = ExtResource( 2 )
+
+[node name="Circle" parent="." index="0"]
+material/0 = SubResource( 2 )
+
+[node name="Area" type="Area" parent="Circle" index="0"]
+
+[node name="CollisionShape" type="CollisionShape" parent="Circle/Area" index="0"]
+transform = Transform( 0.86, 0, 0, 0, 1, 0, 0, 0, 0.86, 0, 1, 0 )
+shape = SubResource( 1 )

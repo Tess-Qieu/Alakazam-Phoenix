@@ -4,6 +4,12 @@ var CellFloor = preload("res://Scenes/CellFloor.tscn")
 var CellFull = preload("res://Scenes/CellFull.tscn")
 var CellHole = preload("res://Scenes/CellHole.tscn")
 
+var CellSize1 = preload("res://Scenes/CellSize1.tscn")
+var CellSize2 = preload("res://Scenes/CellSize2.tscn")
+var CellSize3 = preload("res://Scenes/CellSize3.tscn")
+var CellSize4 = preload("res://Scenes/CellSize4.tscn")
+var CellSize5 = preload("res://Scenes/CellSize5.tscn")
+
 var rng = RandomNumberGenerator.new()
 var grid = []
 var last_mouse_position = Vector2(-1, -1)
@@ -11,9 +17,7 @@ var last_mouse_position = Vector2(-1, -1)
 const PROBA_CELL_FULL = 0.15
 const PROBA_CELL_HOLE = 0.15
 const RAY = 6
-
 const LENGTH_BORDER = 20
-const BORDER_HEIGHT = 3
 
 func _ready():
 	rng.randomize()
@@ -119,11 +123,10 @@ func generate_bordered_grid():
 
 
 
-func instance_cell(cell_type, q, r, kind, height=1):
-	for i in range(height):
-		var cell = cell_type.instance()
-		cell.init(q, r, kind, i)
-		add_child(cell)
+func instance_cell(cell_type, q, r, kind):
+	var cell = cell_type.instance()
+	cell.init(q, r, kind)
+	add_child(cell)
 
 func instance_map():
 	for line in grid:
@@ -133,14 +136,15 @@ func instance_map():
 			var kind = c['kind']
 			
 			if kind == 'hole':
-				instance_cell(CellHole, q, r, kind, 1)
+				instance_cell(CellSize1, q, r, kind)
 			elif kind == 'floor': 
-				instance_cell(CellFloor, q, r, kind, 2)
+				instance_cell(CellSize2, q, r, kind)
 			elif kind == 'full':
-				instance_cell(CellFull, q, r, kind, 3)
+				instance_cell(CellSize3, q, r, kind)
 			elif kind == 'border':
-				var height = rng.randi() % BORDER_HEIGHT + 3
-				instance_cell(CellFull, q, r, kind, height)
+				var height = rng.randi() % 3
+				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
+				instance_cell(choices[height], q, r, kind)
 
 
 
