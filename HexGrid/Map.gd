@@ -119,6 +119,8 @@ func instance_cell(cell_type, q, r, kind, height=1):
 		var cell = cell_type.instance()
 		cell.init(q, r, kind, i)
 		add_child(cell)
+		if cell.kind == "floor":
+			cell.connect("selected", self, "selected_cell", [cell])
 
 func instance_map():
 	for line in grid:
@@ -142,7 +144,6 @@ func selected_cell(index, cell):
 	if selected_cells.size() > index:
 		if selected_cells[index] != null:
 			selected_cells[index].unselect()
-
 		selected_cells[index] = cell
 
 func rotate_camera(mouse_position):
