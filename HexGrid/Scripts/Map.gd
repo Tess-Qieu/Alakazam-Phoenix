@@ -1,7 +1,8 @@
 extends Spatial
 
-var Cell_White = preload("res://Prefabs/Cell/Cell_White/Cell_White.tscn")
-var Cell_Grey = preload("res://Prefabs/Cell/Cell_Grey/Cell_Grey.tscn")
+var CellFloor = preload("res://Scenes/CellFloor.tscn")
+var CellFull = preload("res://Scenes/CellFull.tscn")
+var CellHole = preload("res://Scenes/CellHole.tscn")
 
 var rng = RandomNumberGenerator.new()
 var grid = []
@@ -11,7 +12,7 @@ const PROBA_CELL_FULL = 0.15
 const PROBA_CELL_HOLE = 0.15
 const RAY = 6
 
-const LENGTH_BORDER = 1
+const LENGTH_BORDER = 20
 const BORDER_HEIGHT = 3
 
 func _ready():
@@ -130,14 +131,14 @@ func instance_map():
 			var kind = c['kind']
 			
 			if kind == 'hole':
-				pass
+				instance_cell(CellHole, q, r, kind, 1)
 			elif kind == 'floor': 
-				instance_cell(Cell_White, q, r, kind)
+				instance_cell(CellFloor, q, r, kind, 2)
 			elif kind == 'full':
-				instance_cell(Cell_Grey, q, r, kind, 2)
+				instance_cell(CellFull, q, r, kind, 3)
 			elif kind == 'border':
-				var height = rng.randi() % BORDER_HEIGHT + 2
-				instance_cell(Cell_Grey, q, r, kind, height)
+				var height = rng.randi() % BORDER_HEIGHT + 3
+				instance_cell(CellFull, q, r, kind, height)
 
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):

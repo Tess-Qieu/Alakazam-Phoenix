@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Map.tscn" type="PackedScene" id=1]
-[ext_resource path="res://ViewArena.gd" type="Script" id=2]
+[ext_resource path="res://Scenes/Map.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/ViewArena.gd" type="Script" id=2]
 [ext_resource path="res://icon.png" type="Texture" id=3]
-[ext_resource path="res://BattleScreen.gd" type="Script" id=4]
+[ext_resource path="res://Scripts/BattleScreen.gd" type="Script" id=4]
 
 [node name="BattleScreen" type="Control"]
 anchor_right = 1.0
