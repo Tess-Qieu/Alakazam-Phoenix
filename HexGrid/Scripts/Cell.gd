@@ -36,8 +36,7 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed == true:
 			# cell clicked
-			if kind == 'floor':
-				print('Cell {0} / {1} clicked !'.format([q, r]))
+			print('Cell {0} / {1} : {2} !'.format([q, r, kind]))
 	
 	elif event is InputEventMouseMotion:
 #		print('Cell {0} / {1} motionned !'.format([q, r]))
