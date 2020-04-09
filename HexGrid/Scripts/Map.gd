@@ -117,6 +117,8 @@ func generate_bordered_grid():
 		grid_bordered += [generate_bordered_line(line)]
 	grid = grid_bordered
 
+
+
 func instance_cell(cell_type, q, r, kind, height=1):
 	for i in range(height):
 		var cell = cell_type.instance()
@@ -140,6 +142,8 @@ func instance_map():
 				var height = rng.randi() % BORDER_HEIGHT + 3
 				instance_cell(CellFull, q, r, kind, height)
 
+
+
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):
 		var center_screen = get_viewport().size/2
@@ -152,3 +156,14 @@ func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true
 	return false
+
+
+
+func get_cells_kind(kind):
+#	var cells = []
+#	for line in grid :
+#		for c in line :
+#			if c.kind == kind:
+#				cells += [c]
+#	return cells
+	pass
