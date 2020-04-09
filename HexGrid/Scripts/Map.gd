@@ -28,9 +28,12 @@ func _process(_delta):
 	last_mouse_position = mouse_position
 	
 func distance_coord(q1, r1, q2, r2):
-	return (abs(q1 - q2) 
-		  + abs(q1 + r1 - q2 - r2)
-		  + abs(r1 - r2)) / 2
+	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
+
+func add_instance_to_grid(instance, q, r):
+	if not q in grid.keys():
+		grid[q] = {}
+	grid[q][r] = instance
 
 func random_kind():
 	var value = rng.randf()
@@ -70,12 +73,8 @@ func instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
 	cell.init(q, r, kind)
 	add_child(cell)
+	add_instance_to_grid(cell, q, r)
 
-func add_instance_to_grid(instance, q, r):
-	if not q in grid.keys():
-		grid[q] = {}
-	grid[q][r] = instance
-	
 func instance_map():
 	for q in grid.keys():
 		for r in grid[q].keys():
@@ -108,11 +107,11 @@ func is_rotation_camera_ask(mouse_position):
 
 
 
-#func get_cells_kind(kind):
-#	var cells = []
-#	for line in grid :
-#		for c in line :
-#			if c.kind == kind:
-#				cells += [c]
-#	return cells
-#	pass
+
+func get_cells_kind(kind):
+	var cells = []
+	for q in grid.keys():
+		for r in grid[q].keys():
+			if grid[q][r].kind == kind:
+				cells += [grid[q][r]]
+	return cells
