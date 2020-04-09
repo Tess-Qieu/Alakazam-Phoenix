@@ -1,9 +1,5 @@
 extends Spatial
 
-var CellFloor = preload("res://Scenes/CellFloor.tscn")
-var CellFull = preload("res://Scenes/CellFull.tscn")
-var CellHole = preload("res://Scenes/CellHole.tscn")
-
 var CellSize1 = preload("res://Scenes/CellSize1.tscn")
 var CellSize2 = preload("res://Scenes/CellSize2.tscn")
 var CellSize3 = preload("res://Scenes/CellSize3.tscn")

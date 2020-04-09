@@ -29,7 +29,7 @@ func init(_q, _r, _kind):
 func change_color(color):
 	var material = $Circle.get_surface_material(0)
 	material.albedo_color = color
-	$Circle.set_surface_material(0, material)
+#	$Circle.set_surface_material(0, material)
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# Catch click & motion events on cell
