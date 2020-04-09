@@ -7,6 +7,7 @@ var player_1 = null
 # Called when the node enters the scene tree for the first time.
 func _ready():
 #	prepare()
+	pass
 	
 func prepare():
 	player_1 = Player.instance()
