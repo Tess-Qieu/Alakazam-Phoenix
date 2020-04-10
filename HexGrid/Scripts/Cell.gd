@@ -8,6 +8,7 @@ var kind
 # 0 = unselected
 # 1 = selected_LMB
 # 2 = selected_RMB
+# 3 = path
 var materials = []
 
 signal selected(index)
@@ -39,6 +40,7 @@ func init(_q, _r, _kind):
 	# Addition of two materials corresponding to a selection
 	materials.append(load("res://Prefabs/Cell/selected_mat.tres"))
 	materials.append(load("res://Prefabs/Cell/selected_mat_2.tres"))
+	materials.append(load("res://Prefabs/Cell/path_material.tres"))
 
 func change_color(color):
 	var material = $Circle.get_surface_material(0)
@@ -47,6 +49,9 @@ func change_color(color):
 
 func unselect():
 	$Circle.set_surface_material(0, materials[0])
+	
+func color_path():
+	$Circle.set_surface_material(0, materials[3])
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
@@ -64,4 +69,3 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 	elif event is InputEventMouseMotion:
 #		print('Cell {0} / {1} motionned !'.format([q, r]))
 		pass
-		

@@ -11,6 +11,8 @@ var grid = {}
 var last_mouse_position = Vector2(-1, -1)
 # Array used to store the currently selected cells
 var selected_cells = []
+# Array used to store a cell line
+var line = []
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -117,7 +119,51 @@ func select_cell(index, cell):
 		if selected_cells[index] != null:
 			selected_cells[index].unselect()
 		selected_cells[index] = cell
+	
+	_erase_line(selected_cells[0],selected_cells[1])
+	
+	# Line draw between 2 cells
+	if selected_cells[0] != null and selected_cells[1] != null:
+		line_draw(selected_cells[0], selected_cells[1])
+		
 
+
+func _line_step(start : int, end : int, step : float, epsilon : float) -> float:
+	return start + (end-start)*step + epsilon
+	
+func _erase_line(start, end):
+	# reset of previous line
+	if line.size() > 2:
+		for elt in line:
+			if elt != start and elt != end:
+				elt.unselect()
+	line.clear()
+
+# Line drawing between two cells
+func line_draw(start, end):
+	_erase_line(start, end)
+	
+	var N = distance_coord(start.q, start.r, end.q, end.r)
+	#Addition of starting cell
+	line.append(start)
+	
+	var r_tmp
+	var q_tmp
+	var epsilon : float = 1e-6
+	
+	for i in range(1,N):
+		# float coordinates calculation
+		r_tmp = int(_line_step(start.r, end.r, float(i)/float(N), epsilon))
+		q_tmp = int(_line_step(start.q, end.q, float(i)/float(N), -epsilon))
+		
+		if grid[q_tmp][r_tmp] != null:
+			line.append(grid[q_tmp][r_tmp])
+			grid[q_tmp][r_tmp].color_path()
+			
+	# Addition of ending cell
+	line.append(end)
+	
+	
 
 func get_cells_kind(kind):
 	var cells = []
