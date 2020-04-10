@@ -2,12 +2,12 @@
 
 importer="scene"
 type="PackedScene"
-path="res://.import/cell_white.dae-cf0cd8434e6340c1df7da22a8d64b410.scn"
+path="res://.import/cell_size_4.dae-db194af6b474296afad4c3cc76663b34.scn"
 
 [deps]
 
-source_file="res://Prefabs/Cell/Cell_White/cell_white.dae"
-dest_files=[ "res://.import/cell_white.dae-cf0cd8434e6340c1df7da22a8d64b410.scn" ]
+source_file="res://Prefabs/Cell/cell_size_4.dae"
+dest_files=[ "res://.import/cell_size_4.dae-db194af6b474296afad4c3cc76663b34.scn" ]
 
 [params]
 
