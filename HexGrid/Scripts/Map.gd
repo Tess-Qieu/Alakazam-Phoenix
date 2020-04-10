@@ -9,10 +9,6 @@ var CellSize5 = preload("res://Scenes/CellSize5.tscn")
 var rng = RandomNumberGenerator.new()
 var grid = {}
 var last_mouse_position = Vector2(-1, -1)
-var materials = {'hole': 'ae8257', 
-				'floor': "e6cab8", 
-				'full': '352f2b',
-				'border':'352f2b'}
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -23,7 +19,6 @@ const RAY = LENGTH_BORDER + RAY_ARENA
 
 func _ready():
 	rng.randomize()
-	init_materials()
 	generate_grid()
 	instance_map()
 	
@@ -32,15 +27,8 @@ func _process(_delta):
 	if is_rotation_camera_ask(mouse_position):
 		rotate_camera(mouse_position)
 	last_mouse_position = mouse_position
-	
 
-func init_materials():
-	for key in materials.keys():
-		var color = materials[key]
-		var mat = SpatialMaterial.new()
-		mat.albedo_color = Color(color)
-		materials[key] = mat
-	
+
 func distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
@@ -85,7 +73,7 @@ func generate_grid():
 
 func instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
-	cell.init(q, r, kind, materials[kind])
+	cell.init(q, r, kind)
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
 
