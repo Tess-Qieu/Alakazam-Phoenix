@@ -9,6 +9,8 @@ var CellSize5 = preload("res://Scenes/CellSize5.tscn")
 var rng = RandomNumberGenerator.new()
 var grid = {}
 var last_mouse_position = Vector2(-1, -1)
+# Array used to store the currently selected cells
+var selected_cells = []
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -20,6 +22,8 @@ func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
+	# initialization of the array
+	selected_cells.resize(2)
 	
 func _process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()
@@ -74,6 +78,8 @@ func instance_cell(cell_type, q, r, kind):
 	cell.init(q, r, kind)
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
+	if cell.kind == 'floor':
+		cell.connect("selected", self, "select_cell", [cell])
 
 func instance_map():
 	for q in grid.keys():
@@ -105,7 +111,12 @@ func is_rotation_camera_ask(mouse_position):
 		return true
 	return false
 
-
+# Function memorizing the selected tile and unselecting the previous
+func select_cell(index, cell):
+	if selected_cells.size() > index:
+		if selected_cells[index] != null:
+			selected_cells[index].unselect()
+		selected_cells[index] = cell
 
 
 func get_cells_kind(kind):
