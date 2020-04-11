@@ -53,7 +53,7 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
 		if kind == "floor" :
-			print('Cell {0} / {1} : {2} !'.format([q, r, kind]))
+			#print('Cell {0} / {1} : {2} !'.format([q, r, kind]))
 			# A different material is applied on each button
 			if event.button_index == BUTTON_LEFT :
 				# cell clicked

@@ -149,14 +149,23 @@ func line_draw(start, end):
 	#Addition of starting cell
 	line.append(start)
 	
+	var r_float : float
+	var q_float : float
+	var epsilon : float = 1e-6
 	var r_tmp
 	var q_tmp
-	var epsilon : float = 1e-6
 	
+#	print("Start: ({0};{1})".format([start.r, start.q]))
 	for i in range(1,N):
 		# float coordinates calculation
-		r_tmp = int(_line_step(start.r, end.r, float(i)/float(N), epsilon))
-		q_tmp = int(_line_step(start.q, end.q, float(i)/float(N), -epsilon))
+		r_float = _line_step(start.r, end.r, float(i)/float(N), epsilon)
+		q_float = _line_step(start.q, end.q, float(i)/float(N), -epsilon)
+		
+		r_tmp = int(round(r_float))
+		q_tmp = int(round(q_float))
+		
+#		print("""Line, cell_{0}: ({1};{2})
+#		Rounded: ({3};{4})""".format([i, r_float, q_float, r_tmp, q_tmp]))
 		
 		if grid[q_tmp][r_tmp] != null:
 			line.append(grid[q_tmp][r_tmp])
@@ -164,7 +173,7 @@ func line_draw(start, end):
 			
 	# Addition of ending cell
 	line.append(end)
-	
+#	print("End: ({0};{1})".format([end.r, end.q]))
 	
 
 func get_cells_kind(kind):
