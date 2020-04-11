@@ -19,6 +19,10 @@ config/name="HexGrid"
 run/main_scene="res://Scenes/BattleScreen.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+Global="*res://Scripts/Global.gd"
+
 [rendering]
 
 quality/filters/use_nearest_mipmap_filter=true

@@ -20,6 +20,7 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 6
 const RAY = LENGTH_BORDER + RAY_ARENA
 
+
 func _ready():
 	rng.randomize()
 	generate_grid()
@@ -32,7 +33,8 @@ func _process(_delta):
 	if is_rotation_camera_ask(mouse_position):
 		rotate_camera(mouse_position)
 	last_mouse_position = mouse_position
-	
+
+
 func distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
