@@ -169,7 +169,7 @@ func line_draw(start, end):
 		
 		if grid[q_tmp][r_tmp] != null:
 			line.append(grid[q_tmp][r_tmp])
-			grid[q_tmp][r_tmp].color_path()
+			grid[q_tmp][r_tmp].change_material(Global.materials['path'])
 			
 	# Addition of ending cell
 	line.append(end)

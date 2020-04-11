@@ -3,14 +3,6 @@ extends Spatial
 var q
 var r
 var kind
-var origin_material
-
-# Array of materials
-# 0 = unselected
-# 1 = selected_LMB
-# 2 = selected_RMB
-# 3 = path
-var materials = []
 
 signal selected(index)
 
@@ -32,35 +24,25 @@ func init(q, r, kind):
 	translation.x = q * TRANS_RIGHT.x + r * TRANS_DOWNRIGHT.x
 	translation.z = r * TRANS_DOWNRIGHT.y
 	change_material(Global.materials[kind])
-	
-	# Save of default material
-	materials.append($Circle.get_surface_material(0))
-	# Addition of two materials corresponding to a selection
-	materials.append(load("res://Prefabs/Cell/selected_mat.tres"))
-	materials.append(load("res://Prefabs/Cell/selected_mat_2.tres"))
-	materials.append(load("res://Prefabs/Cell/path_material.tres"))
 
 func change_material(material):
 	$Circle.set_surface_material(0, material)
 
 func unselect():
-	$Circle.set_surface_material(0, materials[0])
-	
-func color_path():
-	$Circle.set_surface_material(0, materials[3])
+	$Circle.set_surface_material(0, Global.materials[kind])
+
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
 		if kind == "floor" :
-			#print('Cell {0} / {1} : {2} !'.format([q, r, kind]))
 			# A different material is applied on each button
 			if event.button_index == BUTTON_LEFT :
 				# cell clicked
-				change_material(Global.materials['clicked'])
+				change_material(Global.materials['clicked_lmb'])
 				emit_signal("selected", 0)
 			elif event.button_index == BUTTON_RIGHT:
-				$Circle.set_surface_material(0, materials[2])
+				change_material(Global.materials['clicked_rmb'])
 				emit_signal("selected", 1)
 	
 	elif event is InputEventMouseMotion:
