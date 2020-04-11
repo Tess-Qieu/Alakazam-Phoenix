@@ -1,22 +1,21 @@
 extends Spatial
 
-var Player = preload("res://Scenes/Player.tscn")
+var Character = preload("res://Scenes/Character.tscn")
 
-var player_1 = null
+var character_1 = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-#	prepare()
-	pass
+	prepare()
 	
 func prepare():
-	player_1 = Player.instance()
-	add_child(player_1)
+	character_1 = Character.instance()
+	add_child(character_1)
 	var cell = $Map.get_cells_kind('floor')[0]
-	put_player_on_map(player_1, cell)
+	put_character_on_map(character_1, cell)
 	
-func put_player_on_map(player, cell):
-	player.translation.x = cell.translation.x
-	player.translation.y = 1.5
-	player.translation.z = cell.translation.z
+func put_character_on_map(character, cell):
+	character.translation.x = cell.translation.x
+	character.translation.y = 1.5
+	character.translation.z = cell.translation.z
 

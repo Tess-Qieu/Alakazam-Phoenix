@@ -16,10 +16,10 @@ const TRANS_DOWNRIGHT = Vector2(DIST*RATIO/2, 3.0*CIRCLE_RAY*RATIO/2)
 func _ready():
 	pass 
 
-func init(q, r, kind):
-	self.q = q
-	self.r = r
-	self.kind = kind
+func init(_q, _r, _kind):
+	q = _q
+	r = _r
+	kind = _kind
 	translation.x = q * TRANS_RIGHT.x + r * TRANS_DOWNRIGHT.x
 	translation.z = r * TRANS_DOWNRIGHT.y
 	change_material(Global.materials[kind])
