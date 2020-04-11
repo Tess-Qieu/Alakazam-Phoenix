@@ -13,7 +13,7 @@ var last_mouse_position = Vector2(-1, -1)
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
 const LENGTH_BORDER = 8
-const RAY_ARENA = 6
+const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
 
@@ -119,8 +119,8 @@ func is_rotation_camera_ask(mouse_position):
 
 
 
-func _line_step(start : int, end : int, step : float, epsilon : float) -> float:
-	return start + (end-start)*step + epsilon
+func _line_step(start : int, end : int, step : float) -> float:
+	return start + (end-start)*step
 	
 # Line drawing between two cells
 func _compute_line(start, end):
@@ -128,21 +128,31 @@ func _compute_line(start, end):
 	var N = distance_coord(start.q, start.r, end.q, end.r)
 	var r_float : float
 	var q_float : float
-	var epsilon : float = 1e-6
-	var r_tmp
-	var q_tmp
 	
 	line.append(start)
 	for i in range(1,N):
 		# float coordinates calculation
-		r_float = _line_step(start.r, end.r, float(i)/float(N), epsilon)
-		q_float = _line_step(start.q, end.q, float(i)/float(N), -epsilon)
+		r_float = _line_step(start.r, end.r, float(i)/float(N))
+		q_float = _line_step(start.q, end.q, float(i)/float(N))
 		
-		r_tmp = int(round(r_float))
-		q_tmp = int(round(q_float))
+		# Compute all r for that step
+		var list_r = []
+		if fmod(r_float, 1) == 0.5:
+			list_r += [int(r_float-0.5), int(r_float + 0.5)]
+		else:
+			list_r += [int(round(r_float))]
+			
+		# Compute all q for that step
+		var list_q = []
+		if fmod(q_float, 1) == 0.5:
+			list_q += [int(q_float-0.5), int(q_float + 0.5)]
+		else:
+			list_q += [int(round(q_float))]
 		
-		if grid[q_tmp][r_tmp] != null:
-			line.append(grid[q_tmp][r_tmp])
+		for q in list_q:
+			for r in list_r:
+				if grid[q][r] != null:
+					line.append(grid[q][r])
 			
 	line.append(end)
 	return line
