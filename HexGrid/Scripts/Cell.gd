@@ -35,8 +35,7 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 			# A different material is applied on each button
 			if event.button_index == BUTTON_LEFT :
 				# cell clicked
-				emit_signal('cell_clicked')
-				
+				#emit_signal('cell_clicked')
 			elif event.button_index == BUTTON_RIGHT:
 				pass
 				
