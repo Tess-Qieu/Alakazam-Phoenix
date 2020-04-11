@@ -122,13 +122,19 @@ func select_cell(index, cell):
 		selected_cells[index] = cell
 	
 	_erase_line(selected_cells[0],selected_cells[1])
-	line = neighbors(cell)
-	for elt in line:
-		elt.change_material(Global.materials['path'])
+#	line = neighbors(cell)
+#	for elt in line:
+#		elt.change_material(Global.materials['path'])
 	
 #	# Line draw between 2 cells
 #	if selected_cells[0] != null and selected_cells[1] != null:
 #		line_draw(selected_cells[0], selected_cells[1])
+	
+	# Path draw between 2 cells
+	if selected_cells[0] != null and selected_cells[1] != null:
+		line = path(selected_cells[0], selected_cells[1])
+		for elt in line:
+			elt.change_material(Global.materials['path'])
 
 # Function used to calulate a step on a line
 func _line_step(start : int, end : int, step : float, epsilon : float) -> float:
@@ -200,6 +206,45 @@ func neighbors (cell):
 		list.append(grid[cell.q -1][cell.r +1])
 	
 	return list
+
+# Function calculating a path between two cells. Start and end are not included
+#  in the path
+func path(start, end):
+	# The frontier is the line of farest cells reached
+	var frontier = []
+	frontier.append(start)
+	# Came_from is a dictionnary where cells are associated with the cell who 
+	#  permitted reaching it
+	var came_from = {}
+	came_from[start] = null
+	
+	var current_cell
+	
+	while not frontier.empty():
+		# Taking the first cell in the frontier
+		current_cell = frontier.pop_front()
+		
+		if current_cell == end:
+			break
+		
+		# For each neighbor of the current cell,
+		#  if the neighbor is a floor cell and hasn't been travelled across
+		#   the neighbor is added to the frontier 
+		#   and associated at the current cell 
+		for next in neighbors(current_cell):
+			if (next.kind == 'floor') and not(next in came_from):
+				frontier.append(next)
+				came_from[next] = current_cell
+	
+	# The path is calculated from end to start, then reversed
+	var _path = []
+	current_cell = came_from[end]
+	while current_cell != start:
+		_path.append(current_cell)
+		current_cell = came_from[current_cell]
+	_path.invert()
+	
+	return _path
 
 func get_cells_kind(kind):
 	var cells = []
