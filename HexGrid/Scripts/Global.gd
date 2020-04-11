@@ -4,9 +4,9 @@ var materials = {'hole': 'ae8257',
 				'floor': "e6cab8", 
 				'full': '352f2b',
 				'border': '352f2b',
-				'clicked_lmb': 'df4828', #lmb = Left Mouse Button
-				'clicked_rmb': '60d1d9', #rmb = Right Mouse Button
-				'path': '74e080'
+				'blue': '2876df',
+				'red': 'df4828',
+				'green': '79cc2b'
 				} 
 
 func _ready():

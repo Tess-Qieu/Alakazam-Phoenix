@@ -4,7 +4,7 @@ var q
 var r
 var kind
 
-signal selected(index)
+signal cell_clicked(index)
 
 const CIRCLE_RAY = 1
 const SPACE_BETWEEN = 0
@@ -28,10 +28,6 @@ func init(_q, _r, _kind):
 func change_material(material):
 	$Circle.set_surface_material(0, material)
 
-func unselect():
-	$Circle.set_surface_material(0, Global.materials[kind])
-
-
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
@@ -39,12 +35,10 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 			# A different material is applied on each button
 			if event.button_index == BUTTON_LEFT :
 				# cell clicked
-				change_material(Global.materials['clicked_lmb'])
-				emit_signal("selected", 0)
+				emit_signal('cell_clicked')
+				
 			elif event.button_index == BUTTON_RIGHT:
-				change_material(Global.materials['clicked_rmb'])
-				emit_signal("selected", 1)
-	
+				pass
+				
 	elif event is InputEventMouseMotion:
-#		print('Cell {0} / {1} motionned !'.format([q, r]))
 		pass
