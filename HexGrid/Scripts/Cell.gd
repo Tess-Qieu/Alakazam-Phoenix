@@ -36,6 +36,8 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 			if event.button_index == BUTTON_LEFT :
 				# cell clicked
 				#emit_signal('cell_clicked')
+				pass
+				
 			elif event.button_index == BUTTON_RIGHT:
 				pass
 				

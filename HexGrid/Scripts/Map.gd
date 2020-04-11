@@ -137,15 +137,15 @@ func _compute_line(start, end):
 		
 		# Compute all r for that step
 		var list_r = []
-		if fmod(r_float, 1) == 0.5:
-			list_r += [int(r_float-0.5), int(r_float + 0.5)]
+		if abs(fmod(r_float, 1)) == 0.5:
+			list_r += [int(r_float - 0.5), int(r_float + 0.5)]
 		else:
 			list_r += [int(round(r_float))]
 			
 		# Compute all q for that step
 		var list_q = []
-		if fmod(q_float, 1) == 0.5:
-			list_q += [int(q_float-0.5), int(q_float + 0.5)]
+		if abs(fmod(q_float, 1)) == 0.5:
+			list_q += [int(q_float - 0.5), int(q_float + 0.5)]
 		else:
 			list_q += [int(round(q_float))]
 		
@@ -161,6 +161,7 @@ func compute_field_of_view(cell, distance):
 	var cells_floor = get_cells_kind('floor')
 	var cells_visible = []
 	for target in cells_floor:
+		
 		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance:
 			var line = _compute_line(cell, target)
 			line += _compute_line(target, cell)
@@ -171,6 +172,7 @@ func compute_field_of_view(cell, distance):
 					flag = false
 			if flag:
 				cells_visible += [target]
+				
 	return cells_visible
 
 func cell_clicked(cell):
