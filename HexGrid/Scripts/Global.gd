@@ -4,7 +4,8 @@ var materials = {'hole': 'ae8257',
 				'floor': "e6cab8", 
 				'full': '352f2b',
 				'border': '352f2b',
-				'clicked': 'df4828'}
+				'clicked': 'df4828',
+				'team_blue': '2876df'}
 
 func _ready():
 	init_materials()

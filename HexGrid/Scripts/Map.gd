@@ -110,6 +110,64 @@ func is_rotation_camera_ask(mouse_position):
 
 
 
+
+func next_cell_on_line(i, j, cell):
+	var row
+	var col
+	if i == -1 and j == -1 :
+		col = cell.col-1 if cell.row%2==0 else cell.col
+		row = cell.row-1
+	elif i == -1 and j == 1 :
+		col = cell.col-1 if cell.row%2==0 else cell.col
+		row = cell.row+1
+	elif i == 0 and j == -1 :
+		col = cell.col-1
+		row = cell.row
+	elif i == 0 and j == 1 :
+		col = cell.col + 1
+		row = cell.row
+	elif i == 1 and j == -1 :
+		col = cell.col+1 if cell.row%2==1 else cell.col
+		row = cell.row-1
+	elif i == 1 and j == 1 :
+		col = cell.col if cell.row%2==0 else cell.col+1
+		row = cell.row+1
+	return get_cell_coord([col, row], 'oddr')
+	
+func draw_line(start, end):
+	# Compute the path between two cells : start and end.
+	var path = []
+	var deltaX = 2*(end.col - start.col) + abs(end.row%2) - abs(start.row%2)
+	var deltaY = end.row - start.row
+	var xSign = -1 if deltaX < 0 else 1
+	var ySign = -1 if deltaY < 0 else 1
+	var gammaX = abs(deltaX)
+	var gammaY = abs(deltaY)
+	var epsilon = -2*gammaX
+	var currentCell = start
+	path += [currentCell]
+	while not currentCell == end :
+		if epsilon >= 0 :
+			currentCell = next_cell_on_line(-1*xSign, ySign, currentCell)
+			epsilon = epsilon - 3*gammaX -3*gammaY
+		else :
+			epsilon += 3*gammaY
+			if epsilon > -1*gammaX :
+				currentCell = next_cell_on_line(xSign, ySign, currentCell)
+				epsilon -= 3*gammaX
+			else :
+				if epsilon < -3*gammaX :
+					currentCell = next_cell_on_line(xSign, -1*ySign, currentCell)
+					epsilon += 3*gammaX
+				else :
+					currentCell = next_cell_on_line(0, xSign, currentCell)
+					epsilon += 3*gammaY
+		if currentCell == null:
+			print('ERROR: cell does not exist.')
+			return path
+		path += [currentCell]
+	return path
+
 func get_cells_kind(kind):
 	var cells = []
 	for q in grid.keys():
@@ -117,3 +175,18 @@ func get_cells_kind(kind):
 			if grid[q][r].kind == kind:
 				cells += [grid[q][r]]
 	return cells
+
+func get_cell_coord(coord, coord_type = 'axial'):
+	for q in grid.keys():
+		for r in grid[q].keys():
+			var cell = grid[q][r]
+			if coord_type == 'axial':
+				if q == coord[0] and r == coord[1]:
+					return cell
+			elif coord_type == 'cube':
+				if cell.x == coord[0] and cell.y == coord[1] and cell.z == coord[2]:
+					return cell
+			elif coord_type == 'oddr':
+				if cell.col == coord[0] and cell.row == coord[1]:
+					return cell
+	return null
