@@ -101,7 +101,6 @@ func instance_map():
 				instance_cell(choices[height], q, r, kind)
 
 
-
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):
 		var center_screen = get_viewport().size/2
@@ -109,7 +108,7 @@ func rotate_camera(mouse_position):
 		var vect_current = center_screen - mouse_position
 		var angle = vect_current.angle_to(vect_last)
 		$Origin.rotate_y(-angle)
-		
+
 func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true
@@ -123,18 +122,20 @@ func select_cell(index, cell):
 		selected_cells[index] = cell
 	
 	_erase_line(selected_cells[0],selected_cells[1])
+	line = neighbors(cell)
+	for elt in line:
+		elt.change_material(Global.materials['path'])
 	
-	# Line draw between 2 cells
-	if selected_cells[0] != null and selected_cells[1] != null:
-		line_draw(selected_cells[0], selected_cells[1])
-		
+#	# Line draw between 2 cells
+#	if selected_cells[0] != null and selected_cells[1] != null:
+#		line_draw(selected_cells[0], selected_cells[1])
 
-
+# Function used to calulate a step on a line
 func _line_step(start : int, end : int, step : float, epsilon : float) -> float:
 	return start + (end-start)*step + epsilon
-	
+
+# reset of previous line
 func _erase_line(start, end):
-	# reset of previous line
 	if line.size() > 2:
 		for elt in line:
 			if elt != start and elt != end:
@@ -145,9 +146,12 @@ func _erase_line(start, end):
 func line_draw(start, end):
 	_erase_line(start, end)
 	
+	# Distance between two cells
 	var N = distance_coord(start.q, start.r, end.q, end.r)
+	
 	#Addition of starting cell
 	line.append(start)
+#	print("Start: ({0};{1})".format([start.r, start.q]))
 	
 	var r_float : float
 	var q_float : float
@@ -155,7 +159,6 @@ func line_draw(start, end):
 	var r_tmp
 	var q_tmp
 	
-#	print("Start: ({0};{1})".format([start.r, start.q]))
 	for i in range(1,N):
 		# float coordinates calculation
 		r_float = _line_step(start.r, end.r, float(i)/float(N), epsilon)
@@ -174,7 +177,29 @@ func line_draw(start, end):
 	# Addition of ending cell
 	line.append(end)
 #	print("End: ({0};{1})".format([end.r, end.q]))
+
+func neighbors (cell):
+	var list = []
 	
+	if grid[cell.q][cell.r +1] != null:
+		list.append(grid[cell.q][cell.r+1])
+	
+	if grid[cell.q +1][cell.r] != null:
+		list.append(grid[cell.q +1][cell.r])
+	
+	if grid[cell.q +1][cell.r -1] != null:
+		list.append(grid[cell.q +1][cell.r -1])
+	
+	if grid[cell.q][cell.r -1] != null:
+		list.append(grid[cell.q][cell.r -1])
+	
+	if grid[cell.q -1][cell.r] != null:
+		list.append(grid[cell.q -1][cell.r])
+	
+	if grid[cell.q -1][cell.r +1] != null:
+		list.append(grid[cell.q -1][cell.r +1])
+	
+	return list
 
 func get_cells_kind(kind):
 	var cells = []
