@@ -17,13 +17,14 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
+signal a_cell_hovered(active, cell)
+
 
 # Initialization
 func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
-	
 
 
 # Usefull functions
@@ -89,8 +90,9 @@ func instance_cell(cell_type, q, r, kind):
 	add_instance_to_grid(cell, q, r)
 	if kind == "floor":
 		cell.connect("cell_clicked", self, "click_handler", [cell])
+		cell.connect("cell_hovered", self, "_on_cell_hovered", [cell])
 		cells_floor += [cell]
-		
+
 func instance_map():
 	for q in grid.keys():
 		for r in grid[q].keys():
@@ -114,7 +116,7 @@ func _line_step(start : int, end : int, step : float) -> float:
 	# Function used to calulate a step on a line	
 	return start + (end-start)*step
 
-func _compute_line(start, end):
+func compute_line(start, end):
 	# Line calculation between two cells
 	var line = []
 	var N = distance_coord(start.q, start.r, end.q, end.r)
@@ -158,8 +160,8 @@ func compute_field_of_view(cell, distance):
 	for target in cells_floor:
 		
 		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance:
-			var line = _compute_line(cell, target)
-			line += _compute_line(target, cell)
+			var line = compute_line(cell, target)
+			line += compute_line(target, cell)
 			
 			var flag = true
 			for c in line :
@@ -205,7 +207,7 @@ func neighbors (cell):
 	
 	return list
 
-func path(start, end):
+func compute_path(start, end):
 	# Function calculating a path between two cells. 
 	# Starting and ending cells are not included in the path
 	# The frontier is the line of farest cells reached
@@ -244,6 +246,12 @@ func path(start, end):
 	
 	return _path
 
+func draw_path(start, end):
+	var path = compute_path(start, end)
+	for elt in path:
+		elt.change_material('green')
+	end.change_material('skyblue')
+
 
 
 
@@ -261,6 +269,10 @@ func click_handler(index, cell):
 	elif index == 2:
 		cell_clicked(cell)
 		cells_floor += [cell]
+
+# Function receiving a cell_hovered event
+func _on_cell_hovered(active, cell):
+	emit_signal("a_cell_hovered", active, cell)
 
 
 

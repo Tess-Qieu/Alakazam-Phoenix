@@ -5,6 +5,7 @@ var r
 var kind
 
 signal cell_clicked(index)
+signal cell_hovered(active)
 
 const CIRCLE_RAY = 1
 const SPACE_BETWEEN = 0
@@ -15,6 +16,8 @@ const TRANS_RIGHT = Vector2(DIST*RATIO, 0)
 const TRANS_DOWNRIGHT = Vector2(DIST*RATIO/2, 3.0*CIRCLE_RAY*RATIO/2)
 
 func _ready():
+	$Circle/Area.connect("mouse_entered", self, '_on_Area_mouse_entered')
+	$Circle/Area.connect("mouse_exited", self, '_on_Area_mouse_exited')
 	pass
 
 func init(_q, _r, _kind):
@@ -46,3 +49,9 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 				
 	elif event is InputEventMouseMotion:
 		pass
+
+func _on_Area_mouse_entered():
+	emit_signal("cell_hovered", true)
+
+func _on_Area_mouse_exited():
+	emit_signal("cell_hovered", false)
