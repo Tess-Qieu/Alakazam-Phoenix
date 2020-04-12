@@ -1,23 +1,38 @@
 extends Spatial
 
 var Character = preload("res://Scenes/Character.tscn")
-var character_1 = null
+var team_blue = []
+var team_red = []
+var current_character
 
 var rng = RandomNumberGenerator.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	prepare()
+	create_character('blue')
+	create_character('red')
+	current_character = team_blue[0]
 	
-func prepare():
-	var cells_floor = $Map.get_cells_kind('floor')
-	var cell = cells_floor[rng.randi_range(0, len(cells_floor))]
-	character_1 = Character.instance()
-	character_1.init(cell)
-	add_child(character_1)
-
+func create_character(team):
+	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor))]
+	var character = Character.instance()
+	character.init(cell, team)
+	character.connect("character_selected", self, "_on_character_selected", [character])
+	add_child(character)
+	
+	if team == 'blue':
+		team_blue += [character]
+	elif team == 'red':
+		team_red += [character]
 
 func _on_ButtonSpell_pressed():
-	var fov = $Map.compute_field_of_view(character_1.current_cell, 10)
+	var character = team_blue[0]
+	var fov = $Map.compute_field_of_view(current_character.current_cell, 30)
 	for c in fov:
 		c.change_material('green')
+
+func _on_character_selected(character):
+	current_character = character
+
+func _on_ButtonClear_pressed():
+	$Map.clear()
