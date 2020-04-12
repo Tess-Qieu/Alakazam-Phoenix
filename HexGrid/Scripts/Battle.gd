@@ -41,9 +41,13 @@ func _on_character_selected(character):
 	current_character = character
 	_color_current_character_cell()
 
-func _on_ButtonSpell_pressed():
+func _on_ButtonSpell_toggled(button_pressed):
 	$Map.clear()
-	var fov = $Map.display_field_of_view(current_character.current_cell, 20)
+	
+	current_character.casting = button_pressed
+	if button_pressed:
+		var fov = $Map.display_field_of_view(current_character.current_cell, 20)
+	
 	_color_current_character_cell()
 
 func _on_ButtonClear_pressed():
@@ -51,8 +55,9 @@ func _on_ButtonClear_pressed():
 	_color_current_character_cell()
 
 func _on_a_cell_hovered(active, cell):
-	$Map.clear()
-	_color_current_character_cell()
-	
-	if active:
-		$Map.draw_path(current_character.current_cell, cell)
+	if not current_character.casting:
+		$Map.clear()
+		_color_current_character_cell()
+		
+		if active:
+			$Map.draw_path(current_character.current_cell, cell)

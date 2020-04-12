@@ -3,6 +3,7 @@ extends Spatial
 signal character_selected
 
 var current_cell
+var casting
 
 func init(cell, team):
 	translation.x = cell.translation.x
@@ -10,6 +11,7 @@ func init(cell, team):
 	translation.z = cell.translation.z
 	current_cell = cell
 	change_material(team)
+	casting = false
 	
 func change_material(material_key):
 	$KinematicBody/MeshInstance.set_surface_material(0, Global.materials[material_key])
