@@ -26,8 +26,15 @@ func create_character(team):
 		team_red += [character]
 
 func _on_character_selected(character):
-	current_character = character
 	$Map.clear()
+	
+	current_character = character
+	if (character in team_blue):
+		character.current_cell.change_material('blue')
+	elif (character in team_red):
+		character.current_cell.change_material('red')
+	else:
+		character.current_cell.change_material('green')
 
 func _on_ButtonSpell_pressed():
 	$Map.clear()
