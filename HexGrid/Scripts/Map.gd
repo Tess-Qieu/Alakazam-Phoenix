@@ -84,8 +84,8 @@ func instance_cell(cell_type, q, r, kind):
 	cell.init(q, r, kind)
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
-	if kind == "floor":
-		cell.connect("cell_clicked", self, "cell_clicked", [cell])
+#	if kind == "floor":
+#		cell.connect("cell_clicked", self, "cell_clicked", [cell])
 
 func instance_map():
 	for q in grid.keys():
@@ -174,12 +174,3 @@ func compute_field_of_view(cell, distance):
 				cells_visible += [target]
 				
 	return cells_visible
-
-func cell_clicked(cell):
-	var cells_floor = get_cells_kind('floor')
-	for c in cells_floor:
-		c.change_material(Global.materials['floor'])
-	var cells_visible = compute_field_of_view(cell, 10)
-	for c in cells_visible:
-		c.change_material(Global.materials['red'])
-	cell.change_material(Global.materials['blue'])

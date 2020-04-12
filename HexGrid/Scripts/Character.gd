@@ -7,7 +7,7 @@ func init(cell):
 	translation.y = 1.5
 	translation.z = cell.translation.z
 	current_cell = cell
-	change_material(Global.materials['blue'])
+	change_material('blue')
 	
-func change_material(material):
-	$KinematicBody/MeshInstance.set_surface_material(0, material)
+func change_material(material_key):
+	$KinematicBody/MeshInstance.set_surface_material(0, Global.materials[material_key])
