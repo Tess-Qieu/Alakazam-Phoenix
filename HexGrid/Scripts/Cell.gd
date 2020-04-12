@@ -23,10 +23,10 @@ func init(_q, _r, _kind):
 	kind = _kind
 	translation.x = q * TRANS_RIGHT.x + r * TRANS_DOWNRIGHT.x
 	translation.z = r * TRANS_DOWNRIGHT.y
-	change_material(Global.materials[kind])
+	change_material(kind)
 
-func change_material(material):
-	$Circle.set_surface_material(0, material)
+func change_material(material_key):
+	$Circle.set_surface_material(0, Global.materials[material_key])
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
@@ -34,11 +34,12 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 		if kind == "floor" :
 			# A different material is applied on each button
 			if event.button_index == BUTTON_LEFT :
-				# cell clicked
-				emit_signal('cell_clicked', 0)
+#				emit_signal('cell_clicked')
+				pass
 				
 			elif event.button_index == BUTTON_RIGHT:
-				emit_signal('cell_clicked', 1)
+#				emit_signal('cell_clicked', 1)
+				pass
 				
 			elif event.button_index == BUTTON_MIDDLE:
 				emit_signal('cell_clicked', 2)

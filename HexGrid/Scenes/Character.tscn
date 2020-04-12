@@ -18,3 +18,4 @@ material/0 = null
 
 [node name="CollisionShape" type="CollisionShape" parent="KinematicBody"]
 shape = SubResource( 2 )
+[connection signal="input_event" from="KinematicBody" to="." method="_on_KinematicBody_input_event"]
