@@ -15,7 +15,7 @@ script = ExtResource( 1 )
 [node name="Origin" type="Position3D" parent="."]
 
 [node name="Camera" type="Camera" parent="Origin"]
-transform = Transform( 1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 13, 11 )
+transform = Transform( 1, 0, 0, 0, 0.5, 0.866025, 0, -0.866025, 0.5, 0, 15, 14 )
 current = true
 
 [node name="Floor" type="StaticBody" parent="."]

@@ -1,8 +1,9 @@
 extends Spatial
 
-var Player = preload("res://Scenes/Player.tscn")
+var Character = preload("res://Scenes/Character.tscn")
+var character_1 = null
 
-var player_1 = null
+var rng = RandomNumberGenerator.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -10,13 +11,9 @@ func _ready():
 	pass
 	
 func prepare():
-	player_1 = Player.instance()
-	add_child(player_1)
-	var cell = $Map.get_cells_kind('floor')[0]
-	put_player_on_map(player_1, cell)
-	
-func put_player_on_map(player, cell):
-	player.translation.x = cell.translation.x
-	player.translation.y = 1.5
-	player.translation.z = cell.translation.z
+	var cells_floor = $Map.get_cells_kind('floor')
+	var cell = cells_floor[rng.randi_range(0, len(cells_floor))]
+	character_1 = Character.instance()
+	character_1.init(cell)
+	add_child(character_1)
 

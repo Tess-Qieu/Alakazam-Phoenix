@@ -17,7 +17,7 @@ var line = []
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
 const LENGTH_BORDER = 8
-const RAY_ARENA = 6
+const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
 
@@ -25,7 +25,6 @@ func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
-	# initialization of the array
 	selected_cells.resize(2)
 	
 func _process(_delta):
@@ -42,6 +41,14 @@ func add_instance_to_grid(instance, q, r):
 	if not q in grid.keys():
 		grid[q] = {}
 	grid[q][r] = instance
+	
+func get_cells_kind(kind):
+	var cells = []
+	for q in grid.keys():
+		for r in grid[q].keys():
+			if grid[q][r].kind == kind:
+				cells += [grid[q][r]]
+	return cells
 
 func random_kind():
 	var value = rng.randf()
@@ -82,8 +89,15 @@ func instance_cell(cell_type, q, r, kind):
 	cell.init(q, r, kind)
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
-	if cell.kind == 'floor':
-		cell.connect("selected", self, "select_cell", [cell])
+	if kind == "floor":
+		cell.connect("cell_clicked", self, "click_handler", [cell])
+
+# Function receiving a cell_clicked event, and calling the correct function
+func click_handler(index, cell):
+	if (index in [0,1]):
+		select_cell(index, cell)
+	elif index == 2:
+		cell_clicked(cell)
 
 func instance_map():
 	for q in grid.keys():
@@ -118,13 +132,18 @@ func is_rotation_camera_ask(mouse_position):
 func select_cell(index, cell):
 	if selected_cells.size() > index:
 		if selected_cells[index] != null:
-			selected_cells[index].unselect()
+			selected_cells[index].change_material(Global.materials[cell.kind])
 		selected_cells[index] = cell
+		if (index == 0): 
+			cell.change_material(Global.materials['blue'])
+		elif index == 1:
+			cell.change_material(Global.materials['red'])
+			
 	
 	_erase_line(selected_cells[0],selected_cells[1])
 #	line = neighbors(cell)
 #	for elt in line:
-#		elt.change_material(Global.materials['path'])
+#		elt.change_material(Global.materials['green'])
 	
 #	# Line draw between 2 cells
 #	if selected_cells[0] != null and selected_cells[1] != null:
@@ -134,25 +153,23 @@ func select_cell(index, cell):
 	if selected_cells[0] != null and selected_cells[1] != null:
 		line = path(selected_cells[0], selected_cells[1])
 		for elt in line:
-			elt.change_material(Global.materials['path'])
+			elt.change_material(Global.materials['green'])
 
 # Function used to calulate a step on a line
-func _line_step(start : int, end : int, step : float, epsilon : float) -> float:
-	return start + (end-start)*step + epsilon
+func _line_step(start : int, end : int, step : float) -> float:
+	return start + (end-start)*step
 
 # reset of previous line
 func _erase_line(start, end):
 	if line.size() > 2:
-		for elt in line:
-			if elt != start and elt != end:
-				elt.unselect()
+		for cell in line:
+			if cell != start and cell != end:
+				cell.change_material(Global.materials[cell.kind])
 	line.clear()
 
 # Line drawing between two cells
-func line_draw(start, end):
-	_erase_line(start, end)
-	
-	# Distance between two cells
+func _compute_line(start, end):
+	var line = []
 	var N = distance_coord(start.q, start.r, end.q, end.r)
 	
 	#Addition of starting cell
@@ -161,28 +178,62 @@ func line_draw(start, end):
 	
 	var r_float : float
 	var q_float : float
-	var epsilon : float = 1e-6
-	var r_tmp
-	var q_tmp
 	
 	for i in range(1,N):
 		# float coordinates calculation
-		r_float = _line_step(start.r, end.r, float(i)/float(N), epsilon)
-		q_float = _line_step(start.q, end.q, float(i)/float(N), -epsilon)
+		r_float = _line_step(start.r, end.r, float(i)/float(N))
+		q_float = _line_step(start.q, end.q, float(i)/float(N))
 		
-		r_tmp = int(round(r_float))
-		q_tmp = int(round(q_float))
+		# Compute all r for that step
+		var list_r = []
+		if abs(fmod(r_float, 1)) == 0.5:
+			list_r += [int(r_float - 0.5), int(r_float + 0.5)]
+		else:
+			list_r += [int(round(r_float))]
+			
+		# Compute all q for that step
+		var list_q = []
+		if abs(fmod(q_float, 1)) == 0.5:
+			list_q += [int(q_float - 0.5), int(q_float + 0.5)]
+		else:
+			list_q += [int(round(q_float))]
 		
-#		print("""Line, cell_{0}: ({1};{2})
-#		Rounded: ({3};{4})""".format([i, r_float, q_float, r_tmp, q_tmp]))
-		
-		if grid[q_tmp][r_tmp] != null:
-			line.append(grid[q_tmp][r_tmp])
-			grid[q_tmp][r_tmp].change_material(Global.materials['path'])
+		for q in list_q:
+			for r in list_r:
+				if grid[q][r] != null:
+					line.append(grid[q][r])
 			
 	# Addition of ending cell
 	line.append(end)
-#	print("End: ({0};{1})".format([end.r, end.q]))
+	return line
+	
+
+func compute_field_of_view(cell, distance):
+	var cells_floor = get_cells_kind('floor')
+	var cells_visible = []
+	for target in cells_floor:
+		
+		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance:
+			var line = _compute_line(cell, target)
+			line += _compute_line(target, cell)
+			
+			var flag = true
+			for c in line :
+				if c.kind == 'full' or c.kind == 'border':
+					flag = false
+			if flag:
+				cells_visible += [target]
+				
+	return cells_visible
+
+func cell_clicked(cell):
+	var cells_floor = get_cells_kind('floor')
+	for c in cells_floor:
+		c.change_material(Global.materials['floor'])
+	var cells_visible = compute_field_of_view(cell, 10)
+	for c in cells_visible:
+		c.change_material(Global.materials['red'])
+	cell.change_material(Global.materials['blue'])
 
 func neighbors (cell):
 	var list = []
@@ -245,11 +296,3 @@ func path(start, end):
 	_path.invert()
 	
 	return _path
-
-func get_cells_kind(kind):
-	var cells = []
-	for q in grid.keys():
-		for r in grid[q].keys():
-			if grid[q][r].kind == kind:
-				cells += [grid[q][r]]
-	return cells
