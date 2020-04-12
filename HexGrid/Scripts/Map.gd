@@ -88,7 +88,7 @@ func instance_cell(cell_type, q, r, kind):
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
 	if kind == "floor":
-		cell.connect("cell_clicked", self, "click_handler", [cell])
+		cell.connect("cell_clicked", self.get_parent(), "_on_cell_clicked", [cell])
 		cells_floor += [cell]
 		
 func instance_map():
@@ -243,25 +243,6 @@ func path(start, end):
 	_path.invert()
 	
 	return _path
-
-
-
-
-# Handle signals
-func cell_clicked(cell):
-	clear()
-	display_field_of_view(cell, 25)
-	cell.change_material('blue')
-
-# Function receiving a cell_clicked event, and calling the correct function
-func click_handler(index, cell):
-	if (index in [0,1]):
-#		select_cell(index, cell)
-		pass
-	elif index == 2:
-		cell_clicked(cell)
-		cells_floor += [cell]
-
 
 
 
