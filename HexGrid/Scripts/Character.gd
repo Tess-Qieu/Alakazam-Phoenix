@@ -14,5 +14,12 @@ func init(cell, team):
 func change_material(material_key):
 	$KinematicBody/MeshInstance.set_surface_material(0, Global.materials[material_key])
 
-func _on_KinematicBody_input_event(camera, event, click_position, click_normal, shape_idx):
-	emit_signal("character_selected")
+func _on_KinematicBody_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
+	# If the event is a mouse click
+	if event is InputEventMouseButton and event.pressed:
+		# A different material is applied on each button
+		if event.button_index == BUTTON_LEFT :
+			emit_signal("character_selected")
+			
+		elif event.button_index == BUTTON_RIGHT:
+			pass

@@ -25,14 +25,13 @@ func create_character(team):
 	elif team == 'red':
 		team_red += [character]
 
+func _on_character_selected(character):
+	current_character = character
+
 func _on_ButtonSpell_pressed():
-	var character = team_blue[0]
 	var fov = $Map.compute_field_of_view(current_character.current_cell, 30)
 	for c in fov:
 		c.change_material('green')
-
-func _on_character_selected(character):
-	current_character = character
 
 func _on_ButtonClear_pressed():
 	$Map.clear()

@@ -4,8 +4,6 @@ var q
 var r
 var kind
 
-signal cell_clicked(index)
-
 const CIRCLE_RAY = 1
 const SPACE_BETWEEN = 0
 const DIST = sqrt(3)*CIRCLE_RAY
