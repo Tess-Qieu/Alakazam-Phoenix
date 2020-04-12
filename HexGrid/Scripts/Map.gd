@@ -9,10 +9,6 @@ var CellSize5 = preload("res://Scenes/CellSize5.tscn")
 var rng = RandomNumberGenerator.new()
 var grid = {}
 var last_mouse_position = Vector2(-1, -1)
-# Array used to store the currently selected cells
-var selected_cells = []
-# Array used to store a cell line
-var line = []
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -25,7 +21,6 @@ func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
-	selected_cells.resize(2)
 	
 func _process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()
@@ -41,7 +36,7 @@ func add_instance_to_grid(instance, q, r):
 	if not q in grid.keys():
 		grid[q] = {}
 	grid[q][r] = instance
-	
+
 func get_cells_kind(kind):
 	var cells = []
 	for q in grid.keys():
@@ -59,7 +54,7 @@ func random_kind():
 	if value < lim:
 		return 'hole'
 	return 'floor'
-	
+
 func generate_one_line(line_size, r):
 	var kind = ''
 	var half = line_size / 2 if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
@@ -90,12 +85,15 @@ func instance_cell(cell_type, q, r, kind):
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
 	if kind == "floor":
-		cell.connect("cell_clicked", self, "click_handler", [cell])
+		# No action available on cell_clicked at the moment
+#		cell.connect("cell_clicked", self, "click_handler", [cell])
+		pass
 
 # Function receiving a cell_clicked event, and calling the correct function
 func click_handler(index, cell):
 	if (index in [0,1]):
-		select_cell(index, cell)
+#		select_cell(index, cell)
+		pass
 	elif index == 2:
 		cell_clicked(cell)
 
@@ -128,53 +126,17 @@ func is_rotation_camera_ask(mouse_position):
 		return true
 	return false
 
-# Function memorizing the selected tile and unselecting the previous
-func select_cell(index, cell):
-	if selected_cells.size() > index:
-		if selected_cells[index] != null:
-			selected_cells[index].change_material(Global.materials[cell.kind])
-		selected_cells[index] = cell
-		if (index == 0): 
-			cell.change_material(Global.materials['blue'])
-		elif index == 1:
-			cell.change_material(Global.materials['red'])
-			
-	
-	_erase_line(selected_cells[0],selected_cells[1])
-#	line = neighbors(cell)
-#	for elt in line:
-#		elt.change_material(Global.materials['green'])
-	
-#	# Line draw between 2 cells
-#	if selected_cells[0] != null and selected_cells[1] != null:
-#		line_draw(selected_cells[0], selected_cells[1])
-	
-	# Path draw between 2 cells
-	if selected_cells[0] != null and selected_cells[1] != null:
-		line = path(selected_cells[0], selected_cells[1])
-		for elt in line:
-			elt.change_material(Global.materials['green'])
-
 # Function used to calulate a step on a line
 func _line_step(start : int, end : int, step : float) -> float:
 	return start + (end-start)*step
 
-# reset of previous line
-func _erase_line(start, end):
-	if line.size() > 2:
-		for cell in line:
-			if cell != start and cell != end:
-				cell.change_material(Global.materials[cell.kind])
-	line.clear()
-
-# Line drawing between two cells
+# Line calculation between two cells
 func _compute_line(start, end):
 	var line = []
 	var N = distance_coord(start.q, start.r, end.q, end.r)
 	
 	#Addition of starting cell
 	line.append(start)
-#	print("Start: ({0};{1})".format([start.r, start.q]))
 	
 	var r_float : float
 	var q_float : float
@@ -190,7 +152,7 @@ func _compute_line(start, end):
 			list_r += [int(r_float - 0.5), int(r_float + 0.5)]
 		else:
 			list_r += [int(round(r_float))]
-			
+		
 		# Compute all q for that step
 		var list_q = []
 		if abs(fmod(q_float, 1)) == 0.5:
@@ -202,11 +164,10 @@ func _compute_line(start, end):
 			for r in list_r:
 				if grid[q][r] != null:
 					line.append(grid[q][r])
-			
+	
 	# Addition of ending cell
 	line.append(end)
 	return line
-	
 
 func compute_field_of_view(cell, distance):
 	var cells_floor = get_cells_kind('floor')
@@ -235,6 +196,7 @@ func cell_clicked(cell):
 		c.change_material(Global.materials['red'])
 	cell.change_material(Global.materials['blue'])
 
+# Function returning every neighbor of a cell, of any kind
 func neighbors (cell):
 	var list = []
 	
@@ -258,8 +220,8 @@ func neighbors (cell):
 	
 	return list
 
-# Function calculating a path between two cells. Start and end are not included
-#  in the path
+# Function calculating a path between two cells. 
+# Starting and ending cells are not included in the path
 func path(start, end):
 	# The frontier is the line of farest cells reached
 	var frontier = []
