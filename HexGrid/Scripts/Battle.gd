@@ -36,10 +36,11 @@ func _color_current_character_cell():
 		current_character.current_cell.change_material('green')
 
 func _on_character_selected(character):
-	$Map.clear()
-	
-	current_character = character
-	_color_current_character_cell()
+	if not current_character.casting:
+		$Map.clear()
+		
+		current_character = character
+		_color_current_character_cell()
 
 func _on_ButtonSpell_toggled(button_pressed):
 	$Map.clear()

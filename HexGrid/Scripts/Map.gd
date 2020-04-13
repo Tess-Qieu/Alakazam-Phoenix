@@ -239,7 +239,7 @@ func compute_path(start, end):
 	# The path is calculated from end to start, then reversed
 	var _path = []
 	current_cell = came_from[end]
-	while current_cell != start:
+	while current_cell != start and current_cell != null:
 		_path.append(current_cell)
 		current_cell = came_from[current_cell]
 	_path.invert()
