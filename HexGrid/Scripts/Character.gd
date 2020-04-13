@@ -25,3 +25,9 @@ func _on_KinematicBody_input_event(_camera, event, _click_position, _click_norma
 			
 		elif event.button_index == BUTTON_RIGHT:
 			pass
+
+func teleport_to(cell):
+	current_cell = cell
+	var teleport_vect = cell.transform.origin - transform.origin
+	teleport_vect.y = 0
+	translate(teleport_vect)

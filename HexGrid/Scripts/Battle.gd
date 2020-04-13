@@ -14,6 +14,7 @@ func _ready():
 	current_character = team_blue[0]
 	_color_current_character_cell()
 	$Map.connect("a_cell_hovered", self, "_on_a_cell_hovered")
+	$Map.connect("a_cell_clicked", self, "_on_a_cell_clicked")
 	
 func create_character(team):
 	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor))]
@@ -62,3 +63,9 @@ func _on_a_cell_hovered(active, cell):
 		
 		if active:
 			$Map.draw_path(current_character.current_cell, cell)
+
+func _on_a_cell_clicked(cell):
+	if not current_character.casting and cell != null:
+		$Map.clear()
+		current_character.teleport_to(cell)
+		_color_current_character_cell()

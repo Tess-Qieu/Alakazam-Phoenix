@@ -17,7 +17,10 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
+# signal emitted when a floor cell is hovered
 signal a_cell_hovered(active, cell)
+# Signal emitted when a floor cell is clicked
+signal a_cell_clicked(cell)
 
 
 # Initialization
@@ -264,8 +267,7 @@ func cell_clicked(cell):
 # Function receiving a cell_clicked event, and calling the correct function
 func click_handler(index, cell):
 	if (index in [0,1]):
-#		select_cell(index, cell)
-		pass
+		emit_signal("a_cell_clicked", cell)
 	elif index == 2:
 		cell_clicked(cell)
 		cells_floor += [cell]
