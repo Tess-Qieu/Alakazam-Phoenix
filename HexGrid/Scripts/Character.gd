@@ -46,4 +46,4 @@ func _on_Character_input_event(_camera, event, _click_position, _click_normal, _
 			pass
 	
 func move_to(cell):
-	$AnimationPlayer.play("movement_kinematic")
+	$AnimationPlayer.play("movement")

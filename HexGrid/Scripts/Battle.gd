@@ -96,7 +96,7 @@ func _on_cell_clicked(cell):
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()
-			$Map.draw_path(current_character.current_cell, cell)
+		$Map.draw_path(current_character.current_cell, cell)
 
 func _on_cell_unhovered(_cell):
 	# useless for now, may have some interest later 
