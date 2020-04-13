@@ -24,7 +24,7 @@ func cast_spell(target):
 	get_parent().add_child(spell)
 	
 func change_material(material_key):
-	$KinematicBody/MeshInstance.set_surface_material(0, Global.materials[material_key])
+	$MeshInstance.set_surface_material(0, Global.materials[material_key])
 
 func _on_KinematicBody_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
