@@ -84,7 +84,11 @@ func _on_character_selected(character):
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
-		current_character.teleport_to(cell)
+#		current_character.teleport_to(cell)
+#		for elt in $Map.compute_path(current_character.current_cell, cell):
+#			current_character.move_to(elt)
+		var path = $Map.compute_path(current_character.current_cell, cell)
+		current_character.set_destination(path.pop_front())
 		clear_arena()
 	
 	elif state == 'cast_spell':

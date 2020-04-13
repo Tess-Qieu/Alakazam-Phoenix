@@ -1,12 +1,17 @@
-extends Spatial
+extends KinematicBody
 
 signal character_selected
 
 var Spell = preload("res://Scenes/Spell.tscn")
 
 var current_cell
-var casting
+var destination
 
+const MVT_MARGIN = 0.01
+
+# Movement variables
+export var speed = 100 
+var moving = false
 
 func init(cell, team):
 	translation.x = cell.translation.x
@@ -14,7 +19,6 @@ func init(cell, team):
 	translation.z = cell.translation.z
 	current_cell = cell
 	change_material(team)
-	casting = false
 	
 func cast_spell(target):
 	var to_look = target.translation
@@ -44,6 +48,31 @@ func _on_Character_input_event(_camera, event, _click_position, _click_normal, _
 			
 		elif event.button_index == BUTTON_RIGHT:
 			pass
-	
-func move_to(cell):
+
+func set_destination(cell):
+	destination = cell
+	moving = true
 	$AnimationPlayer.play("movement")
+
+func _physics_process(delta):
+	if moving:
+		_process_movement(delta)
+			
+func _process_movement(delta):
+	var dist = destination.translation - translation
+	dist.y = 0
+	print("Dist: {0}".format([dist.length()]))
+	if dist.length() > MVT_MARGIN:
+		var to_look = destination.translation
+		to_look.y = translation.y
+		look_at(to_look, Vector3(0,1,0))
+		var velocity = destination.translation - translation
+		velocity.y = 0
+		velocity = velocity.normalized()
+		velocity = velocity * speed * delta
+		move_and_slide(velocity)
+	else:
+		print("STAHP!")
+		moving = false
+		$AnimationPlayer.stop()
+		teleport_to(destination)
