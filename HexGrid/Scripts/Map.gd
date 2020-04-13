@@ -18,12 +18,12 @@ const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
 
+
 # Initialization
 func _ready():
 	rng.randomize()
 	generate_grid()
 	instance_map()
-	
 
 
 # Usefull functions
@@ -82,29 +82,28 @@ func generate_grid():
 
 
 # Handle grid instanciation
-func instance_cell(cell_type, q, r, kind):
+func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
-	cell.init(q, r, kind)
+	cell.init(q, r, kind, self.get_parent())
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
 	if kind == "floor":
-		cell.connect("cell_clicked", self.get_parent(), "_on_cell_clicked", [cell])
 		cells_floor += [cell]
-		
+
 func instance_map():
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
 			if kind == 'hole':
-				instance_cell(CellSize1, q, r, kind)
+				_instance_cell(CellSize1, q, r, kind)
 			elif kind == 'floor': 
-				instance_cell(CellSize2, q, r, kind)
+				_instance_cell(CellSize2, q, r, kind)
 			elif kind == 'full':
-				instance_cell(CellSize3, q, r, kind)
+				_instance_cell(CellSize3, q, r, kind)
 			elif kind == 'border':
 				var height = rng.randi() % 3
 				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
-				instance_cell(choices[height], q, r, kind)
+				_instance_cell(choices[height], q, r, kind)
 
 
 
@@ -181,7 +180,7 @@ func display_field_of_view(cell, distance):
 
 
 # Handle path finding
-func neighbors (cell):
+func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
 	var list = []
 	
@@ -205,7 +204,7 @@ func neighbors (cell):
 	
 	return list
 
-func path(start, end):
+func compute_path(start, end):
 	# Function calculating a path between two cells. 
 	# Starting and ending cells are not included in the path
 	# The frontier is the line of farest cells reached
@@ -229,7 +228,7 @@ func path(start, end):
 		#  if the neighbor is a floor cell and hasn't been travelled across
 		#   the neighbor is added to the frontier 
 		#   and associated at the current cell 
-		for next in neighbors(current_cell):
+		for next in _neighbors(current_cell):
 			if (next.kind == 'floor') and not(next in came_from):
 				frontier.append(next)
 				came_from[next] = current_cell
@@ -237,12 +236,18 @@ func path(start, end):
 	# The path is calculated from end to start, then reversed
 	var _path = []
 	current_cell = came_from[end]
-	while current_cell != start:
+	while current_cell != start and current_cell != null:
 		_path.append(current_cell)
 		current_cell = came_from[current_cell]
 	_path.invert()
 	
 	return _path
+
+func draw_path(start, end):
+	var path = compute_path(start, end)
+	for elt in path:
+		elt.change_material('green')
+	end.change_material('skyblue')
 
 
 

@@ -1,21 +1,24 @@
 extends Spatial
 
+
 var Character = preload("res://Scenes/Character.tscn")
 var team_blue = []
 var team_red = []
 var current_character
 
 var state = 'normal'
+var fov = []
 
 var rng = RandomNumberGenerator.new()
 
-# Called when the node enters the scene tree for the first time.
+# Handle initialization
 func _ready():
 	create_character('blue')
 	create_character('red')
 	current_character = team_blue[0]
-	current_character.cast_spell(team_red[0].current_cell)
-	
+	clear_arena()
+
+# Handle Character
 func create_character(team):
 	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor)-1)]
 	var character = Character.instance()
@@ -28,23 +31,73 @@ func create_character(team):
 	elif team == 'red':
 		team_red += [character]
 
-func _on_character_selected(character):
-	current_character = character
-	$Map.clear()
+func make_current_character_cast_spell(cell):
+	# if cell in fov, cast spell, else cancel spell casting
+	if cell in fov:
+		current_character.cast_spell(cell)
+	fov = []
+	clear_arena()
+	state = 'normal'
 
+
+
+# Handle clear
+func _color_current_character_cell():
+	if (current_character in team_blue):
+		current_character.current_cell.change_material('blue')
+	elif (current_character in team_red):
+		current_character.current_cell.change_material('red')
+	else:
+		current_character.current_cell.change_material('green')
+
+func clear_arena():
+	$Map.clear()
+	_color_current_character_cell()
+
+
+
+
+
+
+# Handle button events
 func _on_ButtonSpell_pressed():
-	$Map.clear()
-	var _fov = $Map.display_field_of_view(current_character.current_cell, 20)
+	clear_arena()
+	fov = $Map.display_field_of_view(current_character.current_cell, 20)
 	state = 'cast_spell'
-
-func _on_ButtonClear_pressed():
-	$Map.clear()
 	
+func _on_ButtonClear_pressed():
+	clear_arena()
+
+
+
+
+
+
+# On object clicked
+func _on_character_selected(character):
+	if not state == 'cast_spell':
+		# select character
+		current_character = character
+		clear_arena()
+	else:
+		make_current_character_cast_spell(character.current_cell)
+
 func _on_cell_clicked(cell):
 	if state == 'normal':
-		$Map.clear()
-		$Map.display_field_of_view(cell, 25)
-		cell.change_material('blue')
+		current_character.teleport_to(cell)
+		clear_arena()
 	
 	elif state == 'cast_spell':
-		current_character.cast_spell(cell)
+		make_current_character_cast_spell(cell)
+
+
+
+# On object hovered
+func _on_cell_hovered(cell):
+	if state == 'normal':
+		clear_arena()
+		$Map.draw_path(current_character.current_cell, cell)
+
+func _on_cell_unhovered(_cell):
+	# useless for now, may have some interest later 
+	pass
