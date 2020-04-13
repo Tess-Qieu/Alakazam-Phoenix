@@ -15,10 +15,13 @@ func init(cell, team):
 	change_material(team)
 	
 func cast_spell(target):
-	look_at(target.translation, Vector3(0, 1, 0))
+	var to_look = target.translation
+	to_look.y = translation.y
+	look_at(to_look, Vector3(0, 1, 0))
+	
 	var spell = Spell.instance()
 	spell.cast(current_cell, target)
-	add_child(spell)
+	get_parent().add_child(spell)
 	
 func change_material(material_key):
 	$KinematicBody/MeshInstance.set_surface_material(0, Global.materials[material_key])

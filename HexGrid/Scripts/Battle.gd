@@ -45,7 +45,6 @@ func _on_cell_clicked(cell):
 		$Map.clear()
 		$Map.display_field_of_view(cell, 25)
 		cell.change_material('blue')
-		print(cell.translation)
 	
 	elif state == 'cast_spell':
 		current_character.cast_spell(cell)
