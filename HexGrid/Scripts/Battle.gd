@@ -67,5 +67,6 @@ func _on_a_cell_hovered(active, cell):
 func _on_a_cell_clicked(cell):
 	if not current_character.casting and cell != null:
 		$Map.clear()
-		current_character.teleport_to(cell)
+#		current_character.teleport_to(cell)
+		current_character.move_to(cell)
 		_color_current_character_cell()

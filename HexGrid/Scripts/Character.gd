@@ -31,3 +31,6 @@ func teleport_to(cell):
 	var teleport_vect = cell.transform.origin - transform.origin
 	teleport_vect.y = 0
 	translate(teleport_vect)
+	
+func move_to(cell):
+	$AnimationPlayer.play("movement_kinematic")
