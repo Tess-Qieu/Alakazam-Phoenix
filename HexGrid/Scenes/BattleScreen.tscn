@@ -30,7 +30,6 @@ __meta__ = {
 [node name="ButtonSpell" type="Button" parent="PanelRight"]
 anchor_right = 1.0
 anchor_bottom = 0.2
-toggle_mode = true
 text = "Spell"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -44,5 +43,5 @@ text = "Clear"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="toggled" from="PanelRight/ButtonSpell" to="Battle" method="_on_ButtonSpell_toggled"]
+[connection signal="pressed" from="PanelRight/ButtonSpell" to="Battle" method="_on_ButtonSpell_pressed"]
 [connection signal="pressed" from="PanelRight/ButtonClear" to="Battle" method="_on_ButtonClear_pressed"]

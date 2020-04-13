@@ -17,10 +17,6 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
-# signal emitted when a floor cell is hovered
-signal a_cell_hovered(active, cell)
-# Signal emitted when a floor cell is clicked
-signal a_cell_clicked(cell)
 
 
 # Initialization
@@ -86,14 +82,12 @@ func generate_grid():
 
 
 # Handle grid instanciation
-func instance_cell(cell_type, q, r, kind):
+func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
-	cell.init(q, r, kind)
+	cell.init(q, r, kind, self.get_parent())
 	add_child(cell)
 	add_instance_to_grid(cell, q, r)
 	if kind == "floor":
-		cell.connect("cell_clicked", self, "click_handler", [cell])
-		cell.connect("cell_hovered", self, "_on_cell_hovered", [cell])
 		cells_floor += [cell]
 
 func instance_map():
@@ -101,15 +95,15 @@ func instance_map():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
 			if kind == 'hole':
-				instance_cell(CellSize1, q, r, kind)
+				_instance_cell(CellSize1, q, r, kind)
 			elif kind == 'floor': 
-				instance_cell(CellSize2, q, r, kind)
+				_instance_cell(CellSize2, q, r, kind)
 			elif kind == 'full':
-				instance_cell(CellSize3, q, r, kind)
+				_instance_cell(CellSize3, q, r, kind)
 			elif kind == 'border':
 				var height = rng.randi() % 3
 				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
-				instance_cell(choices[height], q, r, kind)
+				_instance_cell(choices[height], q, r, kind)
 
 
 
@@ -119,7 +113,7 @@ func _line_step(start : int, end : int, step : float) -> float:
 	# Function used to calulate a step on a line	
 	return start + (end-start)*step
 
-func compute_line(start, end):
+func _compute_line(start, end):
 	# Line calculation between two cells
 	var line = []
 	var N = distance_coord(start.q, start.r, end.q, end.r)
@@ -163,8 +157,8 @@ func compute_field_of_view(cell, distance):
 	for target in cells_floor:
 		
 		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance:
-			var line = compute_line(cell, target)
-			line += compute_line(target, cell)
+			var line = _compute_line(cell, target)
+			line += _compute_line(target, cell)
 			
 			var flag = true
 			for c in line :
@@ -186,7 +180,7 @@ func display_field_of_view(cell, distance):
 
 
 # Handle path finding
-func neighbors (cell):
+func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
 	var list = []
 	
@@ -234,7 +228,7 @@ func compute_path(start, end):
 		#  if the neighbor is a floor cell and hasn't been travelled across
 		#   the neighbor is added to the frontier 
 		#   and associated at the current cell 
-		for next in neighbors(current_cell):
+		for next in _neighbors(current_cell):
 			if (next.kind == 'floor') and not(next in came_from):
 				frontier.append(next)
 				came_from[next] = current_cell
@@ -254,28 +248,6 @@ func draw_path(start, end):
 	for elt in path:
 		elt.change_material('green')
 	end.change_material('skyblue')
-
-
-
-
-# Handle signals
-func cell_clicked(cell):
-	clear()
-	display_field_of_view(cell, 25)
-	cell.change_material('blue')
-
-# Function receiving a cell_clicked event, and calling the correct function
-func click_handler(index, cell):
-	if (index in [0,1]):
-		emit_signal("a_cell_clicked", cell)
-	elif index == 2:
-		cell_clicked(cell)
-		cells_floor += [cell]
-
-# Function receiving a cell_hovered event
-func _on_cell_hovered(active, cell):
-	emit_signal("a_cell_hovered", active, cell)
-
 
 
 
