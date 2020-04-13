@@ -1,11 +1,12 @@
 extends KinematicBody
 
 signal character_selected
+signal character_arrived
 
 var Spell = preload("res://Scenes/Spell.tscn")
 
 var current_cell
-var destination
+var destination_path
 
 const MVT_MARGIN = 0.01
 
@@ -49,8 +50,8 @@ func _on_Character_input_event(_camera, event, _click_position, _click_normal, _
 		elif event.button_index == BUTTON_RIGHT:
 			pass
 
-func set_destination(cell):
-	destination = cell
+func set_path(path):
+	destination_path = path
 	moving = true
 	$AnimationPlayer.play("movement")
 
@@ -59,20 +60,22 @@ func _physics_process(delta):
 		_process_movement(delta)
 			
 func _process_movement(delta):
-	var dist = destination.translation - translation
+	var dist = destination_path[0].translation - translation
 	dist.y = 0
-	print("Dist: {0}".format([dist.length()]))
 	if dist.length() > MVT_MARGIN:
-		var to_look = destination.translation
+		var to_look = destination_path[0].translation
 		to_look.y = translation.y
 		look_at(to_look, Vector3(0,1,0))
-		var velocity = destination.translation - translation
+		var velocity = destination_path[0].translation - translation
 		velocity.y = 0
 		velocity = velocity.normalized()
 		velocity = velocity * speed * delta
 		move_and_slide(velocity)
 	else:
-		print("STAHP!")
-		moving = false
-		$AnimationPlayer.stop()
-		teleport_to(destination)
+		teleport_to(destination_path[0])
+		if destination_path.size() > 1:
+			destination_path.pop_front()
+			$AnimationPlayer.play("movement")
+		else:
+			moving = false
+			emit_signal("character_arrived")

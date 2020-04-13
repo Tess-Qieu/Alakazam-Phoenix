@@ -24,6 +24,7 @@ func create_character(team):
 	var character = Character.instance()
 	character.init(cell, team)
 	character.connect("character_selected", self, "_on_character_selected", [character])
+	character.connect("character_arrived", self, "_on_character_arrived")
 	add_child(character)
 	
 	if team == 'blue':
@@ -68,11 +69,12 @@ func _on_ButtonSpell_pressed():
 func _on_ButtonClear_pressed():
 	clear_arena()
 
-		
 
 
-
-
+func _on_character_arrived():
+	state = 'normal'
+	clear_arena()
+	
 # On object clicked
 func _on_character_selected(character):
 	if not state == 'cast_spell':
@@ -88,8 +90,9 @@ func _on_cell_clicked(cell):
 #		for elt in $Map.compute_path(current_character.current_cell, cell):
 #			current_character.move_to(elt)
 		var path = $Map.compute_path(current_character.current_cell, cell)
-		current_character.set_destination(path.pop_front())
-		clear_arena()
+		path.append(cell)
+		current_character.set_path(path)
+		state = 'moving'
 	
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
