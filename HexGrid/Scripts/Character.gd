@@ -2,12 +2,14 @@ extends KinematicBody
 
 signal character_selected
 signal character_arrived
+signal character_hovered
 
 var Spell = preload("res://Scenes/Spell.tscn")
 
 var current_cell
 var destination_path
 
+# Movement margin is used to discriminate if the character has arrived on a cell
 const MVT_MARGIN = 0.01
 
 # Movement variables
@@ -61,19 +63,36 @@ func _physics_process(delta):
 		_process_movement(delta)
 			
 func _process_movement(delta):
+	# First, the distance between the destination cell and the character 
+	#  position is calculated
 	var dist = destination_path[0].translation - translation
-	dist.y = 0
+	dist.y = 0 # Distance is only considered in (x,z) plan
+	
+	# if the character has not reached the destination cell
 	if dist.length() > MVT_MARGIN:
+		# character orientation to the destination cell
 		var to_look = destination_path[0].translation
 		to_look.y = translation.y
 		look_at(to_look, Vector3(0,1,0))
+		
+		# Character velocity direction calculation
 		var velocity = destination_path[0].translation - translation
 		velocity.y = 0
 		velocity = velocity.normalized()
+		
+		# Velocity value calculation
 		velocity = velocity * speed * delta
+		
+		# Movement action
 		move_and_slide(velocity)
-	else:
+		
+	else: # If the character has reached the cell (within a margin)
+		# The character is teleported to the exact cell location
+		#  in order to avoid an error accumulation
 		teleport_to(destination_path[0])
+		
+		# If the cell is not the final destination, the movement continues
+		#  to the next cell
 		if destination_path.size() > 1:
 			destination_path.pop_front()
 			$AnimationPlayer.play("movement",-1,speed/100.0)
