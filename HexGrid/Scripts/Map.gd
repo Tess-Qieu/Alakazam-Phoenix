@@ -258,6 +258,24 @@ func draw_path_limited(start, end, limit):
 		elt.change_material('green')
 	path[-1].change_material('skyblue')
 
+func compute_range(start, range_int):
+	var visited = [start]
+	var reachable = [[start]]
+	
+	for i in range(1, range_int+1):
+		reachable.append([])
+		for cell in reachable[i-1]:
+			for neighbor in _neighbors(cell):
+				if ( not(neighbor in visited) and (neighbor.kind == 'floor')):
+					visited.append(neighbor)
+					reachable[i].append(neighbor)
+	
+	return visited
+
+func draw_range(start, range_int):
+	var zone = compute_range(start, range_int)
+	for cell in zone:
+		cell.change_material('green')
 
 
 

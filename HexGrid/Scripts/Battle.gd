@@ -25,6 +25,7 @@ func create_character(team):
 	character.init(cell, team)
 	character.connect("character_selected", self, "_on_character_selected", [character])
 	character.connect("character_arrived", self, "_on_character_arrived")
+	character.connect("character_hovered", self, "_on_character_hovered", [character])
 	add_child(character)
 	
 	if team == 'blue':
@@ -110,3 +111,9 @@ func _on_cell_hovered(cell):
 func _on_cell_unhovered(_cell):
 	# useless for now, may have some interest later 
 	pass
+	
+	
+func _on_character_hovered(character):
+	if state == 'normal':
+		clear_arena()
+		$Map.draw_range(character.current_cell, character.movement_range)

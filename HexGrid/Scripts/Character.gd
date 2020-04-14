@@ -9,7 +9,7 @@ var Spell = preload("res://Scenes/Spell.tscn")
 var current_cell
 var destination_path
 
-# Movement margin is used to discriminate if the character has arrived on a cell
+# Movement margin used to discriminate if the character has arrived on a cell
 const MVT_MARGIN = 0.01
 
 # Movement variables
@@ -23,7 +23,19 @@ func init(cell, team):
 	translation.z = cell.translation.z
 	current_cell = cell
 	change_material(team)
-	
+	connect("mouse_entered", self, "_on_Character_mouse_entered")
+
+func _physics_process(delta):
+	if moving:
+		_process_movement(delta)	
+
+
+## GENERAL SECTION ##
+func change_material(material_key):
+	$MeshInstance.set_surface_material(0, Global.materials[material_key])
+
+
+## SPELL SECTION ##
 func cast_spell(target):
 	var to_look = target.translation
 	to_look.y = translation.y
@@ -32,36 +44,20 @@ func cast_spell(target):
 	var spell = Spell.instance()
 	spell.cast(current_cell, target)
 	get_parent().add_child(spell)
-	
+
+
+
+## MOVEMENT SECTION ##
 func teleport_to(cell):
 	current_cell = cell
 	translation.x = cell.translation.x
 	translation.z = cell.translation.z
-	
-	
-func change_material(material_key):
-	$MeshInstance.set_surface_material(0, Global.materials[material_key])
-
-
-func _on_Character_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
-	# If the event is a mouse click
-	if event is InputEventMouseButton and event.pressed:
-		# A different material is applied on each button
-		if event.button_index == BUTTON_LEFT :
-			emit_signal("character_selected")
-			
-		elif event.button_index == BUTTON_RIGHT:
-			pass
 
 func set_path(path):
 	destination_path = path
 	moving = true
 	$AnimationPlayer.play("movement",-1,speed/100.0)
 
-func _physics_process(delta):
-	if moving:
-		_process_movement(delta)
-			
 func _process_movement(delta):
 	# First, the distance between the destination cell and the character 
 	#  position is calculated
@@ -99,3 +95,18 @@ func _process_movement(delta):
 		else:
 			moving = false
 			emit_signal("character_arrived")
+
+
+## EVENT SECTION ##
+func _on_Character_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
+	# If the event is a mouse click
+	if event is InputEventMouseButton and event.pressed:
+		# A different material is applied on each button
+		if event.button_index == BUTTON_LEFT :
+			emit_signal("character_selected")
+			
+		elif event.button_index == BUTTON_RIGHT:
+			pass
+
+func _on_Character_mouse_entered():
+	emit_signal("character_hovered")
