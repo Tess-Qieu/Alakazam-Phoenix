@@ -206,14 +206,14 @@ func _neighbors (cell):
 
 func compute_path(start, end):
 	# Function calculating a path between two cells. 
-	# Starting and ending cells are not included in the path
+	# Starting cell is not included in the path, but ending cell is
 	# The frontier is the line of farest cells reached
 	var frontier = []
 	frontier.append(start)
 	# Came_from is a dictionnary where cells are associated with the cell who 
 	#  permitted reaching it
 	var came_from = {}
-	came_from[start] = null
+	came_from[start] = start
 	
 	var current_cell
 	
@@ -234,7 +234,7 @@ func compute_path(start, end):
 				came_from[next] = current_cell
 	
 	# The path is calculated from end to start, then reversed
-	var _path = []
+	var _path = [end]
 	current_cell = came_from[end]
 	while current_cell != start and current_cell != null:
 		_path.append(current_cell)
@@ -248,6 +248,15 @@ func draw_path(start, end):
 	for elt in path:
 		elt.change_material('green')
 	end.change_material('skyblue')
+
+func draw_path_limited(start, end, limit):
+	# Draws a path within a limited range of cells
+	var path = compute_path(start, end)
+	if path.size() > limit:
+		path.resize(limit)
+	for elt in path:
+		elt.change_material('green')
+	path[-1].change_material('skyblue')
 
 
 

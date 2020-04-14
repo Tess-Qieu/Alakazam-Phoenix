@@ -40,6 +40,14 @@ func make_current_character_cast_spell(cell):
 	clear_arena()
 	state = 'normal'
 
+func make_current_character_move_to(cell):
+	# Movement computation
+	var path = $Map.compute_path(current_character.current_cell, cell)
+	# Movement limitation
+	if path.size() > current_character.movement_range:
+		path.resize(current_character.movement_range)
+	current_character.set_path(path)
+	state = 'moving'
 
 
 # Handle clear
@@ -86,14 +94,7 @@ func _on_character_selected(character):
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
-#		current_character.teleport_to(cell)
-#		for elt in $Map.compute_path(current_character.current_cell, cell):
-#			current_character.move_to(elt)
-		var path = $Map.compute_path(current_character.current_cell, cell)
-		path.append(cell)
-		current_character.set_path(path)
-		state = 'moving'
-	
+		make_current_character_move_to(cell)
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
 
@@ -103,7 +104,8 @@ func _on_cell_clicked(cell):
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()
-		$Map.draw_path(current_character.current_cell, cell)
+#		$Map.draw_path(current_character.current_cell, cell)
+		$Map.draw_path_limited(current_character.current_cell, cell, current_character.movement_range)
 
 func _on_cell_unhovered(_cell):
 	# useless for now, may have some interest later 

@@ -13,6 +13,7 @@ const MVT_MARGIN = 0.01
 # Movement variables
 export var speed = 250 #NOT WORKING IF speed > 250
 var moving = false
+export var movement_range = 6
 
 func init(cell, team):
 	translation.x = cell.translation.x
