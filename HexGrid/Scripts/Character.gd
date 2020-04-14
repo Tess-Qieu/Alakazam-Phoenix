@@ -11,7 +11,7 @@ var destination_path
 const MVT_MARGIN = 0.01
 
 # Movement variables
-export var speed = 100 
+export var speed = 250 #NOT WORKING IF speed > 250
 var moving = false
 
 func init(cell, team):
@@ -53,7 +53,7 @@ func _on_Character_input_event(_camera, event, _click_position, _click_normal, _
 func set_path(path):
 	destination_path = path
 	moving = true
-	$AnimationPlayer.play("movement")
+	$AnimationPlayer.play("movement",-1,speed/100.0)
 
 func _physics_process(delta):
 	if moving:
@@ -75,7 +75,7 @@ func _process_movement(delta):
 		teleport_to(destination_path[0])
 		if destination_path.size() > 1:
 			destination_path.pop_front()
-			$AnimationPlayer.play("movement")
+			$AnimationPlayer.play("movement",-1,speed/100.0)
 		else:
 			moving = false
 			emit_signal("character_arrived")
