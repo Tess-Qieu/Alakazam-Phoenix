@@ -284,7 +284,6 @@ func display_displacement_range(start, distance_max):
 	return zone
 
 
-
 # Handle camera
 func _process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()

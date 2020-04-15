@@ -23,16 +23,29 @@ func _ready():
 
 
 # Handle Character
+func _set_cell_character_on(character, cell):
+	# Update the cell so it has a reference to the character on
+	if character.current_cell != null:
+		character.current_cell.character_on = null
+	cell.character_on = character
+		
 func create_character(team):
 	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor)-1)]
 	var character = Character.instance()
 	character.init(cell, team, self)
+	_set_cell_character_on(character, cell)
 	add_child(character)
 	
 	if team == 'blue':
 		team_blue += [character]
 	elif team == 'red':
 		team_red += [character]
+
+func make_current_character_move_following_path():
+	# Movement limitation
+	state = 'moving'
+	current_character.move_following_path(path)
+	_set_cell_character_on(current_character, path[-1])
 
 func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
@@ -41,12 +54,6 @@ func make_current_character_cast_spell(cell):
 	fov = []
 	clear_arena()
 	state = 'normal'
-
-func make_current_character_move_following_path():
-	# Movement limitation
-	state = 'moving'
-	current_character.move_following_path(path)
-
 
 
 
@@ -77,6 +84,7 @@ func _on_ButtonSpell_pressed():
 	
 func _on_ButtonClear_pressed():
 	clear_arena()
+	print(team_blue[0].current_health, ' : ', team_red[0].current_health)
 
 
 
@@ -104,8 +112,6 @@ func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path) > 0 :
 			make_current_character_move_following_path()
-		else:
-			print('no path')
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
 

@@ -5,7 +5,7 @@ signal cell_clicked
 var q
 var r
 var kind
-
+var character_on
 
 const CIRCLE_RAY = 1
 const SPACE_BETWEEN = 0
@@ -22,6 +22,7 @@ func init(_q, _r, _kind, battle_scene):
 	q = _q
 	r = _r
 	kind = _kind
+	character_on = null
 	
 	translation.x = q * TRANS_RIGHT.x + r * TRANS_DOWNRIGHT.x
 	translation.z = r * TRANS_DOWNRIGHT.y
@@ -35,6 +36,8 @@ func init(_q, _r, _kind, battle_scene):
 
 func change_material(material_key):
 	$Circle.set_surface_material(0, Global.materials[material_key])
+
+
 
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click

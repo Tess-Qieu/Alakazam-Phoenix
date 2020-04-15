@@ -2,15 +2,21 @@ extends KinematicBody
 
 export var speed = 10
 
-export var dammage_amount = 15
-
 var is_casting = false
 var vect = Vector3(0, 0, 0)
 var distance_to_make = 0
 var distance_traveled = 0
+var cell_targeted = null
+
+export var damage_amout = 10
 
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
+	
+func apply_on_target():
+	var target = cell_targeted.character_on
+	if target != null:
+		target.current_health -= damage_amout
 
 func cast(thrower, target):
 	# Translate the ball in front of the character
@@ -26,6 +32,7 @@ func cast(thrower, target):
 	translation += 1*vect
 	distance_traveled += 1.5*euclidean_dist(vect)
 	
+	cell_targeted = target
 	is_casting = true
 	
 func _physics_process(delta):
@@ -40,4 +47,4 @@ func _physics_process(delta):
 			is_casting = false
 			visible = false
 			queue_free()
-		
+			apply_on_target()
