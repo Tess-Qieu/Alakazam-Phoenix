@@ -1,10 +1,11 @@
 extends Spatial
 
+signal cell_clicked
+
 var q
 var r
 var kind
 
-signal cell_clicked
 
 const CIRCLE_RAY = 1
 const SPACE_BETWEEN = 0
@@ -29,8 +30,6 @@ func init(_q, _r, _kind, battle_scene):
 	if battle_scene != null and kind == 'floor':
 		# warning-ignore:return_value_discarded
 		$Circle/Area.connect("mouse_entered", battle_scene, "_on_cell_hovered", [self])
-		# warning-ignore:return_value_discarded
-		$Circle/Area.connect("mouse_exited", battle_scene, "_on_cell_unhovered", [self])
 		# warning-ignore:return_value_discarded
 		connect("cell_clicked", battle_scene, "_on_cell_clicked", [self])
 

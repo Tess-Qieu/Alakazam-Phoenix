@@ -7,7 +7,8 @@ var materials = {'hole': 'ae8257',
 				'blue': '2876df',
 				'red': 'df4828',
 				'green': '79cc2b',
-				'skyblue': '87ceeb'
+				'skyblue': '87ceeb',
+				'grey': 'c6beba'
 				} 
 
 func _ready():

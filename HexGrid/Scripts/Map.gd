@@ -26,6 +26,8 @@ func _ready():
 	instance_map()
 
 
+
+
 # Usefull functions
 func distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
@@ -152,11 +154,11 @@ func _compute_line(start, end):
 	line.append(end)
 	return line
 
-func compute_field_of_view(cell, distance):
+func _compute_field_of_view(cell, distance_max):
 	var cells_visible = []
 	for target in cells_floor:
 		
-		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance:
+		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance_max:
 			var line = _compute_line(cell, target)
 			line += _compute_line(target, cell)
 			
@@ -169,8 +171,8 @@ func compute_field_of_view(cell, distance):
 				
 	return cells_visible
 
-func display_field_of_view(cell, distance):
-	var cells_visible = compute_field_of_view(cell, distance)
+func display_field_of_view(cell, distance_max):
+	var cells_visible = _compute_field_of_view(cell, distance_max)
 	for c in cells_visible:
 		c.change_material('green')
 	return cells_visible
@@ -204,8 +206,13 @@ func _neighbors (cell):
 	
 	return list
 
-func compute_path(start, end):
-	# Function calculating a path between two cells. 
+func _compute_path(start, end, distance_max):
+	# Function calculating a path between two cells
+	if distance_coord(start.q, start.r, end.q, end.r) > distance_max:
+		# If the distance between start and end is taller than distance_max
+		# then no path < distance_max can be found
+		return []
+		
 	# Starting cell is not included in the path, but ending cell is
 	# The frontier is the line of farest cells reached
 	var frontier = []
@@ -233,49 +240,48 @@ func compute_path(start, end):
 				frontier.append(next)
 				came_from[next] = current_cell
 	
-	# The path is calculated from end to start, then reversed
-	var _path = [end]
+	if not (end in came_from.keys()) :
+		# There is no path to reach end from start
+		return []
+		
+	# The path is calculated from end to start, then reversed	
+	var _path = [end]	
 	current_cell = came_from[end]
 	while current_cell != start and current_cell != null:
 		_path.append(current_cell)
 		current_cell = came_from[current_cell]
 	_path.invert()
 	
+	if len(_path) > distance_max:
+		# If the path is taller than distance_max, then there is no path.
+		_path = []
+	
 	return _path
 
-func draw_path(start, end):
-	var path = compute_path(start, end)
+func display_path(start, end, distance_max):
+	var path = _compute_path(start, end, distance_max)
 	for elt in path:
 		elt.change_material('green')
-	end.change_material('skyblue')
+	return path
 
-func draw_path_limited(start, end, limit):
-	# Draws a path within a limited range of cells
-	var path = compute_path(start, end)
-	if path.size() > limit:
-		path.resize(limit)
-	for elt in path:
-		elt.change_material('green')
-	path[-1].change_material('skyblue')
-
-func compute_range(start, range_int):
+func _compute_displacement_range(start, distance_max):
 	var visited = [start]
 	var reachable = [[start]]
 	
-	for i in range(1, range_int+1):
+	for i in range(1, distance_max+1):
 		reachable.append([])
 		for cell in reachable[i-1]:
 			for neighbor in _neighbors(cell):
 				if ( not(neighbor in visited) and (neighbor.kind == 'floor')):
 					visited.append(neighbor)
 					reachable[i].append(neighbor)
-	
 	return visited
 
-func draw_range(start, range_int):
-	var zone = compute_range(start, range_int)
+func display_displacement_range(start, distance_max):
+	var zone = _compute_displacement_range(start, distance_max)
 	for cell in zone:
 		cell.change_material('green')
+	return zone
 
 
 

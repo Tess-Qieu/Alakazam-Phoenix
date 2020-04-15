@@ -1,43 +1,60 @@
 extends KinematicBody
 
 signal character_selected
-signal character_arrived
-signal character_hovered
+signal character_movement_finished
+
 
 var Spell = preload("res://Scenes/Spell.tscn")
 
-var current_cell
-var destination_path
-
-# Movement margin used to discriminate if the character has arrived on a cell
-const MVT_MARGIN = 0.01
 
 # Movement variables
 export var speed = 250 #NOT WORKING IF speed > 250
-export var movement_range = 6
-var moving = false
 
-# Health variables & constants
+var moving = false
+var destination_path
+
+const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character has arrived on a cell
+
+
+
+# Stats informations
+var current_cell
+
 const START_HEALTH = 100 
 var current_health
 
-func init(cell, team):
+const START_RANGE_DISPLACEMENT = 5
+var current_range_displacement
+
+
+
+## GENERAL SECTION ##
+func init(cell, team, battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
 	current_cell = cell
 	change_material(team)
-	connect("mouse_entered", self, "_on_Character_mouse_entered")
+	
 	current_health = START_HEALTH
+	current_range_displacement = START_RANGE_DISPLACEMENT
+	
+	# warning-ignore:return_value_discarded
+	connect("character_selected", battle_scene, "_on_character_selected", [self])
+	# warning-ignore:return_value_discarded
+	connect("mouse_entered", battle_scene, "_on_character_hovered", [self])
+	# warning-ignore:return_value_discarded
+	connect("character_movement_finished", battle_scene, "_on_character_movement_finished")
 
 func _physics_process(delta):
 	if moving:
-		_process_movement(delta)	
-
-
-## GENERAL SECTION ##
+		_process_movement(delta)
+		
 func change_material(material_key):
 	$MeshInstance.set_surface_material(0, Global.materials[material_key])
+
+
+
 
 
 ## SPELL SECTION ##
@@ -52,13 +69,14 @@ func cast_spell(target):
 
 
 
+
 ## MOVEMENT SECTION ##
 func teleport_to(cell):
 	current_cell = cell
 	translation.x = cell.translation.x
 	translation.z = cell.translation.z
 
-func set_path(path):
+func move_following_path(path):
 	destination_path = path
 	moving = true
 	$AnimationPlayer.play("movement",-1,speed/100.0)
@@ -85,6 +103,7 @@ func _process_movement(delta):
 		velocity = velocity * speed * delta
 		
 		# Movement action
+		# warning-ignore:return_value_discarded
 		move_and_slide(velocity)
 		
 	else: # If the character has reached the cell (within a margin)
@@ -99,7 +118,10 @@ func _process_movement(delta):
 			$AnimationPlayer.play("movement",-1,speed/100.0)
 		else:
 			moving = false
-			emit_signal("character_arrived")
+			emit_signal("character_movement_finished")
+
+
+
 
 
 ## EVENT SECTION ##
@@ -112,6 +134,3 @@ func _on_Character_input_event(_camera, event, _click_position, _click_normal, _
 			
 		elif event.button_index == BUTTON_RIGHT:
 			pass
-
-func _on_Character_mouse_entered():
-	emit_signal("character_hovered")

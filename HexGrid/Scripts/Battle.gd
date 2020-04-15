@@ -6,10 +6,12 @@ var team_blue = []
 var team_red = []
 var current_character
 
-var state = 'normal'
+var state = 'normal' # ['normal', 'cast_spell', 'movement']
 var fov = []
+var path = []
 
 var rng = RandomNumberGenerator.new()
+
 
 # Handle initialization
 func _ready():
@@ -18,14 +20,13 @@ func _ready():
 	current_character = team_blue[0]
 	clear_arena()
 
+
+
 # Handle Character
 func create_character(team):
 	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor)-1)]
 	var character = Character.instance()
-	character.init(cell, team)
-	character.connect("character_selected", self, "_on_character_selected", [character])
-	character.connect("character_arrived", self, "_on_character_arrived")
-	character.connect("character_hovered", self, "_on_character_hovered", [character])
+	character.init(cell, team, self)
 	add_child(character)
 	
 	if team == 'blue':
@@ -41,14 +42,13 @@ func make_current_character_cast_spell(cell):
 	clear_arena()
 	state = 'normal'
 
-func make_current_character_move_to(cell):
-	# Movement computation
-	var path = $Map.compute_path(current_character.current_cell, cell)
+func make_current_character_move_following_path():
 	# Movement limitation
-	if path.size() > current_character.movement_range:
-		path.resize(current_character.movement_range)
-	current_character.set_path(path)
 	state = 'moving'
+	current_character.move_following_path(path)
+
+
+
 
 
 # Handle clear
@@ -80,11 +80,18 @@ func _on_ButtonClear_pressed():
 
 
 
-func _on_character_arrived():
+
+
+# Handle waiting events
+func _on_character_movement_finished():
 	state = 'normal'
 	clear_arena()
-	
-# On object clicked
+
+
+
+
+
+# Handle On object clicked
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		# select character
@@ -95,25 +102,28 @@ func _on_character_selected(character):
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
-		make_current_character_move_to(cell)
+		if len(path) > 0 :
+			make_current_character_move_following_path()
+		else:
+			print('no path')
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
 
 
 
-# On object hovered
+
+
+
+# Handle On object hovered
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()
-#		$Map.draw_path(current_character.current_cell, cell)
-		$Map.draw_path_limited(current_character.current_cell, cell, current_character.movement_range)
-
-func _on_cell_unhovered(_cell):
-	# useless for now, may have some interest later 
-	pass
-	
+		path = $Map.display_path(current_character.current_cell, 
+								cell, 
+								current_character.current_range_displacement)
 	
 func _on_character_hovered(character):
 	if state == 'normal':
 		clear_arena()
-		$Map.draw_range(character.current_cell, character.movement_range)
+		$Map.display_displacement_range(character.current_cell, 
+										character.current_range_displacement)
