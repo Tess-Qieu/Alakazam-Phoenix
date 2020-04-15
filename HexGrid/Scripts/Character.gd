@@ -2,6 +2,7 @@ extends KinematicBody
 
 signal character_selected
 signal character_movement_finished
+signal character_dead
 
 
 var Spell = preload("res://Scenes/Spell.tscn")
@@ -18,7 +19,7 @@ const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character 
 
 
 # Stats informations
-var current_cell
+var current_cell setget set_current_cell
 
 const START_HEALTH = 15 
 var current_health
@@ -33,7 +34,7 @@ func init(cell, team, battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
-	current_cell = cell
+	set_current_cell(cell)
 	change_material(team)
 	
 	current_health = START_HEALTH
@@ -44,7 +45,10 @@ func init(cell, team, battle_scene):
 	# warning-ignore:return_value_discarded
 	connect("mouse_entered", battle_scene, "_on_character_hovered", [self])
 	# warning-ignore:return_value_discarded
-	connect("character_movement_finished", battle_scene, "_on_character_movement_finished")
+	connect("character_movement_finished", battle_scene, \
+			"_on_character_movement_finished")
+	# warning-ignore:return_value_discarded
+	connect("character_dead", battle_scene, "_on_character_dead", [self])
 
 func _physics_process(delta):
 	if moving:
@@ -56,9 +60,20 @@ func change_material(material_key):
 func die():
 	change_material('grey')
 	current_range_displacement = 0
-	print("RIP in pepperoni")
+	emit_signal("character_dead")	
 
 
+
+
+
+## GETTERS AND SETTERS ##
+func set_current_cell(cell):
+	if current_cell != null:
+		current_cell.kind = 'floor'
+		current_cell.character_on = null
+	current_cell = cell
+	current_cell.kind = 'blocked'
+	current_cell.character_on = self
 
 
 
@@ -84,7 +99,7 @@ func apply_dmg(dmg_amount):
 
 ## MOVEMENT SECTION ##
 func teleport_to(cell):
-	current_cell = cell
+	set_current_cell(cell)
 	translation.x = cell.translation.x
 	translation.z = cell.translation.z
 
@@ -137,7 +152,8 @@ func _process_movement(delta):
 
 
 ## EVENT SECTION ##
-func _on_Character_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
+func _on_Character_input_event(_camera, event, _click_position, \
+								_click_normal, _shape_idx):
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
 		# A different material is applied on each button
