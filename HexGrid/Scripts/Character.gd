@@ -20,7 +20,7 @@ const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character 
 # Stats informations
 var current_cell
 
-const START_HEALTH = 100 
+const START_HEALTH = 15 
 var current_health
 
 const START_RANGE_DISPLACEMENT = 5
@@ -53,6 +53,11 @@ func _physics_process(delta):
 func change_material(material_key):
 	$MeshInstance.set_surface_material(0, Global.materials[material_key])
 
+func die():
+	change_material('grey')
+	current_range_displacement = 0
+	print("RIP in pepperoni")
+
 
 
 
@@ -66,6 +71,13 @@ func cast_spell(target):
 	var spell = Spell.instance()
 	spell.cast(current_cell, target)
 	get_parent().add_child(spell)
+
+func apply_dmg(dmg_amount):
+	$AnimationPlayer.play("receive_dmg")
+	if current_health - dmg_amount < 0:
+		die()
+	else:
+		current_health -= dmg_amount
 
 
 
