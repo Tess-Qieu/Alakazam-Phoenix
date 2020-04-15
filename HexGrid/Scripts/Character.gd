@@ -14,8 +14,12 @@ const MVT_MARGIN = 0.01
 
 # Movement variables
 export var speed = 250 #NOT WORKING IF speed > 250
-var moving = false
 export var movement_range = 6
+var moving = false
+
+# Health variables & constants
+const START_HEALTH = 100 
+var current_health
 
 func init(cell, team):
 	translation.x = cell.translation.x
@@ -24,6 +28,7 @@ func init(cell, team):
 	current_cell = cell
 	change_material(team)
 	connect("mouse_entered", self, "_on_Character_mouse_entered")
+	current_health = START_HEALTH
 
 func _physics_process(delta):
 	if moving:

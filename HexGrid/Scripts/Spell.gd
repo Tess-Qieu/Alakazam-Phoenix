@@ -2,6 +2,8 @@ extends KinematicBody
 
 export var speed = 10
 
+export var dammage_amount = 15
+
 var is_casting = false
 var vect = Vector3(0, 0, 0)
 var distance_to_make = 0
