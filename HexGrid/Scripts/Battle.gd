@@ -13,7 +13,7 @@ var path = []
 var rng = RandomNumberGenerator.new()
 
 
-# Handle initialization
+## Handle initialization ##
 func _ready():
 	create_character('blue')
 	create_character('red')
@@ -22,18 +22,28 @@ func _ready():
 
 
 
-# Handle Character
-func _set_cell_character_on(character, cell):
-	# Update the cell so it has a reference to the character on
+## Handle Character ##
+func _update_character_cell_references(character, new_cell):
+	## Update references from cell to character and from character to cell
+	
+	# if the character had a cell reference
 	if character.current_cell != null:
+		# The previous cell forgets the character reference 
+		#  and gets back to floor kind
 		character.current_cell.character_on = null
-	cell.character_on = character
-		
+		character.current_cell.kind = 'floor'
+	
+	# The character's new cell reference and kind are update
+	character.current_cell = new_cell
+	new_cell.kind = 'blocked'
+	# The new cell gets a reference to the player on it
+	new_cell.character_on = character
+
 func create_character(team):
 	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor)-1)]
 	var character = Character.instance()
 	character.init(cell, team, self)
-	_set_cell_character_on(character, cell)
+	_update_character_cell_references(character, cell)
 	add_child(character)
 	
 	if team == 'blue':
@@ -44,8 +54,7 @@ func create_character(team):
 func make_current_character_move_following_path():
 	# Movement limitation
 	state = 'moving'
-	current_character.move_following_path(path)
-	_set_cell_character_on(current_character, path[-1])
+	current_character.move_to(path.pop_front())
 
 func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
@@ -68,7 +77,7 @@ func disconnect_character(character):
 
 
 
-# Handle clear
+## Handle clear ##
 func _color_current_character_cell():
 	if (current_character in team_blue):
 		current_character.current_cell.change_material('blue')
@@ -86,7 +95,7 @@ func clear_arena():
 
 
 
-# Handle button events
+## Handle button events ##
 func _on_ButtonSpell_pressed():
 	clear_arena()
 	fov = $Map.display_field_of_view(current_character.current_cell, 20)
@@ -100,16 +109,20 @@ func _on_ButtonClear_pressed():
 
 
 
-# Handle waiting events
-func _on_character_movement_finished():
-	state = 'normal'
-	clear_arena()
+## Handle waiting events ##
+func _on_character_movement_finished(character, ending_cell):
+	_update_character_cell_references(character, ending_cell)
+	if path.size() == 0:
+		state = 'normal'
+		clear_arena()
+	else:
+		make_current_character_move_following_path()
 
 
 
 
 
-# Handle On object clicked
+## Handle On object clicked ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		# select character
@@ -130,7 +143,7 @@ func _on_cell_clicked(cell):
 
 
 
-# Handle On object hovered
+## Handle On object hovered ##
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()
