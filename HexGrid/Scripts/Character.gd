@@ -2,7 +2,7 @@ extends KinematicBody
 
 signal character_selected
 signal character_movement_finished
-signal character_dead
+signal character_die
 
 
 var Spell = preload("res://Scenes/Spell.tscn")
@@ -10,11 +10,10 @@ var Spell = preload("res://Scenes/Spell.tscn")
 
 # Movement variables
 export var speed = 250 #NOT WORKING IF speed > 250
+const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character has arrived on a cell
 
 var moving = false
 var destination_cell
-
-const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character has arrived on a cell
 
 
 
@@ -40,14 +39,13 @@ func init(cell, team, battle_scene):
 	current_range_displacement = START_RANGE_DISPLACEMENT
 	
 	# warning-ignore:return_value_discarded
-	connect("character_selected", battle_scene, "_on_character_selected", [self])
+	connect('character_selected', battle_scene, '_on_character_selected', [self])
 	# warning-ignore:return_value_discarded
-	connect("mouse_entered", battle_scene, "_on_character_hovered", [self])
+	connect('mouse_entered', battle_scene, '_on_character_hovered', [self])
 	# warning-ignore:return_value_discarded
-	connect("character_movement_finished", battle_scene, \
-			"_on_character_movement_finished")
-	# warning-ignore:return_value_discarded
-	connect("character_dead", battle_scene, "_on_character_dead", [self])
+	connect('character_movement_finished', battle_scene, \
+			'_on_character_movement_finished')
+	connect('character_die', battle_scene, '_on_character_die', [self])
 
 func _physics_process(delta):
 	if moving:
@@ -56,10 +54,6 @@ func _physics_process(delta):
 func change_material(material_key):
 	$MeshInstance.set_surface_material(0, Global.materials[material_key])
 
-func die():
-	change_material('grey')
-	current_range_displacement = 0
-	emit_signal("character_dead")
 
 
 
@@ -73,14 +67,23 @@ func cast_spell(target):
 	spell.cast(current_cell, target)
 	get_parent().add_child(spell)
 
-func apply_dmg(dmg_amount):
+
+
+## DAMAGE SECTION ##
+func die(battle_scene):
+	change_material('grey')
+	current_range_displacement = 0
+	
+	disconnect('character_selected', battle_scene, '_on_character_selected')
+	disconnect('mouse_entered', battle_scene, '_on_character_hovered')
+	disconnect('character_movement_finished', battle_scene, \
+			'_on_character_movement_finished')
+
+func receive_damage(dmg_amount):
 	$AnimationPlayer.play("receive_dmg")
-	if current_health - dmg_amount < 0:
-		die()
-	else:
-		current_health -= dmg_amount
-
-
+	current_health -= dmg_amount
+	if current_health <= 0:
+		emit_signal('character_die')
 
 
 ## MOVEMENT SECTION ##

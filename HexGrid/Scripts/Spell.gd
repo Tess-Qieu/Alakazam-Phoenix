@@ -16,7 +16,7 @@ func euclidean_dist(vec):
 func apply_on_target():
 	var target = cell_targeted.character_on
 	if target != null:
-		target.apply_dmg(damage_amout)
+		target.receive_damage(damage_amout)
 
 func cast(thrower, target):
 	# Translate the ball in front of the character

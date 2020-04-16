@@ -60,19 +60,13 @@ func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
 	if cell in fov:
 		current_character.cast_spell(cell)
+	print(team_blue[0].current_health, ' : ', team_red[0].current_health)
 	fov = []
 	clear_arena()
 	state = 'normal'
 
-func _on_character_dead(character):
-	disconnect_character(character) 
-
-func disconnect_character(character):
-	if character.is_connected("character_selected", self, "_on_character_selected"):
-		character.disconnect("character_selected", self, "_on_character_selected")
-	
-	if character.is_connected("mouse_entered", self, "_on_character_hovered"):
-		character.disconnect("mouse_entered", self, "_on_character_hovered")
+func _on_character_die(character):
+	character.die(self)
 
 
 
