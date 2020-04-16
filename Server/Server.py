@@ -7,6 +7,7 @@ import websockets
 
 async def hello(websocket, path):
     name = await websocket.recv()
+    name = name.decode()
     print(f"< {name}")
 
     greeting = f"Hello {name}!"
