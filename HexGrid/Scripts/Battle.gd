@@ -28,14 +28,11 @@ func _update_character_cell_references(character, new_cell):
 	
 	# if the character had a cell reference
 	if character.current_cell != null:
-		# The previous cell forgets the character reference 
-		#  and gets back to floor kind
+		# The previous cell forgets the character reference
 		character.current_cell.character_on = null
-		character.current_cell.kind = 'floor'
 	
 	# The character's new cell reference and kind are update
 	character.current_cell = new_cell
-	new_cell.kind = 'blocked'
 	# The new cell gets a reference to the player on it
 	new_cell.character_on = character
 
