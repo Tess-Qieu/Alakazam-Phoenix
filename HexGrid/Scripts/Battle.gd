@@ -60,7 +60,6 @@ func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
 	if cell in fov:
 		current_character.cast_spell(cell)
-	print(team_blue[0].current_health, ' : ', team_red[0].current_health)
 	fov = []
 	clear_arena()
 	state = 'normal'
@@ -97,7 +96,6 @@ func _on_ButtonSpell_pressed():
 	
 func _on_ButtonClear_pressed():
 	clear_arena()
-	print(team_blue[0].current_health, ' : ', team_red[0].current_health)
 
 
 

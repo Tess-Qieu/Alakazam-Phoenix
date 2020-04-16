@@ -45,6 +45,7 @@ func init(cell, team, battle_scene):
 	# warning-ignore:return_value_discarded
 	connect('character_movement_finished', battle_scene, \
 			'_on_character_movement_finished')
+	# warning-ignore:return_value_discarded
 	connect('character_die', battle_scene, '_on_character_die', [self])
 
 func _physics_process(delta):
