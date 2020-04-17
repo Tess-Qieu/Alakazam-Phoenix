@@ -10,29 +10,6 @@ import ManagerLobbys
 
 
 
-## COMMUNICATION FUNCTIONS ##
-def decode_msg(msg):
-    data = json.loads(msg.decode())
-    print(f"< {data}")
-    return data
-
-def encode_data(data):
-    msg = json.dumps(data).encode()
-    print(f"> {msg.decode()}")
-    return msg
-
-async def receive_data(websocket):
-    msg = await websocket.recv()
-    return decode_msg(msg)
-
-async def send_data(websocket, data):
-    msg = encode_data(data)
-    await websocket.send(msg)
-
-
-
-
-
 class User():
     '''This class holds the variables needed to represent a user.'''
 
@@ -60,13 +37,13 @@ class Server():
             await self.accept_connection(websocket, path)
             async for message in websocket:
                 self.handle_message(websocket, message)
-        except:
-            pass
+        # except:
+        #     pass
         finally:
             self.close_connection(websocket)
 
     async def accept_connection(self, websocket, path):
-        data = await receive_data(websocket)
+        data = await self.receive_data(websocket)
         if data['action'] != 'connection':
             raise Exception('NetworkError: Expect Action to be a Connection.')
         pseudo = data['details']['pseudo']
@@ -74,14 +51,14 @@ class Server():
         self.add_user(websocket, path, pseudo)
 
         response = {'action' : 'connection', 'details' : {'accept' : True}}
-        await send_data(websocket, response)
+        await self.send_data(websocket, response)
 
     def handle_message(self, websocket, message):
-        data = decode_msg(message)
+        data = self.decode_msg(websocket, message)
         print(data)
 
     def close_connection(self, websocket):
-        print(f'User {self.users[websocket]} closed the connection.')
+        print(f'User {self.users[websocket].pseudo} closed the connection.')
         self.remove_user(websocket)
 
 
@@ -93,6 +70,33 @@ class Server():
 
     def remove_user(self, websocket):
         del(self.users[websocket])
+
+
+
+    ## COMMUNICATION FUNCTIONS ##
+    def decode_msg(self, websocket, msg):
+        data = json.loads(msg.decode())
+        if websocket in self.users.keys():
+            print(f"< from {self.users[websocket].pseudo} : {data}")
+        else:
+            print(f"< from unknown client : {data}")
+        return data
+
+    def encode_data(self, websocket, data):
+        msg = json.dumps(data).encode()
+        if websocket in self.users.keys():
+            print(f"> to {self.users[websocket].pseudo} : {msg.decode()}")
+        else:
+            print(f"> to unknown client : {msg.decode()}")
+        return msg
+
+    async def receive_data(self, websocket):
+        msg = await websocket.recv()
+        return self.decode_msg(websocket, msg)
+
+    async def send_data(self, websocket, data):
+        msg = self.encode_data(websocket, data)
+        await websocket.send(msg)
 
 
 

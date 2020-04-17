@@ -17,7 +17,7 @@ func _ready():
 func send_data(data):
 	# data must be a dictionary
 	var msg = JSON.print(data).to_utf8()
-	print('> ' + JSON.print(data))
+	print('> Client : ' + JSON.print(data))
 	_client.get_peer(1).put_packet(msg)
 
 func connect_to_server():
@@ -47,7 +47,7 @@ func _on_connection_opened(_procotols = ''):
 func _on_data_received():
 	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
 	var data = JSON.parse(msg).result
-	print('< ' + msg)
+	print('< Server : ' + msg)
 	
 	var node_game = get_parent()
 	node_game.server_receiver_node._on_message(data)
