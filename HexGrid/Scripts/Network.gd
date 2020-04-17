@@ -11,7 +11,7 @@ func _ready():
 	_client.connect("connection_closed", self, "_on_connection_closed")
 	_client.connect("connection_error", self, "_on_connection_closed")
 	_client.connect("connection_established", self, "_on_connection_opened")
-	_client.connect("data_received", self, "_on_data_received")
+	_client.connect("data_received", self, "_on_message")
 
 
 func send_data(data):
@@ -44,7 +44,7 @@ func _on_connection_opened(_procotols = ''):
 	# always be attached to the Game.)
 	get_parent()._on_connection_to_server()
 	
-func _on_data_received():
+func _on_message():
 	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
 	var data = JSON.parse(msg).result
 	print('< Server : ' + msg)

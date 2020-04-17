@@ -27,7 +27,7 @@ class Server():
     def __init__(self):
         logging.basicConfig()
         self.users = dict()
-        self.manager_lobbys = ManagerLobbys.ManagerLobbys()
+        self.manager_lobbys = ManagerLobbys.ManagerLobbys(self)
 
 
     ## MANAGE CONNECTION WITH CLIENT ##
@@ -36,7 +36,7 @@ class Server():
         try:    
             await self.accept_connection(websocket, path)
             async for message in websocket:
-                self.handle_message(websocket, message)
+                await self._on_message(websocket, message)
         # except:
         #     pass
         finally:
@@ -53,13 +53,16 @@ class Server():
         response = {'action' : 'connection', 'details' : {'accept' : True}}
         await self.send_data(websocket, response)
 
-    def handle_message(self, websocket, message):
-        data = self.decode_msg(websocket, message)
-        print(data)
-
     def close_connection(self, websocket):
         print(f'User {self.users[websocket].pseudo} closed the connection.')
         self.remove_user(websocket)
+
+    async def _on_message(self, websocket, message):
+        # Called when a new message is received
+        data = self.decode_msg(websocket, message)
+        user = self.users[websocket]
+        await self.manager_lobbys._on_message(data, user)
+
 
 
 
