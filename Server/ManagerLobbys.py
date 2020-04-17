@@ -34,7 +34,7 @@ class ManagerLobbys():
 
             if len(self.users_waiting_to_play) >= 2:
                 # Two users are waiting, they can play
-                self.new_game()
+                await self.new_game()
 
             else:
                 # Only one user is waiting to play, he has to wait
@@ -61,10 +61,14 @@ class ManagerLobbys():
         await self.server.send_data(user.websocket, data)
     
 
-    def new_game(self):
+    async def new_game(self):
         # Create a new game
         user_1 = self.users_waiting_to_play.pop(0)
         user_2 = self.users_waiting_to_play.pop(0)
         print(f'New game with users {user_1.pseudo} and {user_2.pseudo}.')
         
         lobby = Lobby.Lobby([user_1, user_2])
+
+        data = {'action' : 'new game', 'details' : {'grid' : lobby.map.grid}}
+        await self.server.send_data(user_1.websocket, data)
+        await self.server.send_data(user_2.websocket, data)

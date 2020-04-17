@@ -15,10 +15,6 @@ var last_mouse_position = Vector2(-1, -1)
 func _ready():
 	rng.randomize()
 
-func init():
-	instance_map()
-
-
 
 
 # Usefull functions
@@ -47,7 +43,8 @@ func _instance_cell(cell_type, q, r, kind):
 	if kind == "floor":
 		cells_floor += [cell]
 
-func instance_map():
+func instance_map(new_grid):
+	grid = new_grid
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]

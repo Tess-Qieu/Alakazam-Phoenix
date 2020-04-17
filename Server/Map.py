@@ -38,7 +38,7 @@ class Map():
             
         def _generate_one_gridline(self, line_size, r):
             kind = ''
-            half = int(line_size / 2 if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1))
+            half = int(line_size / 2 if line_size % 2 == 0 else (line_size / 2 + 1))
             q = -self.RAY -r if r <= 0 else -self.RAY
             # first part : random
             for i in range(half):
@@ -47,7 +47,7 @@ class Map():
                 else:
                     kind = _random_kind(self)
                 _add_instance_to_grid(self, kind, q, r)
-                if line_size / 2.0 == line_size / 2 or i + 1 != half :
+                if line_size % 2 == 0 or i + 1 != half :
                     _add_instance_to_grid(self, kind, line_size - 2*i + q - 1, r)
                 q += 1
 

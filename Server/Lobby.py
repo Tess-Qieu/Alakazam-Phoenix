@@ -11,6 +11,4 @@ class Lobby():
     def __init__(self, players, observators=[]):
         self.players = players
         self.observators = observators
-
         self.map = Map.Map()
-        print(self.map.grid)

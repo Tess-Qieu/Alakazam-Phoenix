@@ -14,14 +14,8 @@ var rng = RandomNumberGenerator.new()
 
 
 ## Handle initialization ##
-func _ready():
-	#create_character('blue')
-	#create_character('red')
-	#current_character = team_blue[0]
-	#clear_arena()
-	pass
-	
-func init():
+func init(grid):
+	$Map.instance_map(grid)
 	create_character('blue')
 	create_character('red')
 	current_character = team_blue[0]
