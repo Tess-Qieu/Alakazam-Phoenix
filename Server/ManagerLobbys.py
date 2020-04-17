@@ -26,5 +26,5 @@ class ManagerLobbys():
         self.players_waiting_to_play = []
 
 
-    def treat_request():
+    def treat_request(data):
         pass

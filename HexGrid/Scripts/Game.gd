@@ -47,10 +47,23 @@ func identify_to_server():
 
 func ask_to_play():
 	var data = {'action' : 'ask to play', 'details' : {}} # put team infos here
-#	Global.network.send_data(data)
+	Global.network.send_data(data)
 	
-func _on_message(_data):
-	pass
+func _on_message(data):
+	if not 'action' in data.keys():
+		print("NetworkError: no key action in data")
+		return
+		
+	if data['action'] == 'connection':
+		if data['details']['accept'] == true:
+			ask_to_play()
+	
+	elif data['action'] == 'ask to wait':
+		# The server is looking for a contestant
+		pass
+		
+	else :
+		print("NetworkError: action {} not known.".format([data['action']]))
 
 
 

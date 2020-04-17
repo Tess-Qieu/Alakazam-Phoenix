@@ -46,7 +46,7 @@ func _on_connection_opened(_procotols = ''):
 	
 func _on_data_received():
 	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
-	var data = JSON.parse(msg)	
+	var data = JSON.parse(msg).result
 	print('< ' + msg)
 	
 	var node_game = get_parent()

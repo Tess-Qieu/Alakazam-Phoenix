@@ -8,11 +8,9 @@ import logging
 
 import ManagerLobbys
 
-logging.basicConfig()
-
-USERS = dict()
 
 
+## COMMUNICATION FUNCTIONS ##
 def decode_msg(msg):
     data = json.loads(msg.decode())
     print(f"< {data}")
@@ -34,44 +32,74 @@ async def send_data(websocket, data):
 
 
 
-async def accept_connection(websocket):
-    data = await receive_data(websocket)
-    if data['action'] != 'connection':
-        raise Exception('NetworkError: Expect Action to be a Connection.')
-    pseudo = data['details']['pseudo']
 
-    USERS[websocket] = pseudo
+class User():
+    '''This class holds the variables needed to represent a user.'''
 
-    response = {'action' : 'connection', 'details' : {'accept' : True}}
-    await send_data(websocket, response)
-
-def close_connection(websocket):
-    print(f'User {USERS[websocket]} closed the connection.')
-    del(USERS[websocket])
+    def __init__(self, websocket, path, pseudo):
+        self.websocket = websocket
+        self.path = path
+        self.pseudo = pseudo
 
 
 
 
+class Server():
+    '''This class holds all the variables and functions the server needs.'''
 
-def handle_message(msg):
-    data = decode_msg(msg)
-    print(data)
-
-async def socket_connection(websocket, path):
-
-    print('New connection received.')
-
-    await accept_connection(websocket)
-    try:    
-        async for message in websocket:
-            handle_message(message)
-    except:
-        pass
-    finally:
-        close_connection(websocket)
+    def __init__(self):
+        logging.basicConfig()
+        self.users = dict()
+        self.manager_lobbys = ManagerLobbys.ManagerLobbys()
 
 
-start_server = websockets.serve(socket_connection, "localhost", 4225)
+    ## MANAGE CONNECTION WITH CLIENT ##
+    async def run(self, websocket, path):
+        print('New connection received.')
+        try:    
+            await self.accept_connection(websocket, path)
+            async for message in websocket:
+                self.handle_message(websocket, message)
+        except:
+            pass
+        finally:
+            self.close_connection(websocket)
+
+    async def accept_connection(self, websocket, path):
+        data = await receive_data(websocket)
+        if data['action'] != 'connection':
+            raise Exception('NetworkError: Expect Action to be a Connection.')
+        pseudo = data['details']['pseudo']
+
+        self.add_user(websocket, path, pseudo)
+
+        response = {'action' : 'connection', 'details' : {'accept' : True}}
+        await send_data(websocket, response)
+
+    def handle_message(self, websocket, message):
+        data = decode_msg(message)
+        print(data)
+
+    def close_connection(self, websocket):
+        print(f'User {self.users[websocket]} closed the connection.')
+        self.remove_user(websocket)
+
+
+
+    ## MANAGE USERS DICTIONARY ##
+    def add_user(self, websocket, path, pseudo):
+        user = User(websocket, path, pseudo)
+        self.users[websocket] = user
+
+    def remove_user(self, websocket):
+        del(self.users[websocket])
+
+
+
+
+
+server = Server()
+start_server = websockets.serve(server.run, "localhost", 4225)
 
 print('Server launched, waiting for connections...')
 asyncio.get_event_loop().run_until_complete(start_server)
