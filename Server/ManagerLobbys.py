@@ -2,6 +2,8 @@
 
 import asyncio
 
+import Lobby
+
 class ManagerID():
     """ Keep in memory all free games ids."""
     

@@ -22,6 +22,8 @@ const RAY = LENGTH_BORDER + RAY_ARENA
 # Initialization
 func _ready():
 	rng.randomize()
+
+func init():
 	generate_grid()
 	instance_map()
 
