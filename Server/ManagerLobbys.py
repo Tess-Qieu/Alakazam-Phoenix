@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import asyncio
-
 import Lobby
+
 
 class ManagerID():
     """ Keep in memory all free games ids."""
@@ -23,17 +23,21 @@ class ManagerLobbys():
     def __init__(self, server):
         self.lobbys = {}
         self.manager_id = ManagerID()
-        self.players_waiting_to_play = []
+        self.users_waiting_to_play = []
         self.server = server # usefull to send data to clients
 
 
     async def _on_message(self, data, user):
         
         if data['action'] == 'ask to play':
-            self.players_waiting_to_play += [user]
-            if len(self.players_waiting_to_play) >= 2:
-                print('more than two players')
+            self.users_waiting_to_play += [user]
+
+            if len(self.users_waiting_to_play) >= 2:
+                # Two users are waiting, they can play
+                self.new_game()
+
             else:
+                # Only one user is waiting to play, he has to wait
                 await self.ask_to_wait(user)
 
 
@@ -44,10 +48,23 @@ class ManagerLobbys():
             print(f'NetworkError: action {data["action"]} not known.')
             return
 
+    def _user_deconnection(self, user):
+        # 
+        if user in self.users_waiting_to_play:
+            self.users_waiting_to_play.remove(user)
 
-    def new_game(self):
-        pass
+
 
     async def ask_to_wait(self, user):
+        # Ask the client to wait until the Lobby Manager find an opponent
         data = {'action' : 'ask to wait', 'details' : {}}
         await self.server.send_data(user.websocket, data)
+    
+
+    def new_game(self):
+        # Create a new game
+        user_1 = self.users_waiting_to_play.pop(0)
+        user_2 = self.users_waiting_to_play.pop(0)
+        print(f'New game with users {user_1.pseudo} and {user_2.pseudo}.')
+        
+        lobby = Lobby.Lobby([user_1, user_2])

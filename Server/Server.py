@@ -54,7 +54,10 @@ class Server():
         await self.send_data(websocket, response)
 
     def close_connection(self, websocket):
-        print(f'User {self.users[websocket].pseudo} closed the connection.')
+        user = self.users[websocket]
+        print(f'User {user.pseudo} closed the connection.')
+
+        self.manager_lobbys._user_deconnection(user)
         self.remove_user(websocket)
 
     async def _on_message(self, websocket, message):
@@ -77,6 +80,14 @@ class Server():
 
 
     ## COMMUNICATION FUNCTIONS ##
+    async def receive_data(self, websocket):
+        msg = await websocket.recv()
+        return self.decode_msg(websocket, msg)
+
+    async def send_data(self, websocket, data):
+        msg = self.encode_data(websocket, data)
+        await websocket.send(msg)
+
     def decode_msg(self, websocket, msg):
         data = json.loads(msg.decode())
         if websocket in self.users.keys():
@@ -93,13 +104,6 @@ class Server():
             print(f"> to unknown client : {msg.decode()}")
         return msg
 
-    async def receive_data(self, websocket):
-        msg = await websocket.recv()
-        return self.decode_msg(websocket, msg)
-
-    async def send_data(self, websocket, data):
-        msg = self.encode_data(websocket, data)
-        await websocket.send(msg)
 
 
 

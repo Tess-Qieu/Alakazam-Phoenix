@@ -11,20 +11,11 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
-const PROBA_CELL_FULL = 0.1
-const PROBA_CELL_HOLE = 0.1
-const LENGTH_BORDER = 8
-const RAY_ARENA = 8
-const RAY = LENGTH_BORDER + RAY_ARENA
-
-
-
 # Initialization
 func _ready():
 	rng.randomize()
 
 func init():
-	generate_grid()
 	instance_map()
 
 
@@ -42,44 +33,6 @@ func add_instance_to_grid(instance, q, r):
 func clear():
 	for c in cells_floor:
 		c.change_material('floor')
-
-
-
-
-# Handle grid generation
-func _random_kind():
-	var value = rng.randf()
-	var lim = PROBA_CELL_FULL
-	if value  < lim:
-		return 'full'
-	lim += PROBA_CELL_HOLE
-	if value < lim:
-		return 'hole'
-	return 'floor'
-	
-func _generate_one_gridline(line_size, r):
-	var kind = ''
-	var half = line_size / 2 if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
-	var q = -RAY -r if r <= 0 else -RAY
-	# first part : random
-	for i in range(half):
-		if distance_coord(q, r, 0, 0) > RAY_ARENA:
-			kind = 'border'
-		else:
-			kind = _random_kind()
-		add_instance_to_grid(kind, q, r)
-		if line_size / 2.0 == line_size / 2 or i + 1 != half :
-			add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
-		q += 1
-
-func generate_grid():
-	var nb_cell = RAY + 1
-	for r in range(-RAY, 0) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell += 1
-	for r in range(RAY + 1) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell -= 1
 
 
 
