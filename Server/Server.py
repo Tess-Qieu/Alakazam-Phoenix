@@ -36,14 +36,13 @@ async def send_data(websocket, data):
 
 async def accept_connection(websocket):
     data = await receive_data(websocket)
-    print(data['Action'])
-    if data['Action'] != 'Connection':
+    if data['action'] != 'connection':
         raise Exception('NetworkError: Expect Action to be a Connection.')
-    pseudo = data['Details']['Pseudo']
+    pseudo = data['details']['pseudo']
 
     USERS[websocket] = pseudo
 
-    response = {'Action' : 'Connection', 'Details' : {'Accept' : True}}
+    response = {'action' : 'connection', 'details' : {'accept' : True}}
     await send_data(websocket, response)
 
 def close_connection(websocket):
@@ -60,6 +59,8 @@ def handle_message(msg):
 
 async def socket_connection(websocket, path):
 
+    print('New connection received.')
+
     await accept_connection(websocket)
     try:    
         async for message in websocket:
@@ -72,5 +73,6 @@ async def socket_connection(websocket, path):
 
 start_server = websockets.serve(socket_connection, "localhost", 4225)
 
+print('Server launched, waiting for connections...')
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()

@@ -5,8 +5,7 @@ export var websocket_url = "ws://127.0.0.1:4225"
 
 # Our WebSocketClient instance
 var _client = WebSocketClient.new()
-var _pseudo = ''
-var is_connected = false
+var is_connected = null
 
 func _ready():
 	_client.connect("connection_closed", self, "_on_connection_closed")
@@ -21,18 +20,15 @@ func send_data(data):
 	print('> ' + JSON.print(data))
 	_client.get_peer(1).put_packet(msg)
 
-func connect_to_server(pseudo):
+func connect_to_server():
 	# Initiate connection to the given URL.
-	_pseudo = pseudo
 	var err = _client.connect_to_url(websocket_url)
 	if err != OK:
 		print("Unable to connect")
+		is_connected = false
 		set_process(false)
 	else:
 		print('Connection made with the server.')
-		is_connected = true
-	
-	
 	
 	
 	
@@ -42,8 +38,11 @@ func _on_connection_closed(was_clean = false):
 	set_process(false)
 
 func _on_connection_opened(_procotols = ''):
-	var data = {'Action' : 'Connection', 'Details' : {'Pseudo' : _pseudo}}
-	send_data(data)
+	is_connected = true
+	# Prevent the game that the connection has been made
+	# (I don't really like to use get_parent(), but the network will
+	# always be attached to the Game.)
+	get_parent()._on_connection_to_server()
 	
 func _on_data_received():
 	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()

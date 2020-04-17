@@ -11,12 +11,20 @@ var materials = {'hole': 'ae8257',
 				'grey': 'c6beba'
 				} 
 
-func _ready():
-	init_materials()
+var network = null
 
-func init_materials():
+
+
+func _ready():
+	_init_materials()
+	_set_network()
+
+func _init_materials():
 	for key in materials.keys():
 		var color = materials[key]
 		var mat = SpatialMaterial.new()
 		mat.albedo_color = Color(color)
 		materials[key] = mat
+
+func _set_network():
+	network = get_tree().get_root().get_node('Game/Network')
