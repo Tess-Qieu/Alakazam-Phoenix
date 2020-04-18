@@ -20,6 +20,7 @@ var destination_cell
 # Stats informations
 var current_cell
 var team
+var id_character
 
 var start_health = 15 
 var current_health
@@ -30,13 +31,14 @@ var current_range_displacement
 
 
 ## GENERAL SECTION ##
-func init(cell, team, health, range_displacement,  battle_scene):
+func init(cell, team, id_character, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
 	change_material(team)
 	
 	self.team = team
+	self.id_character = id_character
 	
 	start_health = health
 	current_health = health

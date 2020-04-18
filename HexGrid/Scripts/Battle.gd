@@ -38,17 +38,21 @@ func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 ## Handle Character ##
 func _create_team(team_name, data):
 	for c in data:
-		var character = _create_character(team_name, int(c['q']), int(c['r']),  
-								int(c['health']), int(c['range displacement']))
+		var character = _create_character(team_name, 
+										int(c['q']), 
+										int(c['r']),
+										int(c['id_character']),
+										int(c['health']), 
+										int(c['range displacement']))
 		if team_name == 'blue':
 			team_blue += [character]
 		elif team_name == 'red':
 			team_red += [character]
 
-func _create_character(team, q, r, health, range_displacement):
+func _create_character(team, q, r, id_character, health, range_displacement):
 	var cell = $Map.grid[q][r]
 	var character = Character.instance()
-	character.init(cell, team, health, range_displacement, self)
+	character.init(cell, team, id_character, health, range_displacement, self)
 	
 	_update_character_cell_references(character, cell)
 	add_child(character)
@@ -153,8 +157,8 @@ func _on_character_selected(character):
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path) > 0 :
-#			emit_signal('ask_move', path)
-			make_current_character_move_following_path()
+			emit_signal('ask_move', path)
+#			make_current_character_move_following_path()
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
 

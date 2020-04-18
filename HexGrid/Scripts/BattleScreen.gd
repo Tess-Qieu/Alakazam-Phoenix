@@ -41,10 +41,10 @@ func _on_message(data):
 func new_game(data):
 	# Init the new Battle	
 	lobby_id = data['details']['id']
+	
 	var grid = transform_grid_keys(data['details']['grid'])
 	var team_blue = data['details']['team_blue']
 	var team_red = data['details']['team_red']
-		
 	get_battle().init(grid, team_blue, team_red, self)
 	
 	data = {'action' : 'new game', 'details' : {'ready' : true}}
@@ -60,9 +60,17 @@ func transform_grid_keys(grid):
 
 
 ## ASK PLAY TO SERVER
-func _on_ask_move(character, cell):
-	var data = {}
-	pass
+func _on_ask_move(character, path):
+	var path_serialized = []
+	for c in path:
+		path_serialized += [[c.q, c.r]]
+		
+	var data = {'action' : 'game',
+				'ask' : 'move', 
+				'details' : {'id_character' : character.id_character,
+							'path' : path_serialized,
+							}}
+	send_data(data)
 
 
 

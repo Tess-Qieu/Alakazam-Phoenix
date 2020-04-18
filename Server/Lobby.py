@@ -3,6 +3,7 @@
 import asyncio
 
 import Map
+from ManagerID import ManagerID
 
 
 class Game():
@@ -13,10 +14,12 @@ class Game():
 
 class Character():
 
-    def __init__(self, team, q, r):
+    def __init__(self, team, q, r, id_character):
         self.team = team
         self.q = q
         self.r = r
+        self.id_character = id_character
+
         self.health = 100
         self.range_displacement = 5
 
@@ -24,6 +27,7 @@ class Character():
         data = {'team' : self.team,
                 'q' : self.q,
                 'r' : self.r,
+                'id_character' : seld.id_character,
                 'health' : self.health,
                 'range displacement' : self.range_displacement}
         return data
@@ -42,11 +46,12 @@ class Lobby():
         self.players_ready = [False for p in self.players]
         self.observators = observators
 
+        self.manager_id = ManagerID()
         self.map = Map.Map()
 
         coords = self.map.random_coords_floor()
-        self.team_blue = [Character('blue', coords[0].q, coords[0].r)]
-        self.team_red = [Character('red', coords[1].q, coords[1].r)] 
+        self.team_blue = [Character('blue', coords[0].q, coords[0].r, self.manager_id.get_new_id())]
+        self.team_red = [Character('red', coords[1].q, coords[1].r, self.manager_id.get_new_id())] 
 
         
 
@@ -72,7 +77,12 @@ class Lobby():
 
 
         elif data['action'] == 'game':
-            pass
+            # game is running
+            if data['ask'] == 'move':
+                # user ask to move a character
+                id_character = data['details']['id_character']
+                path = data['details']['path']
+                game.ask_move(id_character, path)
 
         else:
             print(f'NetworkError: action {data["action"]} not known.')
