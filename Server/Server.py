@@ -3,6 +3,7 @@
 
 import asyncio
 import websockets
+from websockets.exceptions import ConnectionClosedError
 import json
 import logging
 
@@ -17,7 +18,7 @@ class User():
         self.websocket = websocket
         self.path = path
         self.pseudo = pseudo
-
+        self.current_lobby = None
 
 
 
@@ -37,8 +38,8 @@ class Server():
             await self.accept_connection(websocket, path)
             async for message in websocket:
                 await self._on_message(websocket, message)
-        # except:
-        #     pass
+        except ConnectionClosedError:
+            pass
         finally:
             self.close_connection(websocket)
 
@@ -57,7 +58,7 @@ class Server():
         user = self.users[websocket]
         print(f'User {user.pseudo} closed the connection.')
 
-        self.manager_lobbys._user_deconnection(user)
+        self.manager_lobbys._quit_lobby(user)
         self.remove_user(websocket)
 
     async def _on_message(self, websocket, message):
