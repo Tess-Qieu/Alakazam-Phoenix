@@ -41,7 +41,7 @@ class Server():
         except ConnectionClosedError:
             pass
         finally:
-            self.close_connection(websocket)
+            await self.close_connection(websocket)
 
     async def accept_connection(self, websocket, path):
         data = await self.receive_data(websocket)
@@ -54,11 +54,11 @@ class Server():
         response = {'action' : 'connection', 'details' : {'accept' : True}}
         await self.send_data(websocket, response)
 
-    def close_connection(self, websocket):
+    async def close_connection(self, websocket):
         user = self.users[websocket]
         print(f'User {user.pseudo} closed the connection.')
 
-        self.manager_lobbys._quit_lobby(user)
+        await self.manager_lobbys._quit_lobby(user)
         self.remove_user(websocket)
 
     async def _on_message(self, websocket, message):

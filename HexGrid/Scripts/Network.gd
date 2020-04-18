@@ -49,8 +49,7 @@ func _on_message():
 	var data = JSON.parse(msg).result
 	print('< Server : ' + msg)
 	
-	var node_game = get_parent()
-	node_game.server_receiver_node._on_message(data)
+	Global.server_receiver_node._on_message(data)
 
 func _process(_delta):
 	_client.poll()

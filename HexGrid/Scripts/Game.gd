@@ -1,9 +1,6 @@
 extends Control
 
 
-var screen = "WaitingScreen" # Scene to show
-var server_receiver_node = self # Node where information from server is throwed to
-
 var pseudo = ''
 
 
@@ -18,29 +15,12 @@ func _ready():
 
 
 
-## MANAGEMENT ##
-func change_screen(new_screen):
-	if screen != new_screen :
-		var ns = get_tree().get_root().get_node("Game/" + new_screen)
-		var os = get_tree().get_root().get_node("Game/" + screen)
-		os.visible = false
-		ns.visible = true
-		screen = new_screen
-
-func change_server_receiver_node(new_receiver) :
-	var nr = get_tree().get_root().get_node("Game/" + new_receiver)
-	server_receiver_node = nr
-
-
-
-
-
 ## COMMUNICATION WITH SERVER ##
 func _on_connection_to_server():
 	# called when the connection have been made
-	identify_to_server()
+	_identify_to_server()
 
-func identify_to_server():
+func _identify_to_server():
 	var data = {'action' : 'connection', 'details' : {'pseudo' : pseudo}}
 	Global.network.send_data(data)
 
@@ -71,12 +51,12 @@ func _on_message(data):
 	
 	elif data['action'] == 'new game':
 		# Nouvelle game, on bascule dans BattleScreen
-		change_screen('BattleScreen')
-		change_server_receiver_node('BattleScreen')
-		server_receiver_node._on_message(data)
+		Global.change_screen('BattleScreen')
+		Global.change_server_receiver_node('BattleScreen')
+		Global.server_receiver_node._on_message(data)
 		
 	else :
-		print("NetworkError: action {} not known.".format([data['action']]))
+		print("NetworkError: action {0} not known.".format([data['action']]))
 
 
 
