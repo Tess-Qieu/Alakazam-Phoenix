@@ -17,13 +17,13 @@ var rng = RandomNumberGenerator.new()
 
 
 ## Handle initialization ##
-func init(grid, team_blue, team_red, node_battlescreen):
+func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
-	_create_team('blue', team_blue)
-	_create_team('red', team_red)
+	_create_team('blue', team_blue_settings)
+	_create_team('red', team_red_settings)
 	
-	current_character = self.team_blue[0]
+	current_character = team_blue[0]
 	clear_arena()
 	
 	# warning-ignore:return_value_discarded		
