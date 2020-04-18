@@ -13,9 +13,21 @@ class Game():
 
 class Character():
 
-    def __init__(self, team):
+    def __init__(self, team, q, r):
         self.team = team
-        self.lifepoint = 100
+        self.q = q
+        self.r = r
+        self.health = 100
+        self.range_displacement = 5
+
+    def serialize(self):
+        data = {'team' : self.team,
+                'q' : self.q,
+                'r' : self.r,
+                'health' : self.health,
+                'range displacement' : self.range_displacement}
+        return data
+
 
 
 
@@ -32,12 +44,21 @@ class Lobby():
 
         self.map = Map.Map()
 
+        coords = self.map.random_coords_floor()
+        self.team_blue = [Character('blue', coords[0].q, coords[0].r)]
+        self.team_red = [Character('red', coords[1].q, coords[1].r)] 
+
         
 
 
     async def notify_new_game(self):
-        data = {'action' : 'new game', 'details' : {'grid' : self.map.grid,
-                                                    'id' : self.id_lobby}}
+        data = {'action' : 'new game', 
+                'details' : {'grid' : self.map.grid,
+                            'team_blue' : [c.serialize() for c in self.team_blue],    
+                            'team_red' : [c.serialize() for c in self.team_red],
+                            'id' : self.id_lobby
+                            }
+                }
         await self.notify_all(data)
 
 

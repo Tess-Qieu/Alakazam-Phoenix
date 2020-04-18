@@ -1,7 +1,12 @@
 import random
+from collections import namedtuple
 
 def distance_coord(q1, r1, q2, r2):
     return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
+
+
+Coord = namedtuple('Coord', ['q', 'r'])
+
 
 class Map():
     '''Contains a representation of the map'''
@@ -14,9 +19,19 @@ class Map():
 
     def __init__(self):
         self.grid = {}
+        self.coords_floor = []
         self.generate_grid()
 
-    
+
+    def random_coords_floor(self, nb=2):
+        coords = []
+        while nb > 0:
+            coord = random.choice(self.coords_floor)
+            if coord not in coords:
+                coords += [coord]
+                nb -= 1
+        return coords
+ 
 
     ## GRID GENERATION ##
     def generate_grid(self):
@@ -25,6 +40,9 @@ class Map():
             if not q in self.grid.keys():
                 self.grid[q] = {}
             self.grid[q][r] = instance
+
+            if instance == 'floor':
+                self.coords_floor += [Coord(q, r)]
 
         def _random_kind(self):
             value = random.random()

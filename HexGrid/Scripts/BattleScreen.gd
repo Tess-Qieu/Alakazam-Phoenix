@@ -42,11 +42,10 @@ func new_game(data):
 	# Init the new Battle	
 	lobby_id = data['details']['id']
 	var grid = transform_grid_keys(data['details']['grid'])
-	
-	for child in get_children():
-		print(child.name)
+	var team_blue = data['details']['team_blue']
+	var team_red = data['details']['team_red']
 		
-	get_battle().init(grid)
+	get_battle().init(grid, team_blue, team_red, self)
 	
 	data = {'action' : 'new game', 'details' : {'ready' : true}}
 	send_data(data)
@@ -60,8 +59,14 @@ func transform_grid_keys(grid):
 	return new_grid
 
 
-	
-	
+## ASK PLAY TO SERVER
+func _on_ask_move(character, cell):
+	var data = {}
+	pass
+
+
+
+
 
 ## PLAYER/OBSERSATOR LEFT##
 func player_left(data):
@@ -74,7 +79,7 @@ func player_left(data):
 	# remove old battle, create a new one
 	get_battle().queue_free()
 	var new_battle = Battle.instance()
-	new_battle.set_name('Battle')	
+	new_battle.set_name('Battle')
 	add_child(new_battle)
 	
 	ask_to_play()

@@ -1,5 +1,7 @@
 extends Spatial
 
+signal ask_move
+
 
 var Character = preload("res://Scenes/Character.tscn")
 var team_blue = []
@@ -13,17 +15,45 @@ var path = []
 var rng = RandomNumberGenerator.new()
 
 
+
 ## Handle initialization ##
-func init(grid):
+func init(grid, team_blue, team_red, node_battlescreen):
+	# Instanciate map and characters
 	$Map.instance_map(grid)
-	create_character('blue')
-	create_character('red')
-	current_character = team_blue[0]
+	_create_team('blue', team_blue)
+	_create_team('red', team_red)
+	
+	current_character = self.team_blue[0]
 	clear_arena()
+	
+	# warning-ignore:return_value_discarded		
+	connect('ask_move', node_battlescreen, '_on_ask_move')
+	
+
+
+
 
 
 
 ## Handle Character ##
+func _create_team(team_name, data):
+	for c in data:
+		var character = _create_character(team_name, int(c['q']), int(c['r']),  
+								int(c['health']), int(c['range displacement']))
+		if team_name == 'blue':
+			team_blue += [character]
+		elif team_name == 'red':
+			team_red += [character]
+
+func _create_character(team, q, r, health, range_displacement):
+	var cell = $Map.grid[q][r]
+	var character = Character.instance()
+	character.init(cell, team, health, range_displacement, self)
+	
+	_update_character_cell_references(character, cell)
+	add_child(character)
+	return character
+
 func _update_character_cell_references(character, new_cell):
 	## Update references from cell to character and from character to cell
 	
@@ -40,18 +70,15 @@ func _update_character_cell_references(character, new_cell):
 	# The new cell gets a reference to the player on it
 	new_cell.character_on = character
 
-func create_character(team):
-	var cell = $Map.cells_floor[rng.randi_range(0, len($Map.cells_floor)-1)]
-	var character = Character.instance()
-	character.init(cell, team, self)
-	_update_character_cell_references(character, cell)
-	add_child(character)
-	
-	if team == 'blue':
-		team_blue += [character]
-	elif team == 'red':
-		team_red += [character]
+func _on_character_die(character):
+	character.die(self)
 
+
+
+
+
+
+## HANDLE ACTIONS ##
 func make_current_character_move_following_path():
 	# Movement limitation
 	state = 'moving'
@@ -65,8 +92,7 @@ func make_current_character_cast_spell(cell):
 	clear_arena()
 	state = 'normal'
 
-func _on_character_die(character):
-	character.die(self)
+
 
 
 
@@ -127,6 +153,7 @@ func _on_character_selected(character):
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path) > 0 :
+#			emit_signal('ask_move', path)
 			make_current_character_move_following_path()
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)

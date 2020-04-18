@@ -19,24 +19,30 @@ var destination_cell
 
 # Stats informations
 var current_cell
+var team
 
-const START_HEALTH = 15 
+var start_health = 15 
 var current_health
 
-const START_RANGE_DISPLACEMENT = 5
+var start_range_displacement = 5
 var current_range_displacement
 
 
 
 ## GENERAL SECTION ##
-func init(cell, team, battle_scene):
+func init(cell, team, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
 	change_material(team)
 	
-	current_health = START_HEALTH
-	current_range_displacement = START_RANGE_DISPLACEMENT
+	self.team = team
+	
+	start_health = health
+	current_health = health
+	start_range_displacement = range_displacement
+	current_range_displacement = range_displacement
+	
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
