@@ -14,22 +14,7 @@ func _ready():
 	
 
 
-## COMMUNICATION WITH SERVER ##
-func _on_connection_to_server():
-	# called when the connection have been made
-	_identify_to_server()
-
-func _identify_to_server():
-	var data = {'action' : 'connection', 'details' : {'pseudo' : pseudo}}
-	Global.network.send_data(data)
-
-
-func ask_to_play():
-	var data = {'action' : 'ask to play', 'details' : {}} # put team infos here
-	Global.network.send_data(data)
-	
-	
-	
+## COMMUCATION WITH SERVER
 func _on_message(data):
 	if not 'action' in data.keys():
 		print("NetworkError: no key action in data")
@@ -46,10 +31,11 @@ func _on_message(data):
 		
 	elif data['action'] == 'ask to wait':
 		# The server is looking for a contestant
+		# Nothing to do until next message from server
 		pass
 	
 	elif data['action'] == 'new game':
-		# Nouvelle game, on bascule dans BattleScreen
+		# New game, we go into Battlescreen now
 		Global.change_screen('BattleScreen')
 		Global.change_server_receiver_node('BattleScreen')
 		Global.server_receiver_node._on_message(data)
@@ -58,6 +44,23 @@ func _on_message(data):
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
 
+
+func ask_to_play():
+	var data = {'action' : 'ask to play', 'details' : {}} # put team infos here
+	Global.network.send_data(data)
+
+
+
+
+
+## INIT CONNECTIONS WITH THE SERVER ##
+func _on_connection_to_server():
+	# called when the connection have been made
+	_identify_to_server()
+
+func _identify_to_server():
+	var data = {'action' : 'connection', 'details' : {'pseudo' : pseudo}}
+	Global.network.send_data(data)
 
 
 

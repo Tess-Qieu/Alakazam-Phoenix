@@ -13,7 +13,7 @@ func _ready():
 	_client.connect("connection_established", self, "_on_connection_opened")
 	_client.connect("data_received", self, "_on_message")
 
-
+## NETWORK USAGE ##
 func send_data(data):
 	# data must be a dictionary
 	var msg = JSON.print(data).to_utf8()
@@ -32,7 +32,7 @@ func connect_to_server():
 	
 	
 	
-	
+## NETWORK EVENTS ##
 func _on_connection_closed(was_clean = false):
 	print("Connection closed, clean: ", was_clean)
 	set_process(false)
@@ -44,7 +44,21 @@ func _on_connection_opened(_procotols = ''):
 	# always be attached to the Game.)
 	get_parent()._on_connection_to_server()
 
+func _on_message():
+	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
+	var data = JSON.parse(msg).result
+	data = transform_values(data)
+	print('< Server : ' + str(data))
+	
+	Global.server_receiver_node._on_message(data)
 
+func _process(_delta):
+	_client.poll()
+
+
+
+
+## DECODE FUNCTIONS ##
 func string_to_int(val):
 	if val == '0':
 		return 0
@@ -92,13 +106,4 @@ func transform_values(data):
 		return new_data
 
 
-func _on_message():
-	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
-	var data = JSON.parse(msg).result
-	data = transform_values(data)
-	print('< Server : ' + str(data))
-	
-	Global.server_receiver_node._on_message(data)
 
-func _process(_delta):
-	_client.poll()

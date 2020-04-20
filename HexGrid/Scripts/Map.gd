@@ -11,30 +11,15 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
-# Initialization
+
+
 func _ready():
 	rng.randomize()
 
 
 
-# Usefull functions
-func distance_coord(q1, r1, q2, r2):
-	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
-func add_instance_to_grid(instance, q, r):
-	if not q in grid.keys():
-		grid[q] = {}
-	grid[q][r] = instance
-
-func clear():
-	for c in cells_floor:
-		c.change_material('floor')
-
-
-
-
-
-# Handle grid instanciation
+## HANDLE GRID INSTANCIATION
 func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
 	cell.init(q, r, kind, self.get_parent())
@@ -62,7 +47,8 @@ func instance_map(new_grid):
 
 
 
-# Handle fov
+
+## HANDLE FIELD OF VIEW ##
 func _line_step(start : int, end : int, step : float) -> float:
 	# Function used to calulate a step on a line	
 	return start + (end-start)*step
@@ -133,7 +119,8 @@ func display_field_of_view(cell, distance_max):
 
 
 
-# Handle path finding
+
+## HANDLE PATH FINDING ##
 func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
 	var list = []
@@ -236,7 +223,9 @@ func display_displacement_range(start, distance_max):
 	return zone
 
 
-# Handle camera
+
+
+## HANDLE CAMERA ROTATION ##
 func _process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()
 	if is_rotation_camera_ask(mouse_position):
@@ -255,3 +244,18 @@ func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true
 	return false
+	
+	
+	
+## USEFULL FUNCTIONS
+func distance_coord(q1, r1, q2, r2):
+	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
+
+func add_instance_to_grid(instance, q, r):
+	if not q in grid.keys():
+		grid[q] = {}
+	grid[q][r] = instance
+
+func clear():
+	for c in cells_floor:
+		c.change_material('floor')

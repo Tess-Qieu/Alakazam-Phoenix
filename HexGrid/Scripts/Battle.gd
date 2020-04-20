@@ -16,7 +16,7 @@ var rng = RandomNumberGenerator.new()
 
 
 
-## Handle initialization ##
+## INITIALISATION ##
 func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
@@ -35,7 +35,7 @@ func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 
 
 
-## Handle Character ##
+## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
 	for c in data:
 		var character = _create_character(team_name, 
@@ -82,22 +82,21 @@ func _on_character_die(character):
 
 
 
-## HANDLE ACTIONS ##
+## MAKE MOVE/SPELL##
 func _make_current_character_move_one_step():
 	# Movement limitation
 	state = 'moving'
 	current_character.move_to(path.pop_front())
-	
+
+# this function may end in battle_screen
 func make_character_move_following_path_valid(character, path_valid):
 	# Movement limitation
 	current_character = character
 	path = []
 	for coord in path_valid:
 		path += [$Map.grid[coord[0]][coord[1]]]
-	
 	_make_current_character_move_one_step()
-	
-	
+		
 
 func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
@@ -112,7 +111,7 @@ func make_current_character_cast_spell(cell):
 
 
 
-## Handle clear ##
+## CLEAR ##
 func _color_current_character_cell():
 	if (current_character in team_blue):
 		current_character.current_cell.change_material('blue')
@@ -130,7 +129,8 @@ func clear_arena():
 
 
 
-## Handle button events ##
+## BUTTON EVENTS ##
+# may end in battlescreen
 func _on_ButtonSpell_pressed():
 	clear_arena()
 	fov = $Map.display_field_of_view(current_character.current_cell, 20)
@@ -143,7 +143,7 @@ func _on_ButtonClear_pressed():
 
 
 
-## Handle waiting events ##
+## ANIMATION EVENTS ##
 func _on_character_movement_finished(character, ending_cell):
 	_update_character_cell_references(character, ending_cell)
 	if path.size() == 0:
@@ -156,7 +156,7 @@ func _on_character_movement_finished(character, ending_cell):
 
 
 
-## Handle On object clicked ##
+## OBJECT CLICKED EVENTS ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		# select character
@@ -178,7 +178,7 @@ func _on_cell_clicked(cell):
 
 
 
-## Handle On object hovered ##
+## OBJECT HOVERED EVENTS ##
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()

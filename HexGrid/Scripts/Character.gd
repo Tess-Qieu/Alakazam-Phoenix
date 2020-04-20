@@ -31,14 +31,14 @@ var current_range_displacement
 
 
 ## GENERAL SECTION ##
-func init(cell, team, id_character, health, range_displacement,  battle_scene):
+func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
 	change_material(team)
 	
-	self.team = team
-	self.id_character = id_character
+	team = c_team
+	id_character = c_id_character
 	
 	start_health = health
 	current_health = health
@@ -66,7 +66,7 @@ func change_material(material_key):
 
 
 
-## SPELL SECTION ##
+## THROW SPELL SECTION ##
 func cast_spell(target):
 	var to_look = target.translation
 	to_look.y = translation.y
@@ -75,6 +75,7 @@ func cast_spell(target):
 	var spell = Spell.instance()
 	spell.cast(current_cell, target)
 	get_parent().add_child(spell)
+
 
 
 
@@ -93,6 +94,8 @@ func receive_damage(dmg_amount):
 	current_health -= dmg_amount
 	if current_health <= 0:
 		emit_signal('character_die')
+
+
 
 
 ## MOVEMENT SECTION ##
