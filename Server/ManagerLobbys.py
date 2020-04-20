@@ -2,7 +2,7 @@
 
 import asyncio
 
-from Lobby import Lobby
+from Game import Game
 from ManagerID import ManagerID
 
 
@@ -88,11 +88,11 @@ class ManagerLobbys():
         user_2 = self.users_waiting_to_play.pop(0)
         
         id_lobby = self.manager_id.get_new_id()
-        lobby = Lobby(self.server, id_lobby, [user_1, user_2])
+        lobby = Game(self.server, id_lobby, [user_1, user_2])
         self.lobbys[id_lobby] = lobby
 
         print(f'New lobby {id_lobby} with users {user_1.pseudo} and {user_2.pseudo}.')
-        await lobby.notify_new_game()
+        await lobby.notify_new_lobby()
 
         user_1.current_lobby = lobby
         user_2.current_lobby = lobby
