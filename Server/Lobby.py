@@ -46,7 +46,10 @@ class Game():
 
     def ask_move(self, id_character, path):
         character = self.get_character_by_id(id_character)
-        # ATTENTION MESSAGE ERREUR ICI ID CHARACTER NOT KNOWN
+        if character is None:
+            print(f'NetworkValueError: no character with id {is_character}.')
+            return
+
         coord_start = (character.q, character.r)
         is_valid = self.map.is_path_valid(coord_start, path)
         if is_valid: 
@@ -54,6 +57,8 @@ class Game():
                     'response': 'move',
                     'details': {'id_character': id_character,
                                 'path': path}}
+            character.q = path[-1][0]
+            character.r = path[-1][1]
         else:
             data = {'action': 'game',
                     'response': 'not valid',
