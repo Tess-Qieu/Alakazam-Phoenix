@@ -17,7 +17,7 @@ func _ready():
 func send_data(data):
 	# data must be a dictionary
 	var msg = JSON.print(data).to_utf8()
-	print('> Client : ' + JSON.print(data))
+	print('> Client : ' + str(data))
 	_client.get_peer(1).put_packet(msg)
 
 func connect_to_server():

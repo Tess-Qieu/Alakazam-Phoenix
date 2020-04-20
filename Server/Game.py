@@ -8,6 +8,7 @@ from ManagerID import ManagerID
 
 
 class Character():
+    ''' Reprensent a chatacter in the game '''
 
     def __init__(self, team, q, r, id_character):
         self.team = team
@@ -19,6 +20,7 @@ class Character():
         self.range_displacement = 5
 
     def serialize(self):
+        # Serialize the object to send it to the clients
         data = {'team': self.team,
                 'q': self.q,
                 'r': self.r,
@@ -29,6 +31,7 @@ class Character():
 
 
 class Game(Lobby):
+    ''' Administrate a game depending clients actions '''
 
     ## INITIALISATION ##
     def __init__(self, server, id_lobby, players, observators=[]):
@@ -45,6 +48,7 @@ class Game(Lobby):
 
 
     async def notify_new_lobby(self):
+        # Notify the clients that the lobby is ready
         data = {'action': 'new game', 
                 'details': {'grid': self.map.grid,
                             'team_blue': [c.serialize() for c in self.team_blue],    
@@ -56,7 +60,9 @@ class Game(Lobby):
 
 
     ## COMMUNICATION WITH CLIENTS ##
-    async def _on_message(self, data, user):        
+    async def _on_message(self, data, user):
+        # Manage the message from the clients
+
         if data['action'] == 'new game':
             # players send they are ready
             if data['details']['ready'] == True:
@@ -67,25 +73,31 @@ class Game(Lobby):
             # game is running
             if data['ask'] == 'move':
                 # user ask to move a character
-                id_character = data['details']['id_character']
-                path = data['details']['path']
-                data_response = self.ask_move(id_character, path)
-                await self.notify_all(data_response)
+                await self.ask_move(data['details'])
 
         else:
             print(f'NetworkError: action {data["action"]} not known.')
 
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
-    def ask_move(self, id_character, path):
+    def ask_move(self):
+        # Called when the user ask to move a character
+        # Verify that the path is correct
+        id_character = data['id_character']
+        path = data['path']      
+
+        # Find the correct character
         character = self.get_character_by_id(id_character)
         if character is None:
             print(f'NetworkValueError: no character with id {is_character}.')
             return
 
+        # Verify if the path is valid
         coord_start = (character.q, character.r)
-        is_valid = self.map.is_path_valid(coord_start, path)
-        if is_valid: 
+        is_valid = self.map.is_path_valid(coord_start, path) 
+        
+        # Send the response to the clients
+        if is_valid and len(path) <= character.range_displacement: 
             data = {'action': 'game', 
                     'response': 'move',
                     'details': {'id_character': id_character,
@@ -97,9 +109,14 @@ class Game(Lobby):
                     'response': 'not valid',
                     'details': {'id_character': id_character,
                                 'path': path}}
-        return data
+
+        self.notify_all(data)
+
+
 
     def set_player_ready(self, user):
+        # Called when the client indicates that he correctly load the game
+        # and he is ready to play
         index = self.players.index(user)
         self.players_ready[index] = True
 

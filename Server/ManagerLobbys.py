@@ -21,6 +21,7 @@ class ManagerLobbys():
 
 
     async def _on_message(self, data, user):
+        # Manage the message from the clients
         
         if data['action'] == 'ask to play':
             self.users_waiting_to_play += [user]
@@ -52,7 +53,10 @@ class ManagerLobbys():
         def destroy_lobby(self, lobby):
             for user in lobby.players + lobby.observators:
                 user.current_lobby = None
+
             id_lobby = lobby.id_lobby
+            self.manager_id.free_id(id_lobby)
+            
             del(self.lobbys[id_lobby])
             del(lobby)
             print(f'Lobby {id_lobby} destroyed.')
@@ -98,5 +102,6 @@ class ManagerLobbys():
         user_2.current_lobby = lobby
 
     async def transfer_message_to_lobby(self, data, user):
+        # Find the appropriate lobby and call his _on_message function
         id_lobby = data['details']['id']
         await self.lobbys[id_lobby]._on_message(data, user)

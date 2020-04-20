@@ -89,8 +89,6 @@ class Map():
                     return True
             return False
 
-        print(f'Type : {type(path[0][0])}')
-
         current_coord = coord_start
         for c in path:
             coord = (c[0], c[1]) # attention string ici

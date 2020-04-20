@@ -3,7 +3,7 @@
 class ManagerID():
     """ Keep in memory all free games ids."""
     
-    def __init__(self, N=1000000):
+    def __init__(self, N=10000):
         self.ids = list(range(N))
 
     def get_new_id(self):
