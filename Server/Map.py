@@ -77,3 +77,24 @@ class Map():
             _generate_one_gridline(self, nb_cell, r)
             nb_cell -= 1
 
+
+    def is_path_valid(self, coord_start, path):
+
+        def _is_neighbors(coord_1, coord_2):
+
+            coord_diff = (coord_1[0] - coord_2[0], coord_1[1] - coord_2[1])
+            coord_neighbors = [(0, 1), (1, 0), (1, -1), (0, -1), (-1, 0), (-1, 1)]
+            for c in coord_neighbors:
+                if coord_diff == c:
+                    return True
+            return False
+
+        print(f'Type : {type(path[0][0])}')
+
+        current_coord = coord_start
+        for c in path:
+            coord = (c[0], c[1]) # attention string ici
+            if not _is_neighbors(coord, current_coord):
+                return False
+            current_coord = coord
+        return True

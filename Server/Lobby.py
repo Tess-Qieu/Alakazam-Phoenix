@@ -2,14 +2,8 @@
 
 import asyncio
 
-import Map
+from Map import Map
 from ManagerID import ManagerID
-
-
-class Game():
-
-    def __init__(self):
-        pass
 
 
 class Character():
@@ -19,17 +13,52 @@ class Character():
         self.q = q
         self.r = r
         self.id_character = id_character
+        self.started = False
 
         self.health = 100
         self.range_displacement = 5
 
     def serialize(self):
-        data = {'team' : self.team,
-                'q' : self.q,
-                'r' : self.r,
-                'id_character' : seld.id_character,
-                'health' : self.health,
-                'range displacement' : self.range_displacement}
+        data = {'team': self.team,
+                'q': self.q,
+                'r': self.r,
+                'id_character': self.id_character,
+                'health': self.health,
+                'range displacement': self.range_displacement}
+        return data
+
+
+class Game():
+
+    def __init__(self):
+        self.manager_id = ManagerID()
+        self.map = Map()
+
+        coords = self.map.random_coords_floor()
+        self.team_blue = [Character('blue', coords[0].q, coords[0].r, self.manager_id.get_new_id())]
+        self.team_red = [Character('red', coords[1].q, coords[1].r, self.manager_id.get_new_id())]
+
+    def get_character_by_id(self, id_character):
+        for c in self.team_blue + self.team_red:
+            if c.id_character == id_character:
+                return c
+        return None
+
+    def ask_move(self, id_character, path):
+        character = self.get_character_by_id(id_character)
+        # ATTENTION MESSAGE ERREUR ICI ID CHARACTER NOT KNOWN
+        coord_start = (character.q, character.r)
+        is_valid = self.map.is_path_valid(coord_start, path)
+        if is_valid: 
+            data = {'action': 'game', 
+                    'response': 'move',
+                    'details': {'id_character': id_character,
+                                'path': path}}
+        else:
+            data = {'action': 'game',
+                    'response': 'not valid',
+                    'details': {'id_character': id_character,
+                                'path': path}}
         return data
 
 
@@ -46,22 +75,15 @@ class Lobby():
         self.players_ready = [False for p in self.players]
         self.observators = observators
 
-        self.manager_id = ManagerID()
-        self.map = Map.Map()
-
-        coords = self.map.random_coords_floor()
-        self.team_blue = [Character('blue', coords[0].q, coords[0].r, self.manager_id.get_new_id())]
-        self.team_red = [Character('red', coords[1].q, coords[1].r, self.manager_id.get_new_id())] 
-
-        
+        self.game = Game()
 
 
     async def notify_new_game(self):
-        data = {'action' : 'new game', 
-                'details' : {'grid' : self.map.grid,
-                            'team_blue' : [c.serialize() for c in self.team_blue],    
-                            'team_red' : [c.serialize() for c in self.team_red],
-                            'id' : self.id_lobby
+        data = {'action': 'new game', 
+                'details': {'grid': self.game.map.grid,
+                            'team_blue': [c.serialize() for c in self.game.team_blue],    
+                            'team_red': [c.serialize() for c in self.game.team_red],
+                            'id': self.id_lobby
                             }
                 }
         await self.notify_all(data)
@@ -82,7 +104,8 @@ class Lobby():
                 # user ask to move a character
                 id_character = data['details']['id_character']
                 path = data['details']['path']
-                game.ask_move(id_character, path)
+                data_response = self.game.ask_move(id_character, path)
+                await self.notify_all(data_response)
 
         else:
             print(f'NetworkError: action {data["action"]} not known.')
@@ -100,7 +123,7 @@ class Lobby():
             print(f'Player {user.pseudo} left the game. End of the game.')
             print(f'Player(s) {[p.pseudo for p in self.players]} go back to waiting for an opponent.')
         
-            data = {'action' : 'player left', 'details' : {'user' : user.pseudo}}
+            data = {'action': 'player left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
             return False
 
@@ -110,7 +133,7 @@ class Lobby():
             self.observators.remove(user)
             print(f'Observator {user.pseudo} left the game.')
 
-            data = {'action' : 'observator left', 'details' : {'user' : user.pseudo}}
+            data = {'action': 'observator left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
             return True
 
@@ -121,11 +144,12 @@ class Lobby():
 
         # if one user isn't ready, pass
         for p in self.players_ready:
-            if not p :
+            if not p:
                 return
 
         # else start the game
-        print('PLAYERS READY')
+        print(f'The game in the lobby {self.id_lobby} starts !')
+        self.game.started = True
 
 
 

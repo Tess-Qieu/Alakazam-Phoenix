@@ -90,7 +90,21 @@ class Server():
         await websocket.send(msg)
 
     def decode_msg(self, websocket, msg):
+
+        def transform_key_to_int(data):
+            new_data = {}
+            for k, v in data.items():
+                if isinstance(v, dict):
+                    v = transform_key_to_int(v)
+                try:
+                    k = int(k)
+                except:
+                    pass
+                new_data[k] = v
+            return new_data
+
         data = json.loads(msg.decode())
+        data = transform_key_to_int(data)
         if websocket in self.users.keys():
             print(f"< from {self.users[websocket].pseudo} : {data}")
         else:
@@ -100,9 +114,9 @@ class Server():
     def encode_data(self, websocket, data):
         msg = json.dumps(data).encode()
         if websocket in self.users.keys():
-            print(f"> to {self.users[websocket].pseudo} : {msg.decode()}")
+            print(f"> to {self.users[websocket].pseudo} : {data}")
         else:
-            print(f"> to unknown client : {msg.decode()}")
+            print(f"> to unknown client : {data}")
         return msg
 
 

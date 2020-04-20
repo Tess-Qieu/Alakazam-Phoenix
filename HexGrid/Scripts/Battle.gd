@@ -39,11 +39,11 @@ func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 func _create_team(team_name, data):
 	for c in data:
 		var character = _create_character(team_name, 
-										int(c['q']), 
-										int(c['r']),
-										int(c['id_character']),
-										int(c['health']), 
-										int(c['range displacement']))
+										c['q'], 
+										c['r'],
+										c['id_character'],
+										c['health'], 
+										c['range displacement'])
 		if team_name == 'blue':
 			team_blue += [character]
 		elif team_name == 'red':
@@ -83,10 +83,21 @@ func _on_character_die(character):
 
 
 ## HANDLE ACTIONS ##
-func make_current_character_move_following_path():
+func _make_current_character_move_one_step():
 	# Movement limitation
 	state = 'moving'
 	current_character.move_to(path.pop_front())
+	
+func make_character_move_following_path_valid(character, path_valid):
+	# Movement limitation
+	current_character = character
+	path = []
+	for coord in path_valid:
+		path += [$Map.grid[coord[0]][coord[1]]]
+	
+	_make_current_character_move_one_step()
+	
+	
 
 func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
@@ -139,7 +150,7 @@ func _on_character_movement_finished(character, ending_cell):
 		state = 'normal'
 		clear_arena()
 	else:
-		make_current_character_move_following_path()
+		_make_current_character_move_one_step()
 
 
 
@@ -157,8 +168,8 @@ func _on_character_selected(character):
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path) > 0 :
-			emit_signal('ask_move', path)
-#			make_current_character_move_following_path()
+			emit_signal('ask_move', current_character, path)
+#			_make_current_character_move_one_step()
 	elif state == 'cast_spell':
 		make_current_character_cast_spell(cell)
 

@@ -11,8 +11,7 @@ func _ready():
 	pseudo = 'Naowak'
 	
 	$Network.connect_to_server()
-
-
+	
 
 
 ## COMMUNICATION WITH SERVER ##

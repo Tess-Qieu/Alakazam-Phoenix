@@ -12,6 +12,13 @@ func get_battle():
 		if 'Battle' in node.name:
 			return node
 
+func get_character_by_id(id_character):
+	var battle = get_battle()
+	for character in battle.team_red + battle.team_blue:
+		if character.id_character == id_character:
+			return character
+	return null
+
 
 ## COMMUNICATION FUNCTIONS ##
 func send_data(data):
@@ -27,22 +34,34 @@ func _on_message(data):
 	
 	if data['action'] == 'new game':
 		new_game(data)
+		
 	elif data['action'] == 'player left':
 		player_left(data)
+		
 	elif data['action'] == 'observator left':
 		observator_left(data)
 		
-	else :
+	elif data['action'] == 'game':
+		# The game is running
+		if data['response'] == 'move':
+			move_valid(data['details'])
+			
+		elif data['response'] == 'not_valid':
+			print('Movement not valid')
+#		else:
+#			print('NetworkError: response {0} not known.'.format(data['response'])
+			
+	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
 
 
-## NEW GAME ##
+## GAME ##
 func new_game(data):
 	# Init the new Battle	
 	lobby_id = data['details']['id']
 	
-	var grid = transform_grid_keys(data['details']['grid'])
+	var grid = data['details']['grid']
 	var team_blue = data['details']['team_blue']
 	var team_red = data['details']['team_red']
 	get_battle().init(grid, team_blue, team_red, self)
@@ -50,13 +69,11 @@ func new_game(data):
 	data = {'action' : 'new game', 'details' : {'ready' : true}}
 	send_data(data)
 
-func transform_grid_keys(grid):
-	var new_grid = {}
-	for q in grid.keys():
-		new_grid[int(q)] = {}
-		for r in grid[q].keys():
-			new_grid[int(q)][int(r)] = grid[q][r]
-	return new_grid
+func move_valid(data):
+	var character = get_character_by_id(data['id_character'])
+	var path_valid = data['path']
+	get_battle().make_character_move_following_path_valid(character, path_valid)
+
 
 
 ## ASK PLAY TO SERVER
