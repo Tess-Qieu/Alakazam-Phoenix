@@ -33,9 +33,9 @@ func _on_message(data):
 			
 		elif data['response'] == 'not_valid':
 			print('Movement not valid')
-#		else:
-#			print('NetworkError: response {0} not known.'.format(data['response'])
 			
+		else:
+			print('NetworkError: response {0} not known.'.format(data['response']))
 	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
