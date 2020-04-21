@@ -5,29 +5,7 @@ import asyncio
 from Lobby import Lobby
 from Map import Map
 from ManagerID import ManagerID
-
-
-class Character():
-    ''' Reprensent a chatacter in the game '''
-
-    def __init__(self, team, q, r, id_character):
-        self.team = team
-        self.q = q
-        self.r = r
-        self.id_character = id_character
-
-        self.health = 100
-        self.range_displacement = 5
-
-    def serialize(self):
-        # Serialize the object to send it to the clients
-        data = {'team': self.team,
-                'q': self.q,
-                'r': self.r,
-                'id_character': self.id_character,
-                'health': self.health,
-                'range displacement': self.range_displacement}
-        return data
+from Character import Character
 
 
 class Game(Lobby):
@@ -42,17 +20,18 @@ class Game(Lobby):
         self.players_ready = [False for p in self.players]
         self.started = False
 
-        coords = self.map.random_coords_floor()
-        self.team_blue = [Character('blue', coords[0].q, coords[0].r, self.manager_id.get_new_id())]
-        self.team_red = [Character('red', coords[1].q, coords[1].r, self.manager_id.get_new_id())]
+        cells = self.map.random_cells_floor()
+        print(cells)
+        self.team_blue = [Character('blue', cells[0].q, cells[0].r, self.manager_id.get_new_id())]
+        self.team_red = [Character('red', cells[1].q, cells[1].r, self.manager_id.get_new_id())]
 
 
     async def notify_new_lobby(self):
         # Notify the clients that the lobby is ready
         data = {'action': 'new game', 
-                'details': {'grid': self.map.grid,
-                            'team_blue': [c.serialize() for c in self.team_blue],    
-                            'team_red': [c.serialize() for c in self.team_red],
+                'details': {'grid': self.map.serialize(),
+                            'team_blue': [character.serialize() for character in self.team_blue],    
+                            'team_red': [character.serialize() for character in self.team_red],
                             'id': self.id_lobby
                             }
                 }
@@ -75,12 +54,16 @@ class Game(Lobby):
                 # user ask to move a character
                 await self.ask_move(data['details'])
 
+            elif data['ask'] == 'cast spell':
+                # user ask to cast a spell
+                await self.ask_cast_spell(data['details'])
+
         else:
             print(f'NetworkError: action {data["action"]} not known.')
 
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
-    def ask_move(self):
+    async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
         id_character = data['id_character']
@@ -93,24 +76,60 @@ class Game(Lobby):
             return
 
         # Verify if the path is valid
-        coord_start = (character.q, character.r)
-        is_valid = self.map.is_path_valid(coord_start, path) 
+        cell_start = self.map.get_cell(character.q, character.r)
+        path_in_cell = [self.map.get_cell(c[0], c[1]) for c in path]
+        is_valid = self.map.is_path_valid(cell_start, path_in_cell) 
         
         # Send the response to the clients
         if is_valid and len(path) <= character.range_displacement: 
+            # make the move
+            character.q = path[-1][0]
+            character.r = path[-1][1]
+
             data = {'action': 'game', 
                     'response': 'move',
                     'details': {'id_character': id_character,
                                 'path': path}}
-            character.q = path[-1][0]
-            character.r = path[-1][1]
+
         else:
             data = {'action': 'game',
                     'response': 'not valid',
                     'details': {'id_character': id_character,
                                 'path': path}}
 
-        self.notify_all(data)
+        await self.notify_all(data)
+
+
+    async def ask_cast_spell(self, data):
+        # Called when the user ask to move a character
+        # Verify that the path is correct
+        id_thrower = data['thrower']['id_character']
+        coord_target = data['target']
+
+        character_thrower = self.get_character_by_id(id_thrower)
+        cell_thrower = self.map.get_cell(character_thrower.q, character_thrower.r)
+        cell_target = self.map.get_cell(coord_target[0], coord_target[1])
+
+        is_valid = self.map.is_target_in_field_of_view(cell_thrower, cell_target)
+
+
+        if is_valid:
+            # cast the spell
+            character_thrower.cast_spell(cell_target) # implémentation cette fct
+
+            data = {'action': 'game',
+                    'response': 'cast spell',
+                    'details': {'thrower': {'id_character': id_thrower},
+                                'target': coord_target}}
+
+        else:
+            data = {'action': 'game',
+                    'response': 'not valid',
+                    'details': {'thrower': {'id_character': id_thrower},
+                                'target': coord_target}}
+        await self.notify_all(data)
+
+
 
 
 

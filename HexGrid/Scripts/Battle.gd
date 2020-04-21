@@ -1,6 +1,7 @@
 extends Spatial
 
 signal ask_move
+signal ask_cast_spell
 
 
 var Character = preload("res://Scenes/Character.tscn")
@@ -28,6 +29,8 @@ func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 	
 	# warning-ignore:return_value_discarded		
 	connect('ask_move', node_battlescreen, '_on_ask_move')
+	# warning-ignore:return_value_discarded
+	connect('ask_cast_spell', node_battlescreen, '_on_ask_cast_spell')
 	
 
 
@@ -96,7 +99,7 @@ func make_character_move_following_path_valid(character, path_valid):
 	for coord in path_valid:
 		path += [$Map.grid[coord[0]][coord[1]]]
 	_make_current_character_move_one_step()
-		
+	
 
 func make_current_character_cast_spell(cell):
 	# if cell in fov, cast spell, else cancel spell casting
@@ -106,6 +109,11 @@ func make_current_character_cast_spell(cell):
 	clear_arena()
 	state = 'normal'
 
+func make_character_cast_spell(character, cell):
+	character.cast_spell(cell)
+	fov = []
+	clear_arena()
+	state = 'normal'
 
 
 
@@ -163,7 +171,9 @@ func _on_character_selected(character):
 		current_character = character
 		clear_arena()
 	else:
-		make_current_character_cast_spell(character.current_cell)
+		emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
+#		make_current_character_cast_spell(character.current_cell)
+
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
@@ -171,7 +181,8 @@ func _on_cell_clicked(cell):
 			emit_signal('ask_move', current_character, path)
 #			_make_current_character_move_one_step()
 	elif state == 'cast_spell':
-		make_current_character_cast_spell(cell)
+		emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
+#		make_current_character_cast_spell(cell)
 
 
 

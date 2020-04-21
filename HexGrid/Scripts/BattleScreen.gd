@@ -30,9 +30,12 @@ func _on_message(data):
 		# The game is running
 		if data['response'] == 'move':
 			move_valid(data['details'])
+		
+		elif data['response'] == 'cast spell':
+			cast_spell_valid(data['details'])
 			
 		elif data['response'] == 'not_valid':
-			print('Movement not valid')
+			print('Action ask not valid')
 			
 		else:
 			print('NetworkError: response {0} not known.'.format(data['response']))
@@ -46,11 +49,22 @@ func _on_ask_move(character, path):
 	for c in path:
 		path_serialized += [[c.q, c.r]]
 		
-	var data = {'action' : 'game',
-				'ask' : 'move', 
-				'details' : {'id_character' : character.id_character,
+	var data = {'action': 'game',
+				'ask': 'move', 
+				'details': {'id_character' : character.id_character,
 							'path' : path_serialized,
 							}}
+	send_data(data)
+
+func _on_ask_cast_spell(thrower, target): # for now, useless to precise which spell to use
+	# thrower is the character which cast the spell
+	# target is the cell where the spelle is cast
+	var data = {'action': 'game',
+				'ask': 'cast spell',
+				'details': {'thrower': {'id_character': thrower.id_character},
+							'target': [target.q, target.r]
+							}
+				}
 	send_data(data)
 
 
@@ -73,7 +87,10 @@ func move_valid(data):
 	var path_valid = data['path']
 	get_battle().make_character_move_following_path_valid(character, path_valid)
 
-
+func cast_spell_valid(data):
+	var character_thrower = get_character_by_id(data['thrower']['id_character'])
+	var cell_target = get_cell_by_coords(data['target'][0], data['target'][1])
+	get_battle().make_character_cast_spell(character_thrower, cell_target)
 
 
 
@@ -119,3 +136,6 @@ func get_character_by_id(id_character):
 		if character.id_character == id_character:
 			return character
 	return null
+
+func get_cell_by_coords(q, r):
+	return get_battle().get_node('Map').grid[q][r]

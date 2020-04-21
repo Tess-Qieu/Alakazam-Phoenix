@@ -20,11 +20,16 @@ func _ready():
 
 
 ## HANDLE GRID INSTANCIATION
+func _add_instance_to_grid(instance, q, r):
+	if not q in grid.keys():
+		grid[q] = {}
+	grid[q][r] = instance
+	
 func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
 	cell.init(q, r, kind, self.get_parent())
 	add_child(cell)
-	add_instance_to_grid(cell, q, r)
+	_add_instance_to_grid(cell, q, r)
 	if kind == "floor":
 		cells_floor += [cell]
 
@@ -250,11 +255,6 @@ func is_rotation_camera_ask(mouse_position):
 ## USEFULL FUNCTIONS
 func distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
-
-func add_instance_to_grid(instance, q, r):
-	if not q in grid.keys():
-		grid[q] = {}
-	grid[q][r] = instance
 
 func clear():
 	for c in cells_floor:
