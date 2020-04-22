@@ -74,38 +74,6 @@ func real_to_int(val):
 		return new
 	return val
 
-#func transform_one_val(v):
-#	if v is Dictionary:
-#		v = transform_values(v)
-#	elif v is Array:
-#		var new_v = []
-#		for val in v:
-#			val = transform_values(val)
-#			new_v += [val]
-#		v = new_v
-#	elif v is String:
-#		v = string_to_int(v)
-#	elif typeof(v) == TYPE_REAL:
-#		v = real_to_int(v)
-#	return v
-#
-#func transform_values(data):
-#	if data is Dictionary:
-#		var new_data = {}
-#		for k in data.keys():
-#			var v = transform_one_val(data[k])
-#			k = transform_one_val(k)
-#			new_data[k] = v
-#		return new_data
-#
-#	elif data is Array:
-#		var new_data = []
-#		for v in data:
-#			v = transform_one_val(v)
-#			new_data += [v]
-#		return new_data
-
-
 func transform_data(data):
 	if data is Dictionary:
 		var new_data = {}
