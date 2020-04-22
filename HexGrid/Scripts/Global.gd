@@ -37,6 +37,12 @@ func _set_network():
 	
 	
 ## MANAGEMENT ##
+#func find_node(node_parent, node_name):
+#	var nodes = node_name.split('/')
+#	for node in node_parent.get_children():
+#		if node_name in node.name:
+#			return node
+
 func change_screen(new_screen=''):
 	if screen != new_screen :
 		var ns = get_tree().get_root().get_node("Game/" + new_screen)

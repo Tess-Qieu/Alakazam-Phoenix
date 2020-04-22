@@ -18,7 +18,7 @@ var rng = RandomNumberGenerator.new()
 
 
 ## INITIALISATION ##
-func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
+func init(grid, team_blue_settings, team_red_settings, node_battlenetwork):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
 	_create_team('blue', team_blue_settings)
@@ -28,9 +28,9 @@ func init(grid, team_blue_settings, team_red_settings, node_battlescreen):
 	clear_arena()
 	
 	# warning-ignore:return_value_discarded		
-	connect('ask_move', node_battlescreen, '_on_ask_move')
+	connect('ask_move', node_battlenetwork, '_on_ask_move')
 	# warning-ignore:return_value_discarded
-	connect('ask_cast_spell', node_battlescreen, '_on_ask_cast_spell')
+	connect('ask_cast_spell', node_battlenetwork, '_on_ask_cast_spell')
 	
 
 
@@ -137,17 +137,6 @@ func clear_arena():
 
 
 
-## BUTTON EVENTS ##
-# may end in battlescreen
-func _on_ButtonSpell_pressed():
-	clear_arena()
-	fov = $Map.display_field_of_view(current_character.current_cell, 20)
-	state = 'cast_spell'
-	
-func _on_ButtonClear_pressed():
-	clear_arena()
-
-
 
 
 
@@ -181,7 +170,8 @@ func _on_cell_clicked(cell):
 			emit_signal('ask_move', current_character, path)
 #			_make_current_character_move_one_step()
 	elif state == 'cast_spell':
-		emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
+		if cell in fov:
+			emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
 #		make_current_character_cast_spell(cell)
 
 
@@ -202,3 +192,16 @@ func _on_character_hovered(character):
 		clear_arena()
 		$Map.display_displacement_range(character.current_cell, 
 										character.current_range_displacement)
+
+
+
+
+## USEFULL FUNCTIONS ##
+func get_character_by_id(id_character):
+	for character in team_red + team_blue:
+		if character.id_character == id_character:
+			return character
+	return null
+
+func get_cell_by_coords(q, r):
+	return $Map.grid[q][r]

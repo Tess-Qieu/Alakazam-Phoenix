@@ -45,5 +45,5 @@ text = "Clear"
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="PanelRight/ButtonSpell" to="Battle" method="_on_ButtonSpell_pressed"]
-[connection signal="pressed" from="PanelRight/ButtonClear" to="Battle" method="_on_ButtonClear_pressed"]
+[connection signal="pressed" from="PanelRight/ButtonSpell" to="." method="_on_ButtonSpell_pressed"]
+[connection signal="pressed" from="PanelRight/ButtonClear" to="." method="_on_ButtonClear_pressed"]

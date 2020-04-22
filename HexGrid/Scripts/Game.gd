@@ -5,7 +5,7 @@ var pseudo = ''
 
 
 func _ready():
-	$BattleScreen.visible = false
+	$BattleNetwork/BattleScreen.visible = false
 	$WaitingScreen.visible = true
 	
 	pseudo = 'Naowak'
@@ -35,9 +35,9 @@ func _on_message(data):
 		pass
 	
 	elif data['action'] == 'new game':
-		# New game, we go into Battlescreen now
-		Global.change_screen('BattleScreen')
-		Global.change_server_receiver_node('BattleScreen')
+		# New game, we go into Battle mode now
+		Global.change_screen('BattleNetwork/BattleScreen')
+		Global.change_server_receiver_node('BattleNetwork')
 		Global.server_receiver_node._on_message(data)
 		
 	else :
