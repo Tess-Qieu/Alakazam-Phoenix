@@ -97,6 +97,7 @@ class ManagerLobbys():
 
         print(f'New lobby {id_lobby} with users {user_1.pseudo} and {user_2.pseudo}.')
         await lobby.notify_new_lobby()
+        lobby.begin()
 
         user_1.current_lobby = lobby
         user_2.current_lobby = lobby

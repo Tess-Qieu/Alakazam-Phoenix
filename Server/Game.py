@@ -7,6 +7,22 @@ from Map import Map
 from ManagerID import ManagerID
 from Character import Character
 
+# import threading
+
+
+class Timer:
+    def __init__(self, timeout, callback):
+        self._timeout = timeout
+        self._callback = callback
+        self._task = asyncio.ensure_future(self._job())
+
+    async def _job(self):
+        await asyncio.sleep(self._timeout)
+        await self._callback()
+
+    def cancel(self):
+        self._task.cancel()
+
 
 class Game(Lobby):
     ''' Administrate a game depending clients actions '''
@@ -25,6 +41,9 @@ class Game(Lobby):
         self.team_blue = [Character('blue', cells[0].q, cells[0].r, self.manager_id.get_new_id())]
         self.team_red = [Character('red', cells[1].q, cells[1].r, self.manager_id.get_new_id())]
 
+    def begin(self):
+        Timer(10, self.end_turn)
+
 
     async def notify_new_lobby(self):
         # Notify the clients that the lobby is ready
@@ -35,6 +54,14 @@ class Game(Lobby):
                             'id': self.id_lobby
                             }
                 }
+        await self.notify_all(data)
+
+
+    async def end_turn(self):
+        # Notify the clients when a turn end
+        data = {'action': 'game',
+                'directive': 'end turn'}
+        Timer(10, self.end_turn)
         await self.notify_all(data)
 
 

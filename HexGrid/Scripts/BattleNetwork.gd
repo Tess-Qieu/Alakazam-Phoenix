@@ -28,17 +28,24 @@ func _on_message(data):
 		
 	elif data['action'] == 'game':
 		# The game is running
-		if data['response'] == 'move':
-			move_valid(data['details'])
+		if 'response' in data.keys():
+			# Response from the server
+			if data['response'] == 'move':
+				move_valid(data['details'])
+			
+			elif data['response'] == 'cast spell':
+				cast_spell_valid(data['details'])
+				
+			elif data['response'] == 'not valid':
+				print('Action ask not valid')
+				
+			else:
+				print('NetworkError: response {0} not known.'.format([data['response']]))
 		
-		elif data['response'] == 'cast spell':
-			cast_spell_valid(data['details'])
-			
-		elif data['response'] == 'not valid':
-			print('Action ask not valid')
-			
-		else:
-			print('NetworkError: response {0} not known.'.format([data['response']]))
+		if 'directive' in data.keys():
+			# directive from the server
+			if data['directive'] == 'end turn':
+				printt('End turn received.')
 	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
