@@ -11,6 +11,7 @@ import ManagerLobbys
 
 
 
+
 class User():
     '''This class holds the variables needed to represent a user.'''
 

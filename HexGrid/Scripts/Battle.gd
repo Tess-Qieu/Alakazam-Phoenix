@@ -3,6 +3,8 @@ extends Spatial
 signal ask_move
 signal ask_cast_spell
 
+var is_game_local = false
+
 
 var Character = preload("res://Scenes/Character.tscn")
 var team_blue = []
@@ -27,12 +29,31 @@ func init(grid, team_blue_settings, team_red_settings, node_battlenetwork):
 	current_character = team_blue[0]
 	clear_arena()
 	
-	# warning-ignore:return_value_discarded		
-	connect('ask_move', node_battlenetwork, '_on_ask_move')
-	# warning-ignore:return_value_discarded
-	connect('ask_cast_spell', node_battlenetwork, '_on_ask_cast_spell')
+	if not is_game_local:
+		# warning-ignore:return_value_discarded
+		connect('ask_move', node_battlenetwork, '_on_ask_move')
+		# warning-ignore:return_value_discarded
+		connect('ask_cast_spell', node_battlenetwork, '_on_ask_cast_spell')
 	
-
+func init_game_local():
+	# Generate teams and map, then instanciate them
+	# Called only when battlescreen is run with f6
+	is_game_local = true
+	var team_blue_desc = [{'health':100, 
+								'id_character':0, 
+								'q':1, 
+								'r':-5, 
+								'range displacement':5, 
+								'team':'blue'}]
+	var team_red_desc = [{'health':100, 
+							'id_character':1, 
+							'q':6, 
+							'r':-8, 
+							'range displacement':5, 
+							'team':'red'}]
+	$Map.generate_grid()
+	init($Map.grid, team_blue_desc, team_red_desc, null)
+	
 
 
 
@@ -160,19 +181,25 @@ func _on_character_selected(character):
 		current_character = character
 		clear_arena()
 	else:
-		emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
-#		make_current_character_cast_spell(character.current_cell)
+		if not is_game_local:
+			emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
+		else:
+			make_current_character_cast_spell(character.current_cell)
 
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path) > 0 :
-			emit_signal('ask_move', current_character, path)
-#			_make_current_character_move_one_step()
+			if not is_game_local:
+				emit_signal('ask_move', current_character, path)
+			else:
+				_make_current_character_move_one_step()
 	elif state == 'cast_spell':
 		if cell in fov:
-			emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
-#		make_current_character_cast_spell(cell)
+			if not is_game_local:
+				emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
+			else:
+				make_current_character_cast_spell(cell)
 
 
 

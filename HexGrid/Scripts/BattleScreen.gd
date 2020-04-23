@@ -1,8 +1,9 @@
 extends Control
 
-var Battle = preload("res://Scenes/Battle.tscn")
 
-
+func _ready():
+	if is_main_scene():
+		$Battle.init_game_local()
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed():
@@ -22,3 +23,9 @@ func get_battle():
 	for node in get_children():
 		if 'Battle' in node.name:
 			return node
+
+func is_f6(node:Node):
+	return node.filename != ProjectSettings.get_setting('application/run/main_scene')
+
+func is_main_scene():
+	return get_parent() == get_tree().root 

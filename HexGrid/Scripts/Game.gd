@@ -5,6 +5,7 @@ var pseudo = ''
 
 
 func _ready():
+	Global.init_game()
 	$BattleNetwork/BattleScreen.visible = false
 	$WaitingScreen.visible = true
 	

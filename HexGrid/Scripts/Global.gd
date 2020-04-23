@@ -17,10 +17,7 @@ var screen = null # Scene to show
 
 
 func _ready():
-	_init_materials()
-	_set_network()
-	screen = 'WaitingScreen'
-	
+	_init_materials()	
 
 func _init_materials():
 	for key in materials.keys():
@@ -33,8 +30,9 @@ func _set_network():
 	network = get_tree().get_root().get_node('Game/Network')
 	server_receiver_node = get_tree().get_root().get_node('Game')
 	
-	
-	
+func init_game():
+	_set_network()
+	screen = 'WaitingScreen'
 	
 ## MANAGEMENT ##
 #func find_node(node_parent, node_name):

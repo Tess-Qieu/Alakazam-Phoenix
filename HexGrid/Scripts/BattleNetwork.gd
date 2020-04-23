@@ -137,7 +137,6 @@ func observator_left(data):
 
 
 ## USEFULL FUNCTIONS ##
-
 func get_battle():
 	# Only solution to find the node Battle which change name	
 	for node in $BattleScreen.get_children():

@@ -7,7 +7,6 @@ from Map import Map
 from ManagerID import ManagerID
 from Character import Character
 
-# import threading
 
 
 class Timer:
@@ -24,6 +23,8 @@ class Timer:
         self._task.cancel()
 
 
+
+
 class Game(Lobby):
     ''' Administrate a game depending clients actions '''
 
@@ -37,7 +38,6 @@ class Game(Lobby):
         self.started = False
 
         cells = self.map.random_cells_floor()
-        print(cells)
         self.team_blue = [Character('blue', cells[0].q, cells[0].r, self.manager_id.get_new_id())]
         self.team_red = [Character('red', cells[1].q, cells[1].r, self.manager_id.get_new_id())]
 
@@ -45,24 +45,7 @@ class Game(Lobby):
         Timer(10, self.end_turn)
 
 
-    async def notify_new_lobby(self):
-        # Notify the clients that the lobby is ready
-        data = {'action': 'new game', 
-                'details': {'grid': self.map.serialize(),
-                            'team_blue': [character.serialize() for character in self.team_blue],    
-                            'team_red': [character.serialize() for character in self.team_red],
-                            'id': self.id_lobby
-                            }
-                }
-        await self.notify_all(data)
 
-
-    async def end_turn(self):
-        # Notify the clients when a turn end
-        data = {'action': 'game',
-                'directive': 'end turn'}
-        Timer(10, self.end_turn)
-        await self.notify_all(data)
 
 
     ## COMMUNICATION WITH CLIENTS ##
@@ -87,6 +70,29 @@ class Game(Lobby):
 
         else:
             print(f'NetworkError: action {data["action"]} not known.')
+
+    async def notify_new_lobby(self):
+        # Notify the clients that the lobby is ready
+        data = {'action': 'new game', 
+                'details': {'grid': self.map.serialize(),
+                            'team_blue': [character.serialize() for character in self.team_blue],    
+                            'team_red': [character.serialize() for character in self.team_red],
+                            'id': self.id_lobby
+                            }
+                }
+        await self.notify_all(data)
+
+
+    async def end_turn(self):
+        # Notify the clients when a turn end
+        data = {'action': 'game',
+                'directive': 'end turn'}
+        Timer(10, self.end_turn)
+        await self.notify_all(data)
+
+
+
+
 
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
@@ -157,9 +163,6 @@ class Game(Lobby):
         await self.notify_all(data)
 
 
-
-
-
     def set_player_ready(self, user):
         # Called when the client indicates that he correctly load the game
         # and he is ready to play
@@ -174,6 +177,10 @@ class Game(Lobby):
         # else start the game
         print(f'The game in the lobby {self.id_lobby} starts !')
         self.started = True
+
+
+
+
 
 
     ## USEFULL FUNCTIONS ##
