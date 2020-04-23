@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import asyncio
+import random
+from collections import namedtuple
 
 from Lobby import Lobby
 from Map import Map
@@ -8,8 +10,10 @@ from ManagerID import ManagerID
 from Character import Character
 
 
+TIME_TURN = 10
 
-class Timer:
+
+class Timer():
     def __init__(self, timeout, callback):
         self._timeout = timeout
         self._callback = callback
@@ -24,6 +28,9 @@ class Timer:
 
 
 
+Team = namedtuple('Team', ['color_team', 'user', 'characters'])
+
+
 
 class Game(Lobby):
     ''' Administrate a game depending clients actions '''
@@ -36,19 +43,35 @@ class Game(Lobby):
         self.map = Map()
         self.players_ready = [False for p in self.players]
         self.started = False
+        self.teams = []
 
-        cells = self.map.random_cells_floor()
-        self.team_blue = [Character('blue', cells[0].q, cells[0].r, self.manager_id.get_new_id())]
-        self.team_red = [Character('red', cells[1].q, cells[1].r, self.manager_id.get_new_id())]
+        self.init_teams()
+        self.player_on_turn = random.choice(self.players)
 
     def begin(self):
-        Timer(10, self.end_turn)
+        Timer(TIME_TURN, self.end_turn)
+
+    def init_teams(self):
+        # Create the team's characters
+        
+        def _create_team(self, color_team, user, cells):
+            return Team(color_team, 
+                        user,
+                        [Character(color_team, c.q, c.r, self.manager_id.get_new_id()) for c in cells])
+
+        cells = self.map.random_cells_floor(6)
+        random.shuffle(self.players)
+        self.teams += [_create_team(self, 'red', self.players[0], cells[:3])]
+        self.teams += [_create_team(self, 'blue', self.players[1], cells[3:])]
+
+
 
 
 
 
 
     ## COMMUNICATION WITH CLIENTS ##
+
     async def _on_message(self, data, user):
         # Manage the message from the clients
 
@@ -75,8 +98,8 @@ class Game(Lobby):
         # Notify the clients that the lobby is ready
         data = {'action': 'new game', 
                 'details': {'grid': self.map.serialize(),
-                            'team_blue': [character.serialize() for character in self.team_blue],    
-                            'team_red': [character.serialize() for character in self.team_red],
+                            'team_blue': [character.serialize() for character in self.teams[0].characters],    
+                            'team_red': [character.serialize() for character in self.teams[1].characters],
                             'id': self.id_lobby
                             }
                 }
@@ -96,6 +119,7 @@ class Game(Lobby):
 
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
+
     async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
@@ -184,8 +208,15 @@ class Game(Lobby):
 
 
     ## USEFULL FUNCTIONS ##
+
+    def get_all_characters(self):
+        characters = []
+        for team in self.teams:
+            characters += team.characters
+        return characters
+
     def get_character_by_id(self, id_character):
-        for c in self.team_blue + self.team_red:
+        for c in self.get_all_characters():
             if c.id_character == id_character:
                 return c
         return None
