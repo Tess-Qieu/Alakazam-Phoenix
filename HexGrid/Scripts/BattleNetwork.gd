@@ -3,13 +3,15 @@ extends Node
 var Battle = preload('res://Scenes/Battle.tscn')
 
 var lobby_id
+var is_my_turn = false
 
 
 ## COMMUNICATION FUNCTIONS ##
 func send_data(data):
 	# We add the game lobby id
 	# We can add the state of the game too
-	data['details']['id'] = lobby_id
+	data['details']['lobby id'] = lobby_id
+	data['details']['user id'] = Global.user_id
 	Global.network.send_data(data)
 
 func _on_message(data):
@@ -44,8 +46,10 @@ func _on_message(data):
 		
 		if 'directive' in data.keys():
 			# directive from the server
-			if data['directive'] == 'end turn':
-				printt('End turn received.')
+			if data['directive'] == 'new turn':
+				is_my_turn = data['details']['user id'] == Global.user_id
+				print('My turn : {0}'.format([is_my_turn]))
+	
 	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
@@ -54,6 +58,10 @@ func _on_message(data):
 
 ## ASK PLAY TO SERVER
 func _on_ask_move(character, path):
+	if not is_my_turn :
+		# Client should not send ask for a play if it's not his turn to play
+		return
+		
 	var path_serialized = []
 	for c in path:
 		path_serialized += [[c.q, c.r]]
@@ -68,6 +76,10 @@ func _on_ask_move(character, path):
 func _on_ask_cast_spell(thrower, target): # for now, useless to precise which spell to use
 	# thrower is the character which cast the spell
 	# target is the cell where the spelle is cast
+	if not is_my_turn :
+		# Client should not send ask for a play if it's not his turn to play
+		return
+	
 	var data = {'action': 'game',
 				'ask': 'cast spell',
 				'details': {'thrower': {'id character': thrower.id_character},
@@ -81,7 +93,7 @@ func _on_ask_cast_spell(thrower, target): # for now, useless to precise which sp
 ## GAME ##
 func new_game(data):
 	# Init the new Battle	
-	lobby_id = data['details']['id']
+	lobby_id = data['details']['lobby id']
 	
 	var grid = data['details']['grid']
 	var team_blue = data['details']['team blue']

@@ -97,12 +97,11 @@ class ManagerLobbys():
 
         print(f'New lobby {id_lobby} with users {user_1.pseudo} and {user_2.pseudo}.')
         await lobby.notify_new_lobby()
-        lobby.begin()
 
         user_1.current_lobby = lobby
         user_2.current_lobby = lobby
 
     async def transfer_message_to_lobby(self, data, user):
         # Find the appropriate lobby and call his _on_message function
-        id_lobby = data['details']['id']
+        id_lobby = data['details']['lobby id']
         await self.lobbys[id_lobby]._on_message(data, user)

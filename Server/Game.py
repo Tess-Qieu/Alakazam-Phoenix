@@ -60,10 +60,15 @@ class Game(Lobby):
         self.teams = []
 
         self.init_teams()
-        self.player_on_turn = random.choice(self.players)
+
+        self.timer = None
+        self.player_on_turn = None
+        self.turns = self.players.copy()
+        random.shuffle(self.turns)
 
     def begin(self):
-        Timer(TIME_TURN, self.end_turn)
+        self.next_player()
+        self.timer = Timer(TIME_TURN, self.new_turn)
 
     def init_teams(self):
         # Create the team's characters
@@ -116,17 +121,19 @@ class Game(Lobby):
                 'details': {'grid': self.map.serialize(),
                             'team red': self.teams[0].serialize(),
                             'team blue': self.teams[1].serialize(),    
-                            'id': self.id_lobby
+                            'lobby id': self.id_lobby
                             }
                 }
         await self.notify_all(data)
 
 
-    async def end_turn(self):
-        # Notify the clients when a turn end
+    async def new_turn(self):
+        # Notify the clients when new turn
+        self.next_player()
         data = {'action': 'game',
-                'directive': 'end turn'}
-        Timer(10, self.end_turn)
+                'directive': 'new turn',
+                'details' : {'user id': self.player_on_turn.user_id}}
+        self.timer = Timer(TIME_TURN, self.new_turn)
         await self.notify_all(data)
 
 
@@ -139,6 +146,10 @@ class Game(Lobby):
     async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
+        if data['user id'] != self.player_on_turn.user_id :
+            # Serveur treat only request from the on turn user
+            return
+
         id_character = data['id character']
         path = data['path']      
 
@@ -176,6 +187,9 @@ class Game(Lobby):
     async def ask_cast_spell(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
+        if data['user id'] != self.player_on_turn.user_id :
+            # Serveur treat only request from the on turn user
+            return
         id_thrower = data['thrower']['id character']
         coord_target = data['target']
 
@@ -217,6 +231,7 @@ class Game(Lobby):
         # else start the game
         print(f'The game in the lobby {self.id_lobby} starts !')
         self.started = True
+        self.begin()
 
 
 
@@ -236,4 +251,10 @@ class Game(Lobby):
             if c.id_character == id_character:
                 return c
         return None
+
+    def next_player(self):
+        if self.player_on_turn is not None:
+            self.turns += [self.player_on_turn]
+        self.player_on_turn = self.turns.pop(0)
+
 
