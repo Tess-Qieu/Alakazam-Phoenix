@@ -39,7 +39,7 @@ class Game(Lobby):
     def __init__(self, server, id_lobby, players, observators=[]):
         super().__init__(server, id_lobby, players, observators)
 
-        self.manager_id = ManagerID()
+        self.character_manager_id = ManagerID(100)
         self.map = Map()
         self.players_ready = [False for p in self.players]
         self.started = False
@@ -57,7 +57,7 @@ class Game(Lobby):
         def _create_team(self, color_team, user, cells):
             return Team(color_team, 
                         user,
-                        [Character(color_team, c.q, c.r, self.manager_id.get_new_id()) for c in cells])
+                        [Character(color_team, c.q, c.r, self.character_manager_id.get_new_id()) for c in cells])
 
         cells = self.map.random_cells_floor(6)
         random.shuffle(self.players)

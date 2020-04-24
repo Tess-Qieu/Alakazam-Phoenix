@@ -7,7 +7,8 @@ from websockets.exceptions import ConnectionClosedError
 import json
 import logging
 
-import ManagerLobbys
+from ManagerLobbys import ManagerLobbys
+from ManagerID import ManagerID
 
 
 
@@ -15,10 +16,11 @@ import ManagerLobbys
 class User():
     '''This class holds the variables needed to represent a user.'''
 
-    def __init__(self, websocket, path, pseudo):
+    def __init__(self, websocket, path, pseudo, user_id):
         self.websocket = websocket
         self.path = path
         self.pseudo = pseudo
+        self.user_id = user_id
         self.current_lobby = None
 
 
@@ -29,7 +31,8 @@ class Server():
     def __init__(self):
         logging.basicConfig()
         self.users = dict()
-        self.manager_lobbys = ManagerLobbys.ManagerLobbys(self)
+        self.manager_lobbys = ManagerLobbys(self)
+        self.users_manager_id = ManagerID()
 
 
     ## MANAGE CONNECTION WITH CLIENT ##
@@ -50,9 +53,10 @@ class Server():
             raise Exception('NetworkError: Expect Action to be a Connection.')
         pseudo = data['details']['pseudo']
 
-        self.add_user(websocket, path, pseudo)
+        new_id = self.users_manager_id.get_new_id()
+        self.add_user(websocket, path, pseudo, new_id)
 
-        response = {'action' : 'connection', 'details' : {'accept' : True}}
+        response = {'action' : 'connection', 'details' : {'user id' : new_id}}
         await self.send_data(websocket, response)
 
     async def close_connection(self, websocket):
@@ -72,8 +76,8 @@ class Server():
 
 
     ## MANAGE USERS DICTIONARY ##
-    def add_user(self, websocket, path, pseudo):
-        user = User(websocket, path, pseudo)
+    def add_user(self, websocket, path, pseudo, user_id):
+        user = User(websocket, path, pseudo, user_id)
         self.users[websocket] = user
 
     def remove_user(self, websocket):

@@ -1,15 +1,10 @@
 extends Control
 
 
-var pseudo = ''
-
-
 func _ready():
 	Global.init_game()
 	$BattleNetwork/BattleScreen.visible = false
 	$WaitingScreen.visible = true
-	
-	pseudo = 'Naowak'
 	
 	$Network.connect_to_server()
 	
@@ -21,12 +16,11 @@ func _on_message(data):
 		print("NetworkError: no key action in data")
 		return
 		
-		
 	if data['action'] == 'connection':
 		# Validation connection from server
-		if 'accept' in data['details'].keys():
-			if data['details']['accept'] == true:
-				ask_to_play()
+		if 'user id' in data['details'].keys():
+			Global.user_id = data['details']['user id']
+			ask_to_play()
 		else:
 			print('NetworkError: no key accept in details for connection.')
 		
@@ -60,7 +54,7 @@ func _on_connection_to_server():
 	_identify_to_server()
 
 func _identify_to_server():
-	var data = {'action' : 'connection', 'details' : {'pseudo' : pseudo}}
+	var data = {'action' : 'connection', 'details' : {'pseudo' : Global.pseudo}}
 	Global.network.send_data(data)
 
 

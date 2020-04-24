@@ -12,7 +12,7 @@ class ManagerLobbys():
 
     def __init__(self, server):
         self.server = server # usefull to send data to clients
-        self.manager_id = ManagerID()
+        self.lobbys_manager_id = ManagerID()
         self.users_waiting_to_play = []
         self.lobbys = {}
 
@@ -55,7 +55,7 @@ class ManagerLobbys():
                 user.current_lobby = None
 
             id_lobby = lobby.id_lobby
-            self.manager_id.free_id(id_lobby)
+            self.lobbys_manager_id.free_id(id_lobby)
             
             del(self.lobbys[id_lobby])
             del(lobby)
@@ -91,7 +91,7 @@ class ManagerLobbys():
         user_1 = self.users_waiting_to_play.pop(0)
         user_2 = self.users_waiting_to_play.pop(0)
         
-        id_lobby = self.manager_id.get_new_id()
+        id_lobby = self.lobbys_manager_id.get_new_id()
         lobby = Game(self.server, id_lobby, [user_1, user_2])
         self.lobbys[id_lobby] = lobby
 

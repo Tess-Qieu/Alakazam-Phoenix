@@ -15,6 +15,9 @@ var network = null
 var server_receiver_node = null # Node where information from server is throwed to
 var screen = null # Scene to show
 
+var pseudo = ''
+var user_id = null
+
 
 func _ready():
 	_init_materials()	
@@ -33,6 +36,7 @@ func _set_network():
 func init_game():
 	_set_network()
 	screen = 'WaitingScreen'
+	pseudo = 'Naowak'
 	
 ## MANAGEMENT ##
 #func find_node(node_parent, node_name):
