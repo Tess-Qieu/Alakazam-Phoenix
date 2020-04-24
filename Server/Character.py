@@ -3,8 +3,9 @@
 class Character():
     ''' Reprensent a chatacter in the game '''
 
-    def __init__(self, team, q, r, id_character):
+    def __init__(self, team, user, q, r, id_character):
         self.team = team
+        self.user = user
         self.q = q
         self.r = r
         self.id_character = id_character
@@ -15,9 +16,10 @@ class Character():
     def serialize(self):
         # Serialize the object to send it to the clients
         data = {'team': self.team,
+                'user id': self.user.user_id,
                 'q': self.q,
                 'r': self.r,
-                'id_character': self.id_character,
+                'id character': self.id_character,
                 'health': self.health,
                 'range displacement': self.range_displacement}
         return data

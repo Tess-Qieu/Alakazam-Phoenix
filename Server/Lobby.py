@@ -5,7 +5,7 @@ import asyncio
 class Lobby():
     '''Reprensentant the objects containing the game and managing it'''
 
-    def __init__(self, server, id_lobby, players, observators=[]):
+    def __init__(self, server, id_lobby, players, observators):
         self.server = server
         self.id_lobby = id_lobby
 

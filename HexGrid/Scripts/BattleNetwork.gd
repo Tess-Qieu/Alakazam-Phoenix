@@ -60,7 +60,7 @@ func _on_ask_move(character, path):
 		
 	var data = {'action': 'game',
 				'ask': 'move', 
-				'details': {'id_character' : character.id_character,
+				'details': {'id character' : character.id_character,
 							'path' : path_serialized,
 							}}
 	send_data(data)
@@ -70,7 +70,7 @@ func _on_ask_cast_spell(thrower, target): # for now, useless to precise which sp
 	# target is the cell where the spelle is cast
 	var data = {'action': 'game',
 				'ask': 'cast spell',
-				'details': {'thrower': {'id_character': thrower.id_character},
+				'details': {'thrower': {'id character': thrower.id_character},
 							'target': [target.q, target.r]
 							}
 				}
@@ -84,8 +84,8 @@ func new_game(data):
 	lobby_id = data['details']['id']
 	
 	var grid = data['details']['grid']
-	var team_blue = data['details']['team_blue']
-	var team_red = data['details']['team_red']
+	var team_blue = data['details']['team blue']
+	var team_red = data['details']['team red']
 	
 	var battle = get_battle()
 	battle.init(grid, team_blue, team_red, self)
@@ -95,13 +95,13 @@ func new_game(data):
 
 func move_valid(data):
 	var battle = get_battle()
-	var character = battle.get_character_by_id(data['id_character'])
+	var character = battle.get_character_by_id(data['id character'])
 	var path_valid = data['path']
 	battle.make_character_move_following_path_valid(character, path_valid)
 
 func cast_spell_valid(data):
 	var battle = get_battle()
-	var character_thrower = battle.get_character_by_id(data['thrower']['id_character'])
+	var character_thrower = battle.get_character_by_id(data['thrower']['id character'])
 	var cell_target = battle.get_cell_by_coords(data['target'][0], data['target'][1])
 	battle.make_character_cast_spell(character_thrower, cell_target)
 

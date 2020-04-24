@@ -2,7 +2,6 @@
 
 import asyncio
 import random
-from collections import namedtuple
 
 from Lobby import Lobby
 from Map import Map
@@ -28,7 +27,22 @@ class Timer():
 
 
 
-Team = namedtuple('Team', ['color_team', 'user', 'characters'])
+class Team():
+
+    def __init__(self, color_team, user, characters):
+        self.color_team = color_team
+        self.user = user
+        self.characters = characters
+
+    def add_character(self, character):
+        self.characters += [character]
+
+    def remove_character(self, character):
+        self.characters.remove(character)
+
+    def serialize(self):
+        print(self.characters)
+        return [character.serialize() for character in self.characters]
 
 
 
@@ -36,7 +50,7 @@ class Game(Lobby):
     ''' Administrate a game depending clients actions '''
 
     ## INITIALISATION ##
-    def __init__(self, server, id_lobby, players, observators=[]):
+    def __init__(self, server, id_lobby, players, observators):
         super().__init__(server, id_lobby, players, observators)
 
         self.character_manager_id = ManagerID(100)
@@ -55,9 +69,11 @@ class Game(Lobby):
         # Create the team's characters
         
         def _create_team(self, color_team, user, cells):
-            return Team(color_team, 
-                        user,
-                        [Character(color_team, c.q, c.r, self.character_manager_id.get_new_id()) for c in cells])
+            team = Team(color_team, user, [])
+            for c in cells:
+                new_character = Character(color_team, user, c.q, c.r, self.character_manager_id.get_new_id())
+                team.add_character(new_character)
+            return team
 
         cells = self.map.random_cells_floor(6)
         random.shuffle(self.players)
@@ -98,8 +114,8 @@ class Game(Lobby):
         # Notify the clients that the lobby is ready
         data = {'action': 'new game', 
                 'details': {'grid': self.map.serialize(),
-                            'team_blue': [character.serialize() for character in self.teams[0].characters],    
-                            'team_red': [character.serialize() for character in self.teams[1].characters],
+                            'team red': self.teams[0].serialize(),
+                            'team blue': self.teams[1].serialize(),    
                             'id': self.id_lobby
                             }
                 }
@@ -123,7 +139,7 @@ class Game(Lobby):
     async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        id_character = data['id_character']
+        id_character = data['id character']
         path = data['path']      
 
         # Find the correct character
@@ -145,13 +161,13 @@ class Game(Lobby):
 
             data = {'action': 'game', 
                     'response': 'move',
-                    'details': {'id_character': id_character,
+                    'details': {'id character': id_character,
                                 'path': path}}
 
         else:
             data = {'action': 'game',
                     'response': 'not valid',
-                    'details': {'id_character': id_character,
+                    'details': {'id character': id_character,
                                 'path': path}}
 
         await self.notify_all(data)
@@ -160,7 +176,7 @@ class Game(Lobby):
     async def ask_cast_spell(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        id_thrower = data['thrower']['id_character']
+        id_thrower = data['thrower']['id character']
         coord_target = data['target']
 
         character_thrower = self.get_character_by_id(id_thrower)
@@ -176,13 +192,13 @@ class Game(Lobby):
 
             data = {'action': 'game',
                     'response': 'cast spell',
-                    'details': {'thrower': {'id_character': id_thrower},
+                    'details': {'thrower': {'id character': id_thrower},
                                 'target': coord_target}}
 
         else:
             data = {'action': 'game',
                     'response': 'not valid',
-                    'details': {'thrower': {'id_character': id_thrower},
+                    'details': {'thrower': {'id character': id_thrower},
                                 'target': coord_target}}
         await self.notify_all(data)
 

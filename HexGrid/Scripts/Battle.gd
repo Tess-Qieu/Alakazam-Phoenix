@@ -65,7 +65,7 @@ func _create_team(team_name, data):
 		var character = _create_character(team_name, 
 										c['q'], 
 										c['r'],
-										c['id_character'],
+										c['id character'],
 										c['health'], 
 										c['range displacement'])
 		if team_name == 'blue':
