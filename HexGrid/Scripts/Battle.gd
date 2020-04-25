@@ -1,7 +1,8 @@
 extends Spatial
 
 
-var Character = preload("res://Scenes/Character.tscn")
+var Character = preload("res://Scenes/Robot_character.tscn")
+#var Character = preload("res://Scenes/Character.tscn")
 var team_blue = []
 var team_red = []
 var current_character
@@ -114,6 +115,7 @@ func _on_character_movement_finished(character, ending_cell):
 ## Handle On object clicked ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
+		current_character.unselect()
 		# select character
 		current_character = character
 		clear_arena()

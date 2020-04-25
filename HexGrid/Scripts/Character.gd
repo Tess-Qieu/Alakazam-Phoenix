@@ -54,6 +54,9 @@ func _physics_process(delta):
 
 func change_material(material_key):
 	$MeshInstance.set_surface_material(0, Global.materials[material_key])
+	
+func unselect():
+	pass
 
 
 
