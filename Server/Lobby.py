@@ -53,6 +53,8 @@ class Lobby():
 
 
 
+    async def notify_one_player(self, player, data):
+        await self.server.send_data(player.websocket, data)
 
     async def notify_all_players(self, data):
         for user in self.players:

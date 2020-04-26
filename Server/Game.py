@@ -141,44 +141,58 @@ class Game(Lobby):
         await self.notify_all(data)
 
 
+    async def notify_ask_not_valid(self, data):
+        user = self.get_player_by_id(data['user id'])
+        data = {'action': 'game',
+                'response': 'not valid',
+                'details': data}
+        await self.notify_one_player(user, data)
+
+
 
 
 
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
 
-    def is_correct_ask(self, data):
-        if data['user id'] != self.player_on_turn.user_id :
-            # Server treat only request from the on turn user
-            return False
+    def is_correct_user_id(self, data):
+        return data['user id'] == self.player_on_turn.user_id
 
+    def is_correct_character_user(self, character):
+        return character.user.user_id == self.player_on_turn.user_id
+
+    def is_correct_ask_cast_spell(self, data):
+        # Verify if the ask spell is correct
+        character = self.get_character_by_id(data['thrower']['id character'])
+        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+
+    def is_correct_ask_move(self, data):
         character = self.get_character_by_id(data['id character'])
-        if character.user.user_id != self.player_on_turn.user_id:
-            # Client cannot control character that do not belongs to him
-            return False
-        return True
+        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+
+
+
 
     async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        if not self.is_correct_ask(data):
+
+        if not self.is_correct_ask_move(data):
             # if ask isn't correct, then return 
-            # /!\ IN THE FUTURE IT COULD BE NICE TO SEND A MESSAGE TO THE CLIENT
+            await self.notify_ask_not_valid(data)
             return
-            
+
 
         id_character = data['id character']
         path = data['path']      
 
         # Find the correct character
         character = self.get_character_by_id(id_character)
-        if character is None:
-            print(f'NetworkValueError: no character with id {is_character}.')
-            return
 
         # Verify if the path is valid
         cell_start = self.map.get_cell(character.q, character.r)
         path_in_cell = [self.map.get_cell(c[0], c[1]) for c in path]
+
         is_valid = self.map.is_path_valid(cell_start, path_in_cell) 
         
         # Send the response to the clients
@@ -191,25 +205,26 @@ class Game(Lobby):
                     'response': 'move',
                     'details': {'id character': id_character,
                                 'path': path}}
+            
+            await self.notify_all(data)
 
         else:
-            data = {'action': 'game',
-                    'response': 'not valid',
-                    'details': {'id character': id_character,
-                                'path': path}}
+            # path not valid, prevent the user who asked
+            await self.notify_ask_not_valid(data)
 
-        await self.notify_all(data)
+
 
 
     async def ask_cast_spell(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        if not self.is_correct_ask(data):
+
+        if not self.is_correct_ask_cast_spell(data):
             # if ask isn't correct, then return 
-            # /!\ IN THE FUTURE IT COULD BE NICE TO SEND A MESSAGE TO THE CLIENT
+            await self.notify_ask_not_valid(data)
             return
 
-            
+
         id_thrower = data['thrower']['id character']
         coord_target = data['target']
 
@@ -222,19 +237,18 @@ class Game(Lobby):
 
         if is_valid:
             # cast the spell
-            character_thrower.cast_spell(cell_target) # implémentation cette fct
+            character_thrower.cast_spell(cell_target) # /!\ FUNCTION NOT IMPLEMENTED
 
             data = {'action': 'game',
                     'response': 'cast spell',
                     'details': {'thrower': {'id character': id_thrower},
                                 'target': coord_target}}
 
+            await self.notify_all(data)
+
         else:
-            data = {'action': 'game',
-                    'response': 'not valid',
-                    'details': {'thrower': {'id character': id_thrower},
-                                'target': coord_target}}
-        await self.notify_all(data)
+            # spell not valid, tell the user who asked
+            await self.notify_ask_not_valid(data)
 
 
     def set_player_ready(self, user):
@@ -270,6 +284,13 @@ class Game(Lobby):
         for c in self.get_all_characters():
             if c.id_character == id_character:
                 return c
+        print(f'NetworkValueError: no character with id {id_character}.')
+        return None
+
+    def get_player_by_id(self, user_id):
+        for user in self.players:
+            if user.user_id == user_id:
+                return user
         return None
 
     def next_player(self):
