@@ -9,7 +9,9 @@ var is_game_local = false
 var Character = preload("res://Scenes/Character.tscn")
 var team_blue = []
 var team_red = []
+var teams = {}
 var current_character
+var my_team # color of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
 var fov = []
@@ -20,13 +22,13 @@ var rng = RandomNumberGenerator.new()
 
 
 ## INITIALISATION ##
-func init(grid, team_blue_settings, team_red_settings, node_battlenetwork):
+func init(grid, teams_infos, node_battlenetwork):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
-	_create_team('blue', team_blue_settings)
-	_create_team('red', team_red_settings)
+	for name in teams_infos.keys():
+		_create_team(name, teams_infos[name])
 	
-	current_character = team_blue[0]
+	current_character = teams[my_team][0]
 	clear_arena()
 	
 	if not is_game_local:
@@ -39,20 +41,25 @@ func init_game_local():
 	# Generate teams and map, then instanciate them
 	# Called only when battlescreen is run with f6
 	is_game_local = true
-	var team_blue_desc = [{'health':100, 
-								'id_character':0, 
-								'q':1, 
-								'r':-5, 
-								'range displacement':5, 
-								'team':'blue'}]
-	var team_red_desc = [{'health':100, 
-							'id_character':1, 
-							'q':6, 
-							'r':-8, 
-							'range displacement':5, 
-							'team':'red'}]
+	var teams_infos = {'red': {'user id': -1,
+								'characters': [{'health':100, 
+												'id character':1, 
+												'q':6, 
+												'r':-8, 
+												'range displacement':5, 
+												'team':'red'}]
+								},
+						'blue': {'user id': -1,
+								'characters': [{'health':100, 
+												'id character':0,
+												'q':1, 
+												'r':-5, 
+												'range displacement':5, 
+												'team':'blue'}]
+								}
+						}
 	$Map.generate_grid()
-	init($Map.grid, team_blue_desc, team_red_desc, null)
+	init($Map.grid, teams_infos, null)
 	
 
 
@@ -61,17 +68,20 @@ func init_game_local():
 
 ## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
-	for c in data:
+	if data['user id'] == Global.user_id:
+		# stock the name of his team
+		my_team = team_name
+	# init the team
+	teams[team_name] = []
+		
+	for c in data['characters']:
 		var character = _create_character(team_name, 
 										c['q'], 
 										c['r'],
 										c['id character'],
 										c['health'], 
 										c['range displacement'])
-		if team_name == 'blue':
-			team_blue += [character]
-		elif team_name == 'red':
-			team_red += [character]
+		teams[team_name] += [character]
 
 func _create_character(team, q, r, id_character, health, range_displacement):
 	var cell = $Map.grid[q][r]
@@ -225,7 +235,11 @@ func _on_character_hovered(character):
 
 ## USEFULL FUNCTIONS ##
 func get_character_by_id(id_character):
-	for character in team_red + team_blue:
+	var all_characters = []
+	for name in teams.keys():
+		all_characters += teams[name]
+		
+	for character in all_characters:
 		if character.id_character == id_character:
 			return character
 	return null

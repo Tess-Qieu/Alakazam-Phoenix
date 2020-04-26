@@ -95,12 +95,11 @@ func new_game(data):
 	# Init the new Battle	
 	lobby_id = data['details']['lobby id']
 	
-	var grid = data['details']['grid']
-	var team_blue = data['details']['team blue']
-	var team_red = data['details']['team red']
+	var grid_infos = data['details']['grid']
+	var teams_infos = data['details']['teams']
 	
 	var battle = get_battle()
-	battle.init(grid, team_blue, team_red, self)
+	battle.init(grid_infos, teams_infos, self)
 	
 	data = {'action' : 'new game', 'details' : {'ready' : true}}
 	send_data(data)
@@ -108,6 +107,7 @@ func new_game(data):
 func move_valid(data):
 	var battle = get_battle()
 	var character = battle.get_character_by_id(data['id character'])
+	print(character)
 	var path_valid = data['path']
 	battle.make_character_move_following_path_valid(character, path_valid)
 

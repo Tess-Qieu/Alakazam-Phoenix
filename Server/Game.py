@@ -41,8 +41,7 @@ class Team():
         self.characters.remove(character)
 
     def serialize(self):
-        print(self.characters)
-        return [character.serialize() for character in self.characters]
+        return {'user id': self.user.user_id, 'characters': [character.serialize() for character in self.characters]}
 
 
 
@@ -119,9 +118,10 @@ class Game(Lobby):
         # Notify the clients that the lobby is ready
         data = {'action': 'new game', 
                 'details': {'grid': self.map.serialize(),
-                            'team red': self.teams[0].serialize(),
-                            'team blue': self.teams[1].serialize(),    
-                            'lobby id': self.id_lobby
+                            'lobby id': self.id_lobby,
+                            'teams': {'red': self.teams[0].serialize(),
+                                        'blue': self.teams[1].serialize()
+                                    }  
                             }
                 }
         await self.notify_all(data)

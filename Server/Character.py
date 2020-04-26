@@ -16,7 +16,6 @@ class Character():
     def serialize(self):
         # Serialize the object to send it to the clients
         data = {'team': self.team,
-                'user id': self.user.user_id,
                 'q': self.q,
                 'r': self.r,
                 'id character': self.id_character,

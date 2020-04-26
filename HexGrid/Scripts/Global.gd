@@ -16,7 +16,7 @@ var server_receiver_node = null # Node where information from server is throwed 
 var screen = null # Scene to show
 
 var pseudo = ''
-var user_id = null
+var user_id = -1
 
 
 func _ready():
