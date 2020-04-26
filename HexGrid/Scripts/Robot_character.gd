@@ -55,7 +55,7 @@ func _physics_process(delta):
 		_process_movement_one_cell(delta)
 
 func change_material(material_key):
-	$BodyBottom/BodyTorso.set_surface_material(0, Global.materials[material_key])
+	$Armature/TorsoBoneAttachment/BodyTorso.set_surface_material(0, Global.materials[material_key])
 #	$MeshInstance.set_surface_material(0, Global.materials[material_key])
 
 func unselect():
