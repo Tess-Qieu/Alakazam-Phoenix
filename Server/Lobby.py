@@ -14,6 +14,7 @@ class Lobby():
 
 
 
+
     async def notify_new_lobby(self):
         pass
 
@@ -33,6 +34,7 @@ class Lobby():
         
             data = {'action': 'player left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
+            await self.end_of_lobby()
             return False
 
 
@@ -44,6 +46,10 @@ class Lobby():
             data = {'action': 'observator left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
             return True
+
+    async def end_of_lobby(self):
+        # Called when the lobby end
+        pass
 
 
 

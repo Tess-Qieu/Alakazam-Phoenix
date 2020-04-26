@@ -67,7 +67,7 @@ class Game(Lobby):
 
     def begin(self):
         self.next_player()
-        self.timer = Timer(TIME_TURN, self.new_turn)
+        self.timer = Timer(1, self.new_turn) # could be the time while players can place character
 
     def init_teams(self):
         # Create the team's characters
@@ -125,6 +125,10 @@ class Game(Lobby):
                             }
                 }
         await self.notify_all(data)
+
+    async def end_of_lobby(self):
+        # Called when the lobby end
+        self.timer.cancel()
 
 
     async def new_turn(self):

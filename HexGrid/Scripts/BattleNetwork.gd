@@ -107,7 +107,6 @@ func new_game(data):
 func move_valid(data):
 	var battle = get_battle()
 	var character = battle.get_character_by_id(data['id character'])
-	print(character)
 	var path_valid = data['path']
 	battle.make_character_move_following_path_valid(character, path_valid)
 
