@@ -9,8 +9,8 @@ var Spell = preload("res://Scenes/Spell.tscn")
 
 
 # Movement variables
-export var speed = 250 #NOT WORKING IF speed > 250
-const MVT_MARGIN = 0.01 # Movement margin used to discriminate if the character has arrived on a cell
+export var speed = 150 #NOT WORKING IF speed > 250
+const MVT_MARGIN = 0.02 # Movement margin used to discriminate if the character has arrived on a cell
 
 var moving = false
 var destination_cell
@@ -23,7 +23,7 @@ var current_cell
 const START_HEALTH = 15 
 var current_health
 
-const START_RANGE_DISPLACEMENT = 5
+const START_RANGE_DISPLACEMENT = 10
 var current_range_displacement
 
 
@@ -132,10 +132,12 @@ func _process_movement_one_cell(delta):
 	else: # If the character has reached the cell (within a margin)
 		# The character is teleported to the exact cell location
 		#  in order to avoid an error accumulation and movement is stopped
-		moving = false
-		$AnimationPlayer.play("Wait")
+#		moving = false
 		teleport_to(destination_cell)
 
+func stop_movement():
+	moving = false
+	$AnimationPlayer.play("Wait")
 
 
 

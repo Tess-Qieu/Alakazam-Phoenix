@@ -104,6 +104,7 @@ func _on_character_movement_finished(character, ending_cell):
 	_update_character_cell_references(character, ending_cell)
 	if path.size() == 0:
 		state = 'normal'
+		current_character.stop_movement()
 		clear_arena()
 	else:
 		make_current_character_move_following_path()
