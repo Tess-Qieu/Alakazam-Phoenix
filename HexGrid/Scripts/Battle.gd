@@ -43,8 +43,8 @@ func init_game_local():
 	var teams_infos = {'red': {'user id': -1,
 								'characters': [{'health':100, 
 												'id character':1, 
-												'q':6, 
-												'r':-8, 
+												'q':0, 
+												'r':0, 
 												'range displacement':5, 
 												'team':'red'}]
 								},
@@ -52,6 +52,12 @@ func init_game_local():
 								'characters': [{'health':100, 
 												'id character':0,
 												'q':1, 
+												'r':-5, 
+												'range displacement':5, 
+												'team':'blue'},
+												{'health':100, 
+												'id character':2,
+												'q':6, 
 												'r':-5, 
 												'range displacement':5, 
 												'team':'blue'}]
@@ -196,7 +202,7 @@ func _on_cell_clicked(cell):
 			if not is_game_local:
 				emit_signal('ask_move', current_character, path)
 			else:
-				_make_character_moving_move_one_step()
+				make_character_move_following_path_valid(current_character, path)
 	elif state == 'cast_spell':
 		if cell in fov:
 			if not is_game_local:

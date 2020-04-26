@@ -62,14 +62,10 @@ func _on_ask_move(character, path):
 		# Client should not send ask for a play if it's not his turn to play
 		return
 		
-	var path_serialized = []
-	for c in path:
-		path_serialized += [[c.q, c.r]]
-		
 	var data = {'action': 'game',
 				'ask': 'move', 
 				'details': {'id character' : character.id_character,
-							'path' : path_serialized,
+							'path' : path,
 							}}
 	send_data(data)
 

@@ -190,6 +190,13 @@ func _neighbors (cell):
 		list.append(grid[cell.q -1][cell.r +1])
 	
 	return list
+	
+func _serialize_path(path):
+	var path_serialized = []
+	for c in path:
+		path_serialized += [[c.q, c.r]]
+	return path_serialized
+
 
 func _compute_path(start, end, distance_max):
 	# Function calculating a path between two cells
@@ -247,7 +254,8 @@ func display_path(start, end, distance_max):
 	var path = _compute_path(start, end, distance_max)
 	for elt in path:
 		elt.change_material('green')
-	return path
+	return _serialize_path(path)
+
 
 func _compute_displacement_range(start, distance_max):
 	var visited = [start]
