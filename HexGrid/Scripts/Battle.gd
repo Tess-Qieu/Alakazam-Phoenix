@@ -7,13 +7,12 @@ var is_game_local = false
 
 
 var Character = preload("res://Scenes/Character.tscn")
-var team_blue = []
-var team_red = []
 var teams = {}
 var current_character
 var my_team # color of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
+var character_moving = null
 var fov = []
 var path = []
 
@@ -117,28 +116,19 @@ func _on_character_die(character):
 
 
 ## MAKE MOVE/SPELL##
-func _make_current_character_move_one_step():
+func _make_character_moving_move_one_step():
 	# Movement limitation
 	state = 'moving'
-	current_character.move_to(path.pop_front())
+	character_moving.move_to(path.pop_front())
 
-# this function may end in battle_screen
 func make_character_move_following_path_valid(character, path_valid):
 	# Movement limitation
-	current_character = character
+	character_moving = character
 	path = []
 	for coord in path_valid:
 		path += [$Map.grid[coord[0]][coord[1]]]
-	_make_current_character_move_one_step()
-	
+	_make_character_moving_move_one_step()
 
-func make_current_character_cast_spell(cell):
-	# if cell in fov, cast spell, else cancel spell casting
-	if cell in fov:
-		current_character.cast_spell(cell)
-	fov = []
-	clear_arena()
-	state = 'normal'
 
 func make_character_cast_spell(character, cell):
 	character.cast_spell(cell)
@@ -152,14 +142,15 @@ func make_character_cast_spell(character, cell):
 
 ## CLEAR ##
 func _color_current_character_cell():
-	if (current_character in team_blue):
+	if (current_character in teams['blue']):
 		current_character.current_cell.change_material('blue')
-	elif (current_character in team_red):
+	elif (current_character in teams['red']):
 		current_character.current_cell.change_material('red')
 	else:
 		current_character.current_cell.change_material('green')
 
 func clear_arena():
+	state = 'normal'
 	$Map.clear()
 	_color_current_character_cell()
 
@@ -178,7 +169,7 @@ func _on_character_movement_finished(character, ending_cell):
 		state = 'normal'
 		clear_arena()
 	else:
-		_make_current_character_move_one_step()
+		_make_character_moving_move_one_step()
 
 
 
@@ -188,13 +179,15 @@ func _on_character_movement_finished(character, ending_cell):
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		# select character
-		current_character = character
-		clear_arena()
+		if character.team == my_team:
+			# The client can select only chracter in his own team
+			current_character = character
+			clear_arena()
 	else:
 		if not is_game_local:
 			emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
 		else:
-			make_current_character_cast_spell(character.current_cell)
+			make_character_cast_spell(current_character, character.current_cell)
 
 
 func _on_cell_clicked(cell):
@@ -203,13 +196,13 @@ func _on_cell_clicked(cell):
 			if not is_game_local:
 				emit_signal('ask_move', current_character, path)
 			else:
-				_make_current_character_move_one_step()
+				_make_character_moving_move_one_step()
 	elif state == 'cast_spell':
 		if cell in fov:
 			if not is_game_local:
 				emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
 			else:
-				make_current_character_cast_spell(cell)
+				make_character_cast_spell(current_character, cell)
 
 
 
