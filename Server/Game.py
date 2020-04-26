@@ -147,12 +147,25 @@ class Game(Lobby):
 
     ## ACTIONS TO DO WHEN ASK FROM CLIENT ##
 
+    def is_correct_ask(self, data):
+        if data['user id'] != self.player_on_turn.user_id :
+            # Server treat only request from the on turn user
+            return False
+
+        character = self.get_character_by_id(data['id character'])
+        if character.user.user_id != self.player_on_turn.user_id:
+            # Client cannot control character that do not belongs to him
+            return False
+        return True
+
     async def ask_move(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        if data['user id'] != self.player_on_turn.user_id :
-            # Serveur treat only request from the on turn user
+        if not self.is_correct_ask(data):
+            # if ask isn't correct, then return 
+            # /!\ IN THE FUTURE IT COULD BE NICE TO SEND A MESSAGE TO THE CLIENT
             return
+            
 
         id_character = data['id character']
         path = data['path']      
@@ -191,9 +204,12 @@ class Game(Lobby):
     async def ask_cast_spell(self, data):
         # Called when the user ask to move a character
         # Verify that the path is correct
-        if data['user id'] != self.player_on_turn.user_id :
-            # Serveur treat only request from the on turn user
+        if not self.is_correct_ask(data):
+            # if ask isn't correct, then return 
+            # /!\ IN THE FUTURE IT COULD BE NICE TO SEND A MESSAGE TO THE CLIENT
             return
+
+            
         id_thrower = data['thrower']['id character']
         coord_target = data['target']
 
