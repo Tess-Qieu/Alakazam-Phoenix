@@ -4,8 +4,9 @@ signal character_selected
 signal character_movement_finished
 signal character_die
 
-
+## RESSOURCE IMPORT ##
 var Spell = preload("res://Scenes/Spell.tscn")
+var miniature = preload("res://Prefabs/Character/Robot_miniature.png")
 
 
 # Movement variables
@@ -17,8 +18,9 @@ var destination_cell
 
 
 
-# Stats informations
+## Stats informations ##
 var current_cell
+var my_name = "No_0ne"
 
 const START_HEALTH = 15 
 var current_health
@@ -37,6 +39,7 @@ func init(cell, team, battle_scene):
 	
 	current_health = START_HEALTH
 	current_range_displacement = START_RANGE_DISPLACEMENT
+	my_name = team + "_Joe"
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
@@ -47,7 +50,7 @@ func init(cell, team, battle_scene):
 			'_on_character_movement_finished')
 	# warning-ignore:return_value_discarded
 	connect('character_die', battle_scene, '_on_character_die', [self])
-	
+	# warning-ignore:return_value_discarded
 	connect("input_event", self, "_on_Character_input_event")
 
 func _physics_process(delta):
