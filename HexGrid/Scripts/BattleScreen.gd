@@ -1,5 +1,6 @@
 extends Control
 
+var Character_Info = preload("res://Scenes/GUI/Character_Info.tscn")
 
 func _ready():
 	if is_main_scene():
@@ -29,3 +30,8 @@ func is_f6(node:Node):
 
 func is_main_scene():
 	return get_parent() == get_tree().root 
+
+func add_character_info(character, team):
+	var char_info = Character_Info.instance()
+	$PanelLeft/VBoxContainer.add_child(char_info)
+	char_info.connect_character(character, team)

@@ -13,15 +13,15 @@ func connect_character(character, team):
 	$VBoxContainer/Title/Name.text = character.my_name
 	$VBoxContainer/HBoxContainer2/Icon/Character.texture = character.miniature
 	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life/Max.text = \
-		"/" +character.START_HEALTH
-	current_life_bar.max_value = character.START_HEALTH
+		"/{0}".format([character.start_health])
+	current_life_bar.max_value = character.start_health
 	update_life(character.current_health)
 	
 	# Team relative configuration
-	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd\
-		.self_modulate(Global.materials[team])
-	
+	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd \
+		.self_modulate = Global.materials[team].albedo_color
+
 func update_life(new_val):
 	current_life_bar.value = new_val
-	current_life_txt.text  = new_val
+	current_life_txt.text = "{0}".format([new_val])
 
