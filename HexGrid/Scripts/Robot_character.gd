@@ -9,7 +9,7 @@ var Spell = preload("res://Scenes/Spell.tscn")
 
 
 # Movement variables
-export var speed = 150 #NOT WORKING IF speed > 250
+export var speed = 150
 const MVT_MARGIN = 0.02 # Movement margin used to discriminate if the character has arrived on a cell
 
 var moving = false
