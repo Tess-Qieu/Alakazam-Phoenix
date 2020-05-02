@@ -36,7 +36,7 @@ var current_range_displacement
 ## GENERAL SECTION ##
 func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
-	translation.y = 1.5
+	translation.y = 1
 	translation.z = cell.translation.z
 	change_material(c_team)
 	
