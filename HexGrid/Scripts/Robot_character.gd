@@ -3,6 +3,7 @@ extends KinematicBody
 signal character_selected
 signal character_movement_finished
 signal character_die
+signal character_hurt
 
 ## RESSOURCE IMPORT ##
 var Spell = preload("res://Scenes/Spell.tscn")
@@ -35,6 +36,10 @@ var current_range_displacement
 
 ## GENERAL SECTION ##
 func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
+	
+	var rng = RandomNumberGenerator.new()
+	rng.randomize()
+	
 	translation.x = cell.translation.x
 	translation.y = 1
 	translation.z = cell.translation.z
@@ -47,7 +52,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	current_health = health
 	start_range_displacement = range_displacement
 	current_range_displacement = range_displacement
-	my_name = team + "_Joe"
+	my_name = team + "_Joe_{0}".format([rng.randi_range(0,255)])
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
@@ -101,6 +106,8 @@ func receive_damage(dmg_amount):
 	current_health -= dmg_amount
 	if current_health <= 0:
 		emit_signal('character_die')
+	else:
+		emit_signal("character_hurt", current_health)
 
 
 ## MOVEMENT SECTION ##

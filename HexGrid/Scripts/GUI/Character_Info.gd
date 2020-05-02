@@ -20,6 +20,8 @@ func connect_character(character, team):
 	# Team relative configuration
 	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd \
 		.self_modulate = Global.materials[team].albedo_color
+	
+	character.connect("character_hurt", self, "update_life" )
 
 func update_life(new_val):
 	current_life_bar.value = new_val
