@@ -20,25 +20,33 @@ var destination_cell
 
 ## Stats informations ##
 var current_cell
+var team
+var id_character
 var my_name = "No_0ne"
 
-const START_HEALTH = 15 
+
+var start_health = 15 
 var current_health
 
-const START_RANGE_DISPLACEMENT = 10
+var start_range_displacement = 5
 var current_range_displacement
 
 
 
 ## GENERAL SECTION ##
-func init(cell, team, battle_scene):
+func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
-	translation.y = 1
+	translation.y = 1.5
 	translation.z = cell.translation.z
-	change_material(team)
+	change_material(c_team)
 	
-	current_health = START_HEALTH
-	current_range_displacement = START_RANGE_DISPLACEMENT
+	team = c_team
+	id_character = c_id_character
+	
+	start_health = health
+	current_health = health
+	start_range_displacement = range_displacement
+	current_range_displacement = range_displacement
 	my_name = team + "_Joe"
 	
 	# warning-ignore:return_value_discarded
@@ -59,7 +67,6 @@ func _physics_process(delta):
 
 func change_material(material_key):
 	$Armature/TorsoBoneAttachment/BodyTorso.set_surface_material(0, Global.materials[material_key])
-#	$MeshInstance.set_surface_material(0, Global.materials[material_key])
 
 func unselect():
 	$AnimationPlayer.stop()
@@ -67,7 +74,7 @@ func unselect():
 
 
 
-## SPELL SECTION ##
+## THROW SPELL SECTION ##
 func cast_spell(target):
 	var to_look = target.translation
 	to_look.y = translation.y

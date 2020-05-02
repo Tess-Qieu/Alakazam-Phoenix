@@ -8,5 +8,9 @@ export_presets.cfg
 .mono/
 data_*/
 
+
 #Blender specific ignores
 *.blend1
+
+# Python
+__pycache__/

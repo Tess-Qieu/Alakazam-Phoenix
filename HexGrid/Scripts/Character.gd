@@ -19,24 +19,32 @@ var destination_cell
 
 # Stats informations
 var current_cell
+var team
+var id_character
 
-const START_HEALTH = 15 
+var start_health = 15 
 var current_health
 
-const START_RANGE_DISPLACEMENT = 5
+var start_range_displacement = 5
 var current_range_displacement
 
 
 
 ## GENERAL SECTION ##
-func init(cell, team, battle_scene):
+func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
 	translation.x = cell.translation.x
 	translation.y = 1.5
 	translation.z = cell.translation.z
-	change_material(team)
+	change_material(c_team)
 	
-	current_health = START_HEALTH
-	current_range_displacement = START_RANGE_DISPLACEMENT
+	team = c_team
+	id_character = c_id_character
+	
+	start_health = health
+	current_health = health
+	start_range_displacement = range_displacement
+	current_range_displacement = range_displacement
+	
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
@@ -61,7 +69,7 @@ func unselect():
 
 
 
-## SPELL SECTION ##
+## THROW SPELL SECTION ##
 func cast_spell(target):
 	var to_look = target.translation
 	to_look.y = translation.y
@@ -70,6 +78,7 @@ func cast_spell(target):
 	var spell = Spell.instance()
 	spell.cast(current_cell, target)
 	get_parent().add_child(spell)
+
 
 
 
@@ -88,6 +97,8 @@ func receive_damage(dmg_amount):
 	current_health -= dmg_amount
 	if current_health <= 0:
 		emit_signal('character_die')
+
+
 
 
 ## MOVEMENT SECTION ##

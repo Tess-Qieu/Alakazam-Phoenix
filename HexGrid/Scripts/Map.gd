@@ -11,6 +11,7 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
+
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
 const LENGTH_BORDER = 8
@@ -20,33 +21,12 @@ const RAY = LENGTH_BORDER + RAY_ARENA
 export var camera_sensibility = 0.05
 
 
-
-# Initialization
 func _ready():
 	rng.randomize()
-	generate_grid()
-	instance_map()
 
 
 
-
-# Usefull functions
-func distance_coord(q1, r1, q2, r2):
-	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
-
-func add_instance_to_grid(instance, q, r):
-	if not q in grid.keys():
-		grid[q] = {}
-	grid[q][r] = instance
-
-func clear():
-	for c in cells_floor:
-		c.change_material('floor')
-
-
-
-
-# Handle grid generation
+## HANDLE GRID GENERATION ##
 func _random_kind():
 	var value = rng.randf()
 	var lim = PROBA_CELL_FULL
@@ -67,9 +47,9 @@ func _generate_one_gridline(line_size, r):
 			kind = 'border'
 		else:
 			kind = _random_kind()
-		add_instance_to_grid(kind, q, r)
+		_add_instance_to_grid(kind, q, r)
 		if line_size / 2.0 == line_size / 2 or i + 1 != half :
-			add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
+			_add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
 		q += 1
 
 func generate_grid():
@@ -82,19 +62,22 @@ func generate_grid():
 		nb_cell -= 1
 
 
-
-
-
-# Handle grid instanciation
+## HANDLE GRID INSTANCIATION
+func _add_instance_to_grid(instance, q, r):
+	if not q in grid.keys():
+		grid[q] = {}
+	grid[q][r] = instance
+	
 func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
 	cell.init(q, r, kind, self.get_parent())
 	add_child(cell)
-	add_instance_to_grid(cell, q, r)
+	_add_instance_to_grid(cell, q, r)
 	if kind == "floor":
 		cells_floor += [cell]
 
-func instance_map():
+func instance_map(new_grid):
+	grid = new_grid
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
@@ -112,7 +95,8 @@ func instance_map():
 
 
 
-# Handle fov
+
+## HANDLE FIELD OF VIEW ##
 func _line_step(start : int, end : int, step : float) -> float:
 	# Function used to calulate a step on a line	
 	return start + (end-start)*step
@@ -183,7 +167,8 @@ func display_field_of_view(cell, distance_max):
 
 
 
-# Handle path finding
+
+## HANDLE PATH FINDING ##
 func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
 	var list = []
@@ -207,6 +192,13 @@ func _neighbors (cell):
 		list.append(grid[cell.q -1][cell.r +1])
 	
 	return list
+	
+func _serialize_path(path):
+	var path_serialized = []
+	for c in path:
+		path_serialized += [[c.q, c.r]]
+	return path_serialized
+
 
 func _compute_path(start, end, distance_max):
 	# Function calculating a path between two cells
@@ -264,7 +256,8 @@ func display_path(start, end, distance_max):
 	var path = _compute_path(start, end, distance_max)
 	for elt in path:
 		elt.change_material('green')
-	return path
+	return _serialize_path(path)
+
 
 func _compute_displacement_range(start, distance_max):
 	var visited = [start]
@@ -286,7 +279,9 @@ func display_displacement_range(start, distance_max):
 	return zone
 
 
-# Handle camera
+
+
+## HANDLE CAMERA ROTATION ##
 func _process(_delta):
 	var mouse_position = get_viewport().get_mouse_position()
 	if is_rotation_camera_ask(mouse_position):
@@ -317,3 +312,13 @@ func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
 		return true
 	return false
+	
+	
+	
+## USEFULL FUNCTIONS
+func distance_coord(q1, r1, q2, r2):
+	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
+
+func clear():
+	for c in cells_floor:
+		c.change_material('floor')
