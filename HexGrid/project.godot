@@ -23,6 +23,17 @@ config/icon="res://icon.png"
 
 Global="*res://Scripts/Global.gd"
 
+[input]
+
+Map_zoom_in={
+"deadzone": 0.5,
+"events": [  ]
+}
+Map_zoom_out={
+"deadzone": 0.5,
+"events": [  ]
+}
+
 [rendering]
 
 quality/filters/use_nearest_mipmap_filter=true

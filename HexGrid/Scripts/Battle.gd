@@ -6,8 +6,9 @@ signal ask_cast_spell
 var is_game_local = false
 
 
-var Character = preload("res://Scenes/Character.tscn")
+var Character = preload("res://Scenes/Robot_character.tscn")
 var teams = {}
+
 var current_character
 var my_team # color of the team the client is controlling
 
@@ -170,6 +171,7 @@ func _on_character_movement_finished(character, ending_cell):
 	_update_character_cell_references(character, ending_cell)
 	if path.size() == 0:
 		state = 'normal'
+		current_character.stop_movement()
 		clear_arena()
 	else:
 		_make_character_moving_move_one_step()
@@ -181,6 +183,7 @@ func _on_character_movement_finished(character, ending_cell):
 ## OBJECT CLICKED EVENTS ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
+		current_character.unselect()
 		# select character
 		if character.team == my_team:
 			# The client can select only chracter in his own team

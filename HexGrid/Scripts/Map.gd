@@ -18,6 +18,8 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
+export var camera_sensibility = 0.05
+
 
 func _ready():
 	rng.randomize()
@@ -286,13 +288,25 @@ func _process(_delta):
 		rotate_camera(mouse_position)
 	last_mouse_position = mouse_position
 
+func _input(event):
+	var MAX_ZOOM = 0.8
+	var MIN_ZOOM = 0
+	if event.is_action_pressed("Map_zoom_in"):
+		$CameraScrollPath/CameraTrolley.unit_offset = clamp( \
+			$CameraScrollPath/CameraTrolley.unit_offset + camera_sensibility, \
+			MIN_ZOOM, MAX_ZOOM)
+	if event.is_action_pressed("Map_zoom_out"):
+		$CameraScrollPath/CameraTrolley.unit_offset = clamp( \
+			$CameraScrollPath/CameraTrolley.unit_offset - camera_sensibility, \
+			MIN_ZOOM, MAX_ZOOM)
+
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):
 		var center_screen = get_viewport().size/2
 		var vect_last = center_screen - last_mouse_position
 		var vect_current = center_screen - mouse_position
 		var angle = vect_current.angle_to(vect_last)
-		$Origin.rotate_y(-angle)
+		$CameraScrollPath.rotate_y(-angle)
 		
 func is_rotation_camera_ask(mouse_position):
 	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
