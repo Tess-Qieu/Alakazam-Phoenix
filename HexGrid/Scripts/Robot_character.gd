@@ -119,6 +119,7 @@ func _process_movement_one_cell(delta):
 	#  position is calculated
 	var dist = destination_cell.translation - translation
 	dist.y = 0 # Distance is only considered in (x,z) plan
+	print(dist, ' --- ', MVT_MARGIN)
 	
 	# if the character has not reached the destination cell
 	if dist.length() > MVT_MARGIN:
