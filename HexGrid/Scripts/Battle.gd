@@ -10,12 +10,14 @@ var Character = preload("res://Scenes/Robot_character.tscn")
 var teams = {}
 
 var current_character
+var character_moving = null
 var my_team # color of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
-var character_moving = null
+
 var fov = []
-var path = []
+var path_instanced = []
+var path_serialized = []
 
 var rng = RandomNumberGenerator.new()
 
@@ -123,14 +125,14 @@ func _on_character_die(character):
 func _make_character_moving_move_one_step():
 	# Movement limitation
 	state = 'moving'
-	character_moving.move_to(path.pop_front())
+	character_moving.move_to(path_instanced.pop_front())
 
 func make_character_move_following_path_valid(character, path_valid):
 	# Movement limitation
 	character_moving = character
-	path = []
+	path_instanced = []
 	for coord in path_valid:
-		path += [$Map.grid[coord[0]][coord[1]]]
+		path_instanced += [$Map.grid[coord[0]][coord[1]]]
 	_make_character_moving_move_one_step()
 
 
@@ -169,9 +171,9 @@ func clear_arena():
 ## ANIMATION EVENTS ##
 func _on_character_movement_finished(character, ending_cell):
 	_update_character_cell_references(character, ending_cell)
-	if path.size() == 0:
+	if path_instanced.size() == 0:
 		state = 'normal'
-		current_character.stop_movement()
+		character_moving.stop_movement()
 		clear_arena()
 	else:
 		_make_character_moving_move_one_step()
@@ -198,11 +200,11 @@ func _on_character_selected(character):
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
-		if len(path) > 0 :
+		if len(path_serialized) > 0 :
 			if not is_game_local:
-				emit_signal('ask_move', current_character, path)
+				emit_signal('ask_move', current_character, path_serialized)
 			else:
-				make_character_move_following_path_valid(current_character, path)
+				make_character_move_following_path_valid(current_character, path_serialized)
 	elif state == 'cast_spell':
 		if cell in fov:
 			if not is_game_local:
@@ -219,7 +221,7 @@ func _on_cell_clicked(cell):
 func _on_cell_hovered(cell):
 	if state == 'normal':
 		clear_arena()
-		path = $Map.display_path(current_character.current_cell, 
+		path_serialized = $Map.display_path(current_character.current_cell, 
 								cell, 
 								current_character.current_range_displacement)
 	
