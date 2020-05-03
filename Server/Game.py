@@ -9,7 +9,7 @@ from ManagerID import ManagerID
 from Character import Character
 
 
-TIME_TURN = 10
+TIME_TURN = 30
 
 
 class Timer():
@@ -161,14 +161,19 @@ class Game(Lobby):
     def is_correct_character_user(self, character):
         return character.user.user_id == self.player_on_turn.user_id
 
+    def is_correct_ask(self, character, data):
+        return self.is_correct_user_id(data) \
+                and self.is_correct_character_user(character) \
+                and character.alive
+
     def is_correct_ask_cast_spell(self, data):
         # Verify if the ask spell is correct
         character = self.get_character_by_id(data['thrower']['id character'])
-        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+        return self.is_correct_ask(character, data)
 
     def is_correct_ask_move(self, data):
         character = self.get_character_by_id(data['id character'])
-        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+        return self.is_correct_ask(character, data)
 
 
 
@@ -237,12 +242,13 @@ class Game(Lobby):
 
         if is_valid:
             # cast the spell
-            character_thrower.cast_spell(cell_target) # /!\ FUNCTION NOT IMPLEMENTED
+            data_spell_applied = character_thrower.cast_spell(cell_target, self.teams) # return a list
 
             data = {'action': 'game',
                     'response': 'cast spell',
                     'details': {'thrower': {'id character': id_thrower},
-                                'target': coord_target}}
+                                'target': coord_target,
+                                'damages': data_spell_applied}}
 
             await self.notify_all(data)
 

@@ -8,7 +8,7 @@ var distance_to_make = 0
 var distance_traveled = 0
 var cell_targeted = null
 
-export var damage_amout = 10
+var damage_amout
 
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
@@ -18,7 +18,7 @@ func apply_on_target():
 	if target != null:
 		target.receive_damage(damage_amout)
 
-func cast(thrower, target):
+func cast(thrower, target, damages_infos):
 	# Translate the ball in front of the character
 	# and prepare the throw
 	translation.x = thrower.translation.x
@@ -33,6 +33,8 @@ func cast(thrower, target):
 	distance_traveled += 1.5*euclidean_dist(vect)
 	
 	cell_targeted = target
+	damage_amout = damages_infos[0]['damage'] # /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
+	# SOLUTION TO APPLY DAMAGE AND EFFECT ON CHARACTERS (FOR NOW ON, ONLY ONE TARGET)
 	is_casting = true
 	
 func _physics_process(delta):

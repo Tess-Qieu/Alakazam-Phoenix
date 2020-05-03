@@ -80,13 +80,13 @@ func unselect():
 
 
 ## THROW SPELL SECTION ##
-func cast_spell(target):
+func cast_spell(target, damages_infos):
 	var to_look = target.translation
 	to_look.y = translation.y
 	look_at(to_look, Vector3(0, 1, 0))
 	
 	var spell = Spell.instance()
-	spell.cast(current_cell, target)
+	spell.cast(current_cell, target, damages_infos)
 	get_parent().add_child(spell)
 
 

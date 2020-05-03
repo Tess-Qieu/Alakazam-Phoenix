@@ -138,8 +138,8 @@ func make_character_move_following_path_valid(character, path_valid):
 	_make_character_moving_move_one_step()
 
 
-func make_character_cast_spell(character, cell):
-	character.cast_spell(cell)
+func make_character_cast_spell(character, cell, damages_infos):
+	character.cast_spell(cell, damages_infos)
 	fov = []
 	clear_arena()
 	state = 'normal'
@@ -185,6 +185,18 @@ func _on_character_movement_finished(character, ending_cell):
 
 
 ## OBJECT CLICKED EVENTS ##
+
+func _character_selected_local(character):
+	var damage_amout = 15
+	var is_dead = character.current_health - damage_amout <= 0
+	var damages_infos = [{'id character':character.id_character,
+					'damage': damage_amout,
+					'event': []}]
+	if is_dead:
+		damages_infos[0]['event'] += ['character dead']
+	make_character_cast_spell(current_character, character.current_cell, damages_infos)
+	
+
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		current_character.unselect()
@@ -193,11 +205,16 @@ func _on_character_selected(character):
 			# The client can select only chracter in his own team
 			current_character = character
 			clear_arena()
+			
 	else:
 		if not is_game_local:
 			emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
+		
 		else:
-			make_character_cast_spell(current_character, character.current_cell)
+			# Game is local, we have to create a response like the server would do
+			_character_selected_local(character)
+
+
 
 
 func _on_cell_clicked(cell):
@@ -212,7 +229,8 @@ func _on_cell_clicked(cell):
 			if not is_game_local:
 				emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
 			else:
-				make_character_cast_spell(current_character, cell)
+				var damages_infos = [] # hit a empty cell
+				make_character_cast_spell(current_character, cell, damages_infos)
 
 
 
