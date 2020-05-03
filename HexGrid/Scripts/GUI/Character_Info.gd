@@ -7,11 +7,15 @@ const MIN_VBOX_Y = 20
 const MIN_SELF_Y = 34
 
 func _ready():
-	$VBoxContainer/Title/Expand_Button.connect("pressed", self, \
-		"_on_Expand_Button_pressed")
+	$VBoxContainer/Title/Expand_Button.connect("pressed",self,"_toggle_expansion")
 
 ## GUI MANAGEMENT SECTION ##
-func _on_Expand_Button_pressed():
+func _toggle_expansion():
+	## Function expanding and unexpanding the Character_Info
+	#  The HBox containing the character icon and lifebars is masked/unmasked
+	# 	and remaining controls are resized (Manually while unexpanding, 
+	#	automatically while expanding)
+	
 	if $VBoxContainer/HBoxContainer2.visible:
 		$VBoxContainer/HBoxContainer2.hide()
 		$VBoxContainer.rect_size[1] = MIN_VBOX_Y

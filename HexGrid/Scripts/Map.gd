@@ -18,6 +18,7 @@ const LENGTH_BORDER = 8
 const RAY_ARENA = 8
 const RAY = LENGTH_BORDER + RAY_ARENA
 
+# Littlest step the camera can do on the Zoom 3D Curve, on unit_offset
 export var camera_sensibility = 0.05
 
 
@@ -289,16 +290,26 @@ func _process(_delta):
 	last_mouse_position = mouse_position
 
 func _unhandled_input(event):
-	var MAX_ZOOM = 0.8
+	# Zoom handling
+	# Done in _unhandled_input instead of _input in order to let other nodes
+	#  (as ScrollPane) handle a zoom before handling it on the map
+	var MAX_ZOOM = 0.8 #The camera is limited to a portion of the 3D Curve
 	var MIN_ZOOM = 0
+	
 	if event.is_action_pressed("Map_zoom_in"):
+		# If zoom in, camera goes forward inside the authorized curve portion
 		$CameraScrollPath/CameraTrolley.unit_offset = clamp( \
 			$CameraScrollPath/CameraTrolley.unit_offset + camera_sensibility, \
 			MIN_ZOOM, MAX_ZOOM)
-	if event.is_action_pressed("Map_zoom_out"):
+		# No other handle needed on this event
+		get_tree().set_input_as_handled() 
+	elif event.is_action_pressed("Map_zoom_out"):
+		# If zoom out, camera goes backward inside the authorized curve portion
 		$CameraScrollPath/CameraTrolley.unit_offset = clamp( \
 			$CameraScrollPath/CameraTrolley.unit_offset - camera_sensibility, \
 			MIN_ZOOM, MAX_ZOOM)
+		# No other handle needed on this event
+		get_tree().set_input_as_handled()
 
 func rotate_camera(mouse_position):
 	if last_mouse_position != Vector2(-1, -1):

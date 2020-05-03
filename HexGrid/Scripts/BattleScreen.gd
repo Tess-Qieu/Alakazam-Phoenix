@@ -41,5 +41,12 @@ func add_character_info(character, team):
 
 ## GUI MANAGEMENT SECTION ##
 func _on_BattleScreen_resized():
+	## Function called when the BattleScreen is resized. 
+	#
+	#  Limits the maximal width of PanelLeft to 200px
+	#	PanelLeft is, by default, sized at 0.2 of the BattleScreen width, 
+	#	this way, it is resized with the BattleScreen (mostly interesting when 
+	#	downsizing). But, as we don't want PanelLeft to block too much view
+	#	while using full screen, its width is limited to 200px
 	if ($PanelLeft.rect_size[0] > 200):
 		$PanelLeft.rect_size[0] = 200
