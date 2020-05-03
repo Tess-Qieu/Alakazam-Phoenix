@@ -22,8 +22,14 @@ func connect_character(character, team):
 		.self_modulate = Global.materials[team].albedo_color
 	
 	character.connect("character_hurt", self, "update_life" )
+	character.connect("character_die", self, "character_die")
 
 func update_life(new_val):
 	current_life_bar.value = new_val
 	current_life_txt.text = "{0}".format([new_val])
 
+func character_die():
+	# Change background color
+	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd \
+		.self_modulate = Global.materials["grey"].albedo_color
+	update_life(0)

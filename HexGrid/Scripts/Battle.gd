@@ -90,6 +90,7 @@ func _create_team(team_name, data):
 										c['health'], 
 										c['range displacement'])
 		teams[team_name] += [character]
+		# Addition of a character info on the BattleScreen
 		get_parent().add_character_info(character, team_name)
 
 func _create_character(team, q, r, id_character, health, range_displacement):
