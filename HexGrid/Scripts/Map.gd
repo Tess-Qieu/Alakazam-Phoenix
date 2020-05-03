@@ -288,7 +288,7 @@ func _process(_delta):
 		rotate_camera(mouse_position)
 	last_mouse_position = mouse_position
 
-func _input(event):
+func _unhandled_input(event):
 	var MAX_ZOOM = 0.8
 	var MIN_ZOOM = 0
 	if event.is_action_pressed("Map_zoom_in"):

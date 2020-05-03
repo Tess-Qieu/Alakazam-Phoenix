@@ -5,6 +5,8 @@ var Character_Info = preload("res://Scenes/GUI/Character_Info.tscn")
 func _ready():
 	if is_main_scene():
 		$Battle.init_game_local()
+	
+	connect("resized", self, "_on_BattleScreen_resized")
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed():
@@ -33,5 +35,11 @@ func is_main_scene():
 
 func add_character_info(character, team):
 	var char_info = Character_Info.instance()
-	$PanelLeft/VBoxContainer.add_child(char_info)
+	$PanelLeft/ScrollContainer/VBoxContainer.add_child(char_info)
 	char_info.connect_character(character, team)
+
+
+## GUI MANAGEMENT SECTION ##
+func _on_BattleScreen_resized():
+	if ($PanelLeft.rect_size[0] > 200):
+		$PanelLeft.rect_size[0] = 200

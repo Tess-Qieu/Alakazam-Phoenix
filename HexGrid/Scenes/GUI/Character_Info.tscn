@@ -6,7 +6,8 @@
 
 [node name="Character_Info" type="PanelContainer"]
 margin_right = 200.0
-margin_bottom = 102.0
+margin_bottom = 34.0
+size_flags_horizontal = 3
 script = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -17,6 +18,7 @@ margin_left = 7.0
 margin_top = 7.0
 margin_right = 193.0
 margin_bottom = 109.0
+size_flags_vertical = 0
 
 [node name="Title" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 186.0
@@ -30,7 +32,7 @@ size_flags_horizontal = 3
 text = "This is my name"
 valign = 1
 
-[node name="Expand_button" type="Button" parent="VBoxContainer/Title"]
+[node name="Expand_Button" type="Button" parent="VBoxContainer/Title"]
 margin_left = 166.0
 margin_right = 186.0
 margin_bottom = 20.0
