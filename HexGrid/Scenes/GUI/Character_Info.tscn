@@ -5,7 +5,7 @@
 [ext_resource path="res://Scripts/GUI/Character_Info.gd" type="Script" id=3]
 
 [node name="Character_Info" type="PanelContainer"]
-margin_right = 200.0
+margin_right = 150.0
 margin_bottom = 34.0
 size_flags_horizontal = 3
 script = ExtResource( 3 )
@@ -16,31 +16,31 @@ __meta__ = {
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 margin_left = 7.0
 margin_top = 7.0
-margin_right = 193.0
+margin_right = 169.0
 margin_bottom = 109.0
 size_flags_vertical = 0
 
 [node name="Title" type="HBoxContainer" parent="VBoxContainer"]
-margin_right = 186.0
+margin_right = 162.0
 margin_bottom = 20.0
 
 [node name="Name" type="Label" parent="VBoxContainer/Title"]
 margin_top = 3.0
-margin_right = 162.0
+margin_right = 138.0
 margin_bottom = 17.0
 size_flags_horizontal = 3
 text = "This is my name"
 valign = 1
 
 [node name="Expand_Button" type="Button" parent="VBoxContainer/Title"]
-margin_left = 166.0
-margin_right = 186.0
+margin_left = 142.0
+margin_right = 162.0
 margin_bottom = 20.0
 text = "+"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 24.0
-margin_right = 186.0
+margin_right = 162.0
 margin_bottom = 102.0
 
 [node name="Icon" type="PanelContainer" parent="VBoxContainer/HBoxContainer2"]
@@ -68,17 +68,17 @@ __meta__ = {
 
 [node name="Infos" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2"]
 margin_left = 82.0
-margin_right = 186.0
+margin_right = 162.0
 margin_bottom = 78.0
 size_flags_horizontal = 3
 
 [node name="Health_Bar" type="VBoxContainer" parent="VBoxContainer/HBoxContainer2/Infos"]
-margin_right = 104.0
+margin_right = 80.0
 margin_bottom = 78.0
 size_flags_vertical = 3
 
 [node name="Life" type="HBoxContainer" parent="VBoxContainer/HBoxContainer2/Infos/Health_Bar"]
-margin_right = 104.0
+margin_right = 80.0
 margin_bottom = 14.0
 
 [node name="Text" type="Label" parent="VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life"]
@@ -100,7 +100,7 @@ text = "/100"
 
 [node name="Life_Bar" type="ProgressBar" parent="VBoxContainer/HBoxContainer2/Infos/Health_Bar"]
 margin_top = 18.0
-margin_right = 104.0
+margin_right = 80.0
 margin_bottom = 32.0
 value = 50.0
 allow_greater = true

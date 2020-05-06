@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/GUI/TeamContainer.gd" type="Script" id=2]
+
+[node name="Background" type="PanelContainer"]
+anchor_bottom = 1.0
+margin_right = 200.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Body" type="VBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 193.0
+margin_bottom = 593.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Header" type="HBoxContainer" parent="Body"]
+margin_right = 186.0
+margin_bottom = 20.0
+
+[node name="Name" type="Label" parent="Body/Header"]
+margin_top = 3.0
+margin_right = 162.0
+margin_bottom = 17.0
+size_flags_horizontal = 3
+text = "Best Team Ever"
+valign = 1
+
+[node name="ExpandButton" type="Button" parent="Body/Header"]
+margin_left = 166.0
+margin_right = 186.0
+margin_bottom = 20.0
+text = "+"
+
+[node name="Members" type="VBoxContainer" parent="Body"]
+margin_top = 24.0
+margin_right = 186.0
+margin_bottom = 24.0
+size_flags_horizontal = 3

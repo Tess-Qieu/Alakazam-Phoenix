@@ -27,15 +27,11 @@ margin_left = 7.0
 margin_top = 7.0
 margin_right = 197.8
 margin_bottom = 593.0
+scroll_horizontal_enabled = false
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelLeft/ScrollContainer"]
 margin_right = 190.8
-grow_horizontal = 2
-grow_vertical = 2
 size_flags_horizontal = 3
-__meta__ = {
-"_edit_use_anchors_": false
-}
 
 [node name="PanelRight" type="Panel" parent="."]
 anchor_left = 0.85

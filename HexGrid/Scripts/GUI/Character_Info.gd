@@ -24,7 +24,7 @@ func _toggle_expansion():
 		$VBoxContainer/HBoxContainer2.show()
 
 ## CHARACTER RELATIVE SECTION ##
-func connect_character(character, team):
+func connect_character(character, team_color):
 	## Connects a character to the interface :
 	#	Sets the character name as title
 	#	Sets the character miniature as icon
@@ -41,7 +41,7 @@ func connect_character(character, team):
 	
 	# Team relative configuration
 	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd \
-		.self_modulate = Global.materials[team].albedo_color
+		.self_modulate = Global.materials[team_color].albedo_color
 	
 	character.connect("character_hurt", self, "update_life" )
 	character.connect("character_die", self, "character_die")
