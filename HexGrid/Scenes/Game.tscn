@@ -22,14 +22,21 @@ script = ExtResource( 4 )
 [node name="Network" type="Node" parent="."]
 script = ExtResource( 1 )
 
-[node name="WaitingScreen" type="Node2D" parent="."]
+[node name="WaitingScreen" type="CenterContainer" parent="."]
 visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Label" type="Label" parent="WaitingScreen"]
-margin_left = 427.77
-margin_top = 266.225
-margin_right = 592.77
-margin_bottom = 297.225
+margin_left = 429.0
+margin_top = 284.0
+margin_right = 595.0
+margin_bottom = 315.0
+grow_horizontal = 2
+grow_vertical = 2
 text = "Looking for an opponent...
 Please wait..."
 align = 1
