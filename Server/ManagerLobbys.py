@@ -46,20 +46,23 @@ class ManagerLobbys():
 
 
 
+
+
+    def destroy_lobby(self, lobby):
+        for user in lobby.players + lobby.observators:
+            user.current_lobby = None
+
+        id_lobby = lobby.id_lobby
+        self.lobbys_manager_id.free_id(id_lobby)
+        
+        del(self.lobbys[id_lobby])
+        del(lobby)
+        print(f'Lobby {id_lobby} destroyed.')
+
+
     # /!\ Only manage deconnection for now
     async def _quit_lobby(self, user):
         # Called when the user quit the lobby
-    
-        def destroy_lobby(self, lobby):
-            for user in lobby.players + lobby.observators:
-                user.current_lobby = None
-
-            id_lobby = lobby.id_lobby
-            self.lobbys_manager_id.free_id(id_lobby)
-            
-            del(self.lobbys[id_lobby])
-            del(lobby)
-            print(f'Lobby {id_lobby} destroyed.')
 
         
         if user in self.users_waiting_to_play:
@@ -72,7 +75,7 @@ class ManagerLobbys():
             game_continue = await lobby._quit_lobby(user)
 
             if not game_continue:
-                destroy_lobby(self, lobby)
+                self.destroy_lobby(lobby)
 
 
 
@@ -92,7 +95,7 @@ class ManagerLobbys():
         user_2 = self.users_waiting_to_play.pop(0)
         
         id_lobby = self.lobbys_manager_id.get_new_id()
-        lobby = Game(self.server, id_lobby, [user_1, user_2], [])
+        lobby = Game(self.server, self, id_lobby, [user_1, user_2], [])
         self.lobbys[id_lobby] = lobby
 
         print(f'New lobby {id_lobby} with users {user_1.pseudo} and {user_2.pseudo}.')

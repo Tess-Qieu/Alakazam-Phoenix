@@ -5,8 +5,9 @@ import asyncio
 class Lobby():
     '''Reprensentant the objects containing the game and managing it'''
 
-    def __init__(self, server, id_lobby, players, observators):
+    def __init__(self, server, manager_lobby, id_lobby, players, observators):
         self.server = server
+        self.manager_lobby = manager_lobby
         self.id_lobby = id_lobby
 
         self.players = players
@@ -34,7 +35,9 @@ class Lobby():
         
             data = {'action': 'player left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
-            await self.end_of_lobby()
+
+            self.end_of_lobby()
+
             return False
 
 
@@ -47,9 +50,9 @@ class Lobby():
             await self.notify_all(data)
             return True
 
-    async def end_of_lobby(self):
+    def end_of_lobby(self):
         # Called when the lobby end
-        pass
+        self.manager_lobby.destroy_lobby(self)
 
 
 

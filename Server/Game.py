@@ -9,7 +9,7 @@ from ManagerID import ManagerID
 from Character import Character
 
 
-TIME_TURN = 10
+TIME_TURN = 30
 
 
 class Timer():
@@ -40,6 +40,12 @@ class Team():
     def remove_character(self, character):
         self.characters.remove(character)
 
+    def is_team_dead(self):
+        for c in self.characters:
+            if c.alive:
+                return False
+        return True
+
     def serialize(self):
         return {'user id': self.user.user_id, 'characters': [character.serialize() for character in self.characters]}
 
@@ -49,8 +55,8 @@ class Game(Lobby):
     ''' Administrate a game depending clients actions '''
 
     ## INITIALISATION ##
-    def __init__(self, server, id_lobby, players, observators):
-        super().__init__(server, id_lobby, players, observators)
+    def __init__(self, server, manager_lobby, id_lobby, players, observators):
+        super().__init__(server, manager_lobby, id_lobby, players, observators)
 
         self.character_manager_id = ManagerID(100)
         self.map = Map()
@@ -79,10 +85,10 @@ class Game(Lobby):
                 team.add_character(new_character)
             return team
 
-        cells = self.map.random_cells_floor(6)
+        cells = self.map.random_cells_floor(2)
         random.shuffle(self.players)
-        self.teams += [_create_team(self, 'red', self.players[0], cells[:3])]
-        self.teams += [_create_team(self, 'blue', self.players[1], cells[3:])]
+        self.teams += [_create_team(self, 'red', self.players[0], cells[:len(cells)//2])]
+        self.teams += [_create_team(self, 'blue', self.players[1], cells[len(cells)//2:])]
 
 
 
@@ -94,25 +100,28 @@ class Game(Lobby):
 
     async def _on_message(self, data, user):
         # Manage the message from the clients
-
         if data['action'] == 'new game':
             # players send they are ready
             if data['details']['ready'] == True:
                 self.set_player_ready(user)
-
 
         elif data['action'] == 'game':
             # game is running
             if data['ask'] == 'move':
                 # user ask to move a character
                 await self.ask_move(data['details'])
-
             elif data['ask'] == 'cast spell':
                 # user ask to cast a spell
                 await self.ask_cast_spell(data['details'])
+            # after a player ask a play, check if the game is over
+            if self.is_game_over():
+                await self.notify_game_over()
+                self.end_of_lobby()
 
         else:
             print(f'NetworkError: action {data["action"]} not known.')
+
+
 
     async def notify_new_lobby(self):
         # Notify the clients that the lobby is ready
@@ -126,9 +135,28 @@ class Game(Lobby):
                 }
         await self.notify_all(data)
 
-    async def end_of_lobby(self):
+
+
+    async def notify_game_over(self):
+        # Notify the players that the game is over and who won/lose
+        results = {team.user: not team.is_team_dead() for team in self.teams}
+        
+        print('Game Over !')
+        print('\n'.join([f'{user.pseudo} lost the game.' for user in results if not results[user]]))
+        print('\n'.join([f'{user.pseudo} won the game.' for user in results if results[user]]))
+
+        for user, res in results.items():            
+            data = {'action': 'game over',
+                    'details': {'victory': res}}
+            await self.notify_one_player(user, data)
+
+
+
+    def end_of_lobby(self):
         # Called when the lobby end
         self.timer.cancel()
+        super().end_of_lobby()
+
 
 
     async def new_turn(self):
@@ -139,6 +167,7 @@ class Game(Lobby):
                 'details' : {'user id': self.player_on_turn.user_id}}
         self.timer = Timer(TIME_TURN, self.new_turn)
         await self.notify_all(data)
+
 
 
     async def notify_ask_not_valid(self, data):
@@ -161,14 +190,19 @@ class Game(Lobby):
     def is_correct_character_user(self, character):
         return character.user.user_id == self.player_on_turn.user_id
 
+    def is_correct_ask(self, character, data):
+        return self.is_correct_user_id(data) \
+                and self.is_correct_character_user(character) \
+                and character.alive
+
     def is_correct_ask_cast_spell(self, data):
         # Verify if the ask spell is correct
         character = self.get_character_by_id(data['thrower']['id character'])
-        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+        return self.is_correct_ask(character, data)
 
     def is_correct_ask_move(self, data):
         character = self.get_character_by_id(data['id character'])
-        return self.is_correct_user_id(data) and self.is_correct_character_user(character)
+        return self.is_correct_ask(character, data)
 
 
 
@@ -237,12 +271,13 @@ class Game(Lobby):
 
         if is_valid:
             # cast the spell
-            character_thrower.cast_spell(cell_target) # /!\ FUNCTION NOT IMPLEMENTED
+            data_spell_applied = character_thrower.cast_spell(cell_target, self.teams) # return a list
 
             data = {'action': 'game',
                     'response': 'cast spell',
                     'details': {'thrower': {'id character': id_thrower},
-                                'target': coord_target}}
+                                'target': coord_target,
+                                'damages': data_spell_applied}}
 
             await self.notify_all(data)
 
@@ -273,6 +308,12 @@ class Game(Lobby):
 
 
     ## USEFULL FUNCTIONS ##
+
+    def is_game_over(self):
+        for team in self.teams:
+            if team.is_team_dead():
+                return True
+        return False
 
     def get_all_characters(self):
         characters = []

@@ -80,13 +80,13 @@ func unselect():
 
 
 ## THROW SPELL SECTION ##
-func cast_spell(target):
+func cast_spell(target, damages_infos):
 	var to_look = target.translation
 	to_look.y = translation.y
 	look_at(to_look, Vector3(0, 1, 0))
 	
 	var spell = Spell.instance()
-	spell.cast(current_cell, target)
+	spell.cast(current_cell, target, damages_infos)
 	get_parent().add_child(spell)
 
 
@@ -101,10 +101,11 @@ func die(battle_scene):
 	disconnect('character_movement_finished', battle_scene, \
 			'_on_character_movement_finished')
 
-func receive_damage(dmg_amount):
+func receive_damage(dmg_amount, is_dead):
 	$AnimationPlayer.play("Receive_Dmg")
 	current_health -= dmg_amount
-	if current_health <= 0:
+	
+	if is_dead:
 		emit_signal('character_die')
 	else:
 		emit_signal("character_hurt", current_health)

@@ -50,6 +50,10 @@ func _on_message(data):
 				is_my_turn = data['details']['user id'] == Global.user_id
 				print('My turn : {0}'.format([is_my_turn]))
 	
+	elif data['action'] == 'game over':
+		print('Game over.')
+		get_tree().quit()
+	
 	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
@@ -110,7 +114,8 @@ func cast_spell_valid(data):
 	var battle = get_battle()
 	var character_thrower = battle.get_character_by_id(data['thrower']['id character'])
 	var cell_target = battle.get_cell_by_coords(data['target'][0], data['target'][1])
-	battle.make_character_cast_spell(character_thrower, cell_target)
+	var damages_infos = data['damages']
+	battle.make_character_cast_spell(character_thrower, cell_target, damages_infos)
 
 
 
