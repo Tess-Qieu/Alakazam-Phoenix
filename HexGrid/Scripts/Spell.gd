@@ -9,6 +9,7 @@ var distance_traveled = 0
 var cell_targeted = null
 
 var damage_amout
+var does_target_die
 
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
@@ -16,7 +17,7 @@ func euclidean_dist(vec):
 func apply_on_target():
 	var target = cell_targeted.character_on
 	if target != null:
-		target.receive_damage(damage_amout)
+		target.receive_damage(damage_amout, does_target_die)
 
 func cast(thrower, target, damages_infos):
 	# Translate the ball in front of the character
@@ -34,6 +35,7 @@ func cast(thrower, target, damages_infos):
 	
 	cell_targeted = target
 	damage_amout = damages_infos[0]['damage'] # /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
+	does_target_die = 'character dead' in damages_infos[0]['events'] # GET IF THE TARGET DIED
 	# SOLUTION TO APPLY DAMAGE AND EFFECT ON CHARACTERS (FOR NOW ON, ONLY ONE TARGET)
 	is_casting = true
 	

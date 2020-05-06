@@ -50,6 +50,10 @@ func _on_message(data):
 				is_my_turn = data['details']['user id'] == Global.user_id
 				print('My turn : {0}'.format([is_my_turn]))
 	
+	elif data['action'] == 'game over':
+		print('Game over.')
+		get_tree().quit()
+	
 	else:
 		print("NetworkError: action {0} not known.".format([data['action']]))
 

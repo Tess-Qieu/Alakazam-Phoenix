@@ -101,10 +101,11 @@ func die(battle_scene):
 	disconnect('character_movement_finished', battle_scene, \
 			'_on_character_movement_finished')
 
-func receive_damage(dmg_amount):
+func receive_damage(dmg_amount, is_dead):
 	$AnimationPlayer.play("Receive_Dmg")
 	current_health -= dmg_amount
-	if current_health <= 0:
+	
+	if is_dead:
 		emit_signal('character_die')
 	else:
 		emit_signal("character_hurt", current_health)

@@ -59,12 +59,12 @@ class Character():
             # apply damage
             damage = damages[i]
             c.health -= damage
-            data_one_target = {'id character': c.id_character, 'damage': damage, 'event': []}
+            data_one_target = {'id character': c.id_character, 'damage': damage, 'events': []}
 
             # Verify if character still alive       
             if c.health <= 0:
                 c.die()
-                data_one_target['event'] += ['character dead']
+                data_one_target['events'] += ['character dead']
 
             data += [data_one_target]
 

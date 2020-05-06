@@ -3,7 +3,7 @@
 
 import asyncio
 import websockets
-from websockets.exceptions import ConnectionClosedError
+from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK
 import json
 import logging
 
@@ -43,6 +43,8 @@ class Server():
             async for message in websocket:
                 await self._on_message(websocket, message)
         except ConnectionClosedError:
+            pass
+        except ConnectionClosedOK:
             pass
         finally:
             await self.close_connection(websocket)
