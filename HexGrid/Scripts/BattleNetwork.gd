@@ -90,6 +90,8 @@ func _on_ask_cast_spell(thrower, target): # for now, useless to precise which sp
 	send_data(data)
 
 func _on_end_turn_asked():
+	## Request from the client to the server to end his turn before 
+	#   the timer's end
 	if not is_my_turn or $BattleScreen/Battle.state != 'normal':
 		# Client should not ask to end his turn if it's not his turn to play
 		#  of if the Battle is still busy
@@ -114,6 +116,7 @@ func new_game(data):
 	battle.init(grid_infos, teams_infos, self)
 	
 	# IS IT BEST WAY TO CONNECT ?
+	# Connection of "End of turn" button with the end of turn request
 	$BattleScreen/EndTurn_Widget/Button.connect("pressed", self, "_on_end_turn_asked")
 	
 	data = {'action' : 'new game', 'details' : {'ready' : true}}
