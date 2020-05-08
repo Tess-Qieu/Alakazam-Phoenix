@@ -49,6 +49,7 @@ func _on_message(data):
 			if data['directive'] == 'new turn':
 				is_my_turn = data['details']['user id'] == Global.user_id
 				print('My turn : {0}'.format([is_my_turn]))
+				$BattleScreen/EndTurn_Widget.reset(is_my_turn, data['details']['turn time'])
 	
 	elif data['action'] == 'game over':
 		print('Game over.')

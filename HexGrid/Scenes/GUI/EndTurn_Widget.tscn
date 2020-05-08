@@ -18,13 +18,12 @@ margin_right = 120.0
 margin_bottom = 20.0
 text = "End of Turn"
 
-[node name="ProgressBar" type="ProgressBar" parent="."]
+[node name="TimerBar" type="ProgressBar" parent="."]
 margin_top = 24.0
 margin_right = 120.0
 margin_bottom = 30.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-value = 30.0
 percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false

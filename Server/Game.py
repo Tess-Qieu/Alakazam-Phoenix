@@ -164,7 +164,8 @@ class Game(Lobby):
         self.next_player()
         data = {'action': 'game',
                 'directive': 'new turn',
-                'details' : {'user id': self.player_on_turn.user_id}}
+                'details' : {'user id': self.player_on_turn.user_id,
+                             'turn time': TIME_TURN}}
         self.timer = Timer(TIME_TURN, self.new_turn)
         await self.notify_all(data)
 
