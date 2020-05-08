@@ -113,6 +113,11 @@ class Game(Lobby):
             elif data['ask'] == 'cast spell':
                 # user ask to cast a spell
                 await self.ask_cast_spell(data['details'])
+            elif data['ask'] == 'end turn':
+                # user ask to end its turn
+                self.timer.cancel()
+                await self.new_turn()
+                
             # after a player ask a play, check if the game is over
             if self.is_game_over():
                 await self.notify_game_over()

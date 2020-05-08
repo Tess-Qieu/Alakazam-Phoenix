@@ -86,8 +86,10 @@ func init_game_local():
 						}
 	$Map.generate_grid()
 	init($Map.grid, teams_infos, null)
-	
+	get_parent().get_node("EndTurn_Widget/Button").connect("pressed",self,"_on_button_pressed")
 
+func _on_button_pressed():
+	print("Button pressed!")
 
 
 
