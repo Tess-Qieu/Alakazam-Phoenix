@@ -157,12 +157,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Local button" type="Button" parent="HBoxContainer"]
+[node name="Local_Button" type="Button" parent="HBoxContainer"]
 margin_right = 83.0
 margin_bottom = 40.0
 text = "LocalGame"
 
-[node name="Online button" type="Button" parent="HBoxContainer"]
+[node name="Online_Button" type="Button" parent="HBoxContainer"]
 margin_left = 87.0
 margin_right = 180.0
 margin_bottom = 40.0
