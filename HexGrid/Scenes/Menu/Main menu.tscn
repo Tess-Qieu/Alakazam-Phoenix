@@ -1,0 +1,170 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Scenes/CellSize1.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scripts/GUI/Menu/Main menu.gd" type="Script" id=2]
+
+[sub_resource type="Animation" id=2]
+resource_name = "round"
+length = 7.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("CellSize1:rotation_degrees")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 7 ),
+"transitions": PoolRealArray( 1, 1 ),
+"update": 0,
+"values": [ Vector3( 0, 0, 0 ), Vector3( 0, 360, 0 ) ]
+}
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.223529, 0.215686, 0.25098, 1 )
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color( 0.54902, 0.0745098, 0.941176, 1 )
+border_blend = true
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+expand_margin_left = 4.0
+expand_margin_right = 4.0
+
+[sub_resource type="StyleBoxFlat" id=3]
+content_margin_left = 2.0
+content_margin_right = 2.0
+content_margin_top = 1.0
+content_margin_bottom = 5.0
+bg_color = Color( 0.223529, 0.215686, 0.25098, 1 )
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color( 0.54902, 0.0745098, 0.941176, 1 )
+corner_radius_top_left = 1
+corner_radius_top_right = 1
+corner_radius_bottom_right = 1
+corner_radius_bottom_left = 1
+
+[node name="Main menu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Spatial" type="Spatial" parent="."]
+
+[node name="CellSize1" parent="Spatial" instance=ExtResource( 1 )]
+transform = Transform( -0.900969, 0, 0.433883, 0, 1, 0, -0.433883, 0, -0.900969, 0, 0, 0 )
+
+[node name="CellSize2" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.73, 0, 0 )
+
+[node name="CellSize3" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.73, 0, 0 )
+
+[node name="CellSize4" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.868, 0, -1.498 )
+
+[node name="CellSize7" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.868, 0, -1.498 )
+
+[node name="CellSize5" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.868, 0, 1.498 )
+
+[node name="CellSize6" parent="Spatial/CellSize1" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.868, 0, 1.498 )
+
+[node name="Camera" type="Camera" parent="Spatial"]
+transform = Transform( 1, 0, 0, 0, 0.798572, 0.601899, 0, -0.601899, 0.798572, -0.006, 2.71151, 3.69303 )
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Spatial"]
+playback_speed = 0.3
+anims/round = SubResource( 2 )
+
+[node name="OmniLight_red" type="OmniLight" parent="Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8033, 2.60356, 1.7461 )
+light_color = Color( 0.878431, 0.223529, 0.270588, 1 )
+omni_range = 5.05243
+
+[node name="OmniLight_blue" type="OmniLight" parent="Spatial"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 2.80756, 2.77045, 0.48629 )
+light_color = Color( 0.0823529, 0.839216, 0.898039, 1 )
+omni_range = 5.05243
+
+[node name="Title" type="Label" parent="."]
+anchor_left = 0.5
+anchor_top = 0.25
+anchor_right = 0.5
+anchor_bottom = 0.3
+grow_horizontal = 2
+grow_vertical = 2
+custom_styles/normal = SubResource( 1 )
+text = "Alakazham - Phoenix"
+align = 1
+valign = 1
+uppercase = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_bottom = 50.0
+grow_horizontal = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+margin_right = 156.0
+margin_bottom = 20.0
+custom_styles/normal = SubResource( 3 )
+text = "Enter your player name:"
+align = 1
+valign = 1
+
+[node name="Name Selector" type="LineEdit" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 156.0
+margin_bottom = 54.0
+size_flags_vertical = 3
+align = 1
+expand_to_text_length = true
+clear_button_enabled = true
+placeholder_text = "Xx_Best_player_xX"
+placeholder_alpha = 0.4
+caret_blink = true
+caret_blink_speed = 0.5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.7
+anchor_right = 0.5
+anchor_bottom = 0.7
+margin_bottom = 40.0
+grow_horizontal = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Local button" type="Button" parent="HBoxContainer"]
+margin_right = 83.0
+margin_bottom = 40.0
+text = "LocalGame"
+
+[node name="Online button" type="Button" parent="HBoxContainer"]
+margin_left = 87.0
+margin_right = 180.0
+margin_bottom = 40.0
+text = "OnlineGame"
