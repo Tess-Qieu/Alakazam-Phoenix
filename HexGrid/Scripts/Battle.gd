@@ -6,12 +6,12 @@ signal ask_cast_spell
 var is_game_local = false
 
 
-var Character = preload("res://Scenes/Robot_character.tscn")
+var RobotCharacter = preload("res://Scenes/Robot_character.tscn")
 var teams = {}
 
 var current_character
 var character_moving = null
-var my_team # color of the team the client is controlling
+var my_team_name # name of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
 
@@ -30,7 +30,7 @@ func init(grid, teams_infos, node_battlenetwork):
 	for name in teams_infos.keys():
 		_create_team(name, teams_infos[name])
 	
-	current_character = teams[my_team][0]
+	current_character = teams[my_team_name].get_member(0)
 	clear_arena()
 	
 	if not is_game_local:
@@ -98,24 +98,30 @@ func _on_button_pressed():
 func _create_team(team_name, data):
 	if data['user id'] == Global.user_id:
 		# stock the name of his team
-		my_team = team_name
+		my_team_name = team_name
+	
 	# init the team
-	teams[team_name] = []
-		
+	var new_team = Team.new()
+	new_team.name = team_name
+	new_team.color_key = team_name
+	teams[team_name] = new_team
+	
 	for c in data['characters']:
-		var character = _create_character(team_name, 
+		var character = _create_character(new_team.color_key, 
 										c['q'], 
 										c['r'],
 										c['id character'],
 										c['health'], 
 										c['range displacement'])
-		teams[team_name] += [character]
+		teams[team_name].add_member(character)
 		# Addition of a character info on the BattleScreen
-		get_parent().add_character_info(character, team_name)
+		get_parent().add_character_info(character, new_team)
+	
+	add_child(new_team)
 
 func _create_character(team, q, r, id_character, health, range_displacement):
 	var cell = $Map.grid[q][r]
-	var character = Character.instance()
+	var character = RobotCharacter.instance()
 	character.init(cell, team, id_character, health, range_displacement, self)
 	
 	_update_character_cell_references(character, cell)
@@ -221,7 +227,7 @@ func _on_character_selected(character):
 	if not state == 'cast_spell':
 		current_character.unselect()
 		# select character
-		if character.team == my_team:
+		if teams[my_team_name].has_member(character):
 			# The client can select only chracter in his own team
 			current_character = character
 			clear_arena()

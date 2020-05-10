@@ -31,14 +31,14 @@ func is_f6(node:Node):
 func is_main_scene():
 	return get_parent() == get_tree().root 
 
-func add_character_info(character, team):
+func add_character_info(character:Character, team:Team):
 	
 	# Looking through each team container existing. If one has the same name
 	#  as the character's team name, the character is added, then an early return
 	#  is used.
 	for elt in $PanelLeft/ScrollContainer/VBoxContainer.get_children():
-		if elt.get_team_name() == team:
-			elt.add_teammate(character, team)
+		if elt.get_team_name() == team.name:
+			elt.add_teammate(character)
 			return
 	
 	# If we get here, the character hasn't been add to a team
@@ -48,4 +48,4 @@ func add_character_info(character, team):
 	$PanelLeft/ScrollContainer/VBoxContainer.add_child(new_team)
 	
 	new_team.config_team(team)
-	new_team.add_teammate(character, team)
+	new_team.add_teammate(character)

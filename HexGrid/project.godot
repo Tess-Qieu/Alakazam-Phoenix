@@ -15,9 +15,14 @@ _global_script_classes=[ {
 "path": "res://Scripts/Character.gd"
 }, {
 "base": "Character",
-"class": "CharacterRobot",
+"class": "RobotCharacter",
 "language": "GDScript",
 "path": "res://Scripts/Robot_character.gd"
+}, {
+"base": "KinematicBody",
+"class": "Spell",
+"language": "GDScript",
+"path": "res://Scripts/Spells/Spell.gd"
 }, {
 "base": "Node",
 "class": "Team",
@@ -26,7 +31,8 @@ _global_script_classes=[ {
 } ]
 _global_script_class_icons={
 "Character": "",
-"CharacterRobot": "",
+"RobotCharacter": "",
+"Spell": "",
 "Team": ""
 }
 

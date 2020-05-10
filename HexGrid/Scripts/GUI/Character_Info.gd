@@ -24,7 +24,7 @@ func _toggle_expansion():
 		$VBoxContainer/HBoxContainer2.show()
 
 ## CHARACTER RELATIVE SECTION ##
-func connect_character(character, team_color):
+func connect_character(character : Character, team_color):
 	## Connects a character to the interface :
 	#	Sets the character name as title
 	#	Sets the character miniature as icon

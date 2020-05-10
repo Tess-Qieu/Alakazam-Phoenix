@@ -1,34 +1,23 @@
 extends Character
-class_name CharacterRobot
+class_name RobotCharacter
 
 signal character_selected
 signal character_movement_finished
-signal character_die
-signal character_hurt
 
 ## RESSOURCE IMPORT ##
-var Spell = preload("res://Scenes/Spell.tscn")
-var miniature = preload("res://Prefabs/Character/Robot_miniature.png")
-
+var Spell = preload("res://Scenes/Spells/Spell.tscn")
 
 # Movement variables
 export var speed = 150
 const MVT_MARGIN = 0.02 # Movement margin used to discriminate if the character has arrived on a cell
-
 var moving = false
 var destination_cell
 
 
-
 ## Stats informations ##
 var current_cell
-
 var id_character
-var my_name = "No_0ne"
 
-
-var start_health = 15 
-var current_health
 
 var start_range_displacement = 5
 var current_range_displacement
@@ -46,14 +35,13 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	translation.z = cell.translation.z
 	change_material(c_team)
 	
-	team = c_team
 	id_character = c_id_character
 	
 	start_health = health
 	current_health = health
 	start_range_displacement = range_displacement
 	current_range_displacement = range_displacement
-	my_name = team + "_Joe_{0}".format([rng.randi_range(0,255)])
+	my_name = c_team + "_Joe_{0}".format([rng.randi_range(0,255)])
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
@@ -66,6 +54,9 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	connect('character_die', battle_scene, '_on_character_die', [self])
 	# warning-ignore:return_value_discarded
 	connect("input_event", self, "_on_Character_input_event")
+	
+	# Miniature update
+	miniature = load("res://Prefabs/Character/Robot_miniature.png")
 
 func _physics_process(delta):
 	if moving:

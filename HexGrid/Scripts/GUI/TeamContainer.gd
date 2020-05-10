@@ -2,6 +2,7 @@ extends PanelContainer
 
 var Character_Info = preload("res://Scenes/GUI/Character_Info.tscn")
 
+var my_team : Team
 const MIN_VBOX_Y = 20
 const MIN_SELF_Y = 34
 
@@ -15,16 +16,17 @@ func get_team_name():
 	return $Body/Header/Name.text
 
 ## TEAM MANAGEMENT SECTION ##
-func config_team(team_name):
-	$Body/Header/Name.text = team_name
+func config_team(team : Team):
+	my_team = team
+	$Body/Header/Name.text = team.name
 
-func add_teammate(new_member, team_color):
+func add_teammate(new_member : Character):
 	
 	# Instanciation of a character_info object 
 	var char_info = Character_Info.instance()
 	$Body/Members.add_child(char_info)
 	
-	char_info.connect_character(new_member, team_color)
+	char_info.connect_character(new_member, my_team.color_key)
 	
 
 ## GUI MANAGEMENT SECTION ##

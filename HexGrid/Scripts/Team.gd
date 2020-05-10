@@ -14,7 +14,6 @@ func add_member(character : Character):
 		character.get_parent().remove_child(character)
 	
 	add_child(character)
-	character.my_team = self
 	character.change_material(color_key)
 
 func has_member(character):
@@ -25,3 +24,7 @@ func remove_member(character : Character):
 		character.change_material("white")
 		character.my_team = null
 		remove_child(character)
+
+func get_member(index : int):
+	if index >= 0 and index < get_child_count():
+		return get_child(index)
