@@ -1,4 +1,5 @@
-extends KinematicBody
+extends Character
+class_name CharacterRobot
 
 signal character_selected
 signal character_movement_finished
@@ -21,7 +22,7 @@ var destination_cell
 
 ## Stats informations ##
 var current_cell
-var team
+
 var id_character
 var my_name = "No_0ne"
 

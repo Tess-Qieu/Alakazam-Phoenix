@@ -8,9 +8,26 @@
 
 config_version=4
 
-_global_script_classes=[  ]
+_global_script_classes=[ {
+"base": "KinematicBody",
+"class": "Character",
+"language": "GDScript",
+"path": "res://Scripts/Character.gd"
+}, {
+"base": "Character",
+"class": "CharacterRobot",
+"language": "GDScript",
+"path": "res://Scripts/Robot_character.gd"
+}, {
+"base": "Node",
+"class": "Team",
+"language": "GDScript",
+"path": "res://Scripts/Team.gd"
+} ]
 _global_script_class_icons={
-
+"Character": "",
+"CharacterRobot": "",
+"Team": ""
 }
 
 [application]
