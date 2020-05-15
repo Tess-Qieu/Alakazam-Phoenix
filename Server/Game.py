@@ -7,6 +7,7 @@ from Lobby import Lobby
 from Map import Map
 from ManagerID import ManagerID
 from Character import Character
+from Team import Team
 
 
 TIME_TURN = 30
@@ -24,31 +25,6 @@ class Timer():
 
     def cancel(self):
         self._task.cancel()
-
-
-
-class Team():
-
-    def __init__(self, color_team, user, characters):
-        self.color_team = color_team
-        self.user = user
-        self.characters = characters
-
-    def add_character(self, character):
-        self.characters += [character]
-
-    def remove_character(self, character):
-        self.characters.remove(character)
-
-    def is_team_dead(self):
-        for c in self.characters:
-            if c.alive:
-                return False
-        return True
-
-    def serialize(self):
-        return {'user id': self.user.user_id, 'characters': [character.serialize() for character in self.characters]}
-
 
 
 class Game(Lobby):
@@ -78,17 +54,17 @@ class Game(Lobby):
     def init_teams(self):
         # Create the team's characters
         
-        def _create_team(self, color_team, user, cells):
-            team = Team(color_team, user, [])
+        def _create_team(self, team_name, color_team, user, cells):
+            team = Team(team_name, color_team, user, [])
             for c in cells:
-                new_character = Character(color_team, user, c.q, c.r, self.character_manager_id.get_new_id())
-                team.add_character(new_character)
+                new_character = Character(team.team_color, user, c.q, c.r, self.character_manager_id.get_new_id())
+                team.add_member(new_character)
             return team
 
         cells = self.map.random_cells_floor(2)
         random.shuffle(self.players)
-        self.teams += [_create_team(self, 'red', self.players[0], cells[:len(cells)//2])]
-        self.teams += [_create_team(self, 'blue', self.players[1], cells[len(cells)//2:])]
+        self.teams += [_create_team(self, "Devil's Flame", 'red', self.players[0], cells[:len(cells)//2])]
+        self.teams += [_create_team(self, "Ocean's Deep", 'blue', self.players[1], cells[len(cells)//2:])]
 
 
 
@@ -133,8 +109,8 @@ class Game(Lobby):
         data = {'action': 'new game', 
                 'details': {'grid': self.map.serialize(),
                             'lobby id': self.id_lobby,
-                            'teams': {'red': self.teams[0].serialize(),
-                                        'blue': self.teams[1].serialize()
+                            'teams': {self.teams[0].name: self.teams[0].serialize(),
+                                      self.teams[1].name: self.teams[1].serialize()
                                     }  
                             }
                 }

@@ -33,6 +33,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	translation.x = cell.translation.x
 	translation.y = 1
 	translation.z = cell.translation.z
+	team_color = c_team
 	change_material(c_team)
 	
 	id_character = c_id_character

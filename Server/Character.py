@@ -7,10 +7,10 @@ def distance_coord(q1, r1, q2, r2):
 
 
 class Character():
-    ''' Reprensent a chatacter in the game '''
+    ''' Represents a character in the game '''
 
-    def __init__(self, team, user, q, r, id_character):
-        self.team = team
+    def __init__(self, team_color, user, q, r, id_character):
+        self.team_color = team_color
         self.user = user
         self.q = q
         self.r = r
@@ -27,7 +27,7 @@ class Character():
 
     def serialize(self):
         # Serialize the object to send it to the clients
-        data = {'team': self.team,
+        data = {'team_color': self.team_color,
                 'q': self.q,
                 'r': self.r,
                 'id character': self.id_character,

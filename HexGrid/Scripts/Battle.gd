@@ -9,7 +9,7 @@ var is_game_local = false
 var RobotCharacter = preload("res://Scenes/Robot_character.tscn")
 var teams = {}
 
-var current_character
+var current_character : Character
 var character_moving = null
 var my_team_name # name of the team the client is controlling
 
@@ -43,47 +43,61 @@ func init_game_local():
 	# Generate teams and map, then instanciate them
 	# Called only when battlescreen is run with f6
 	is_game_local = true
-	var teams_infos = {'red': {'user id': -1,
-								'characters': [{'health':100, 
-												'id character':1, 
-												'q':0, 
-												'r':0, 
-												'range displacement':5, 
-												'team':'red'},
-												{'health':100, 
-												'id character':4, 
-												'q':1, 
-												'r':3, 
-												'range displacement':5, 
-												'team':'red'},
-												{'health':100, 
-												'id character':5, 
-												'q':3, 
-												'r':5, 
-												'range displacement':5, 
-												'team':'red'}]
-								},
-						'blue': {'user id': -1,
-								'characters': [{'health':100, 
-												'id character':0,
-												'q':1, 
-												'r':-5, 
-												'range displacement':5, 
-												'team':'blue'},
-												{'health':100, 
-												'id character':2,
-												'q':6, 
-												'r':-5, 
-												'range displacement':5, 
-												'team':'blue'},
-												{'health':100, 
-												'id character':3,
-												'q':6, 
-												'r':-4, 
-												'range displacement':5, 
-												'team':'blue'}]
-								}
+	var teams_infos = {'Local redz': 
+						{	'user id': -1,
+							'color': 'red',
+							'characters': 
+								[ {	'health':100, 
+									'id character':1, 
+									'q':0, 
+									'r':0, 
+									'range displacement':5, 
+									'team_color':'red'
+									},
+								{	'health':100, 
+									'id character':4, 
+									'q':1, 
+									'r':3, 
+									'range displacement':5, 
+									'team_color':'red'
+									},
+								{	'health':100, 
+									'id character':5, 
+									'q':3, 
+									'r':5, 
+									'range displacement':5, 
+									'team_color':'red'
+									}
+								]
+						},
+					'Visiter blues': 
+						{	'user id': -1,
+							'color': 'blue',
+							'characters': 
+								[ {	'health':100, 
+									'id character':0,
+									'q':1, 
+									'r':-5, 
+									'range displacement':5, 
+									'team_color':'blue'
+									},
+								{	'health':100, 
+									'id character':2,
+									'q':6, 
+									'r':-5, 
+									'range displacement':5, 
+									'team_color':'blue'
+									},
+								{	'health':100, 
+									'id character':3,
+									'q':6, 
+									'r':-4, 
+									'range displacement':5, 
+									'team_color':'blue'
+									}
+								]
 						}
+					}
 	$Map.generate_grid()
 	init($Map.grid, teams_infos, null)
 	get_parent().get_node("EndTurn_Widget/Button").connect("pressed",self,"_on_button_pressed")
@@ -103,7 +117,7 @@ func _create_team(team_name, data):
 	# init the team
 	var new_team = Team.new()
 	new_team.name = team_name
-	new_team.color_key = team_name
+	new_team.color_key = data['color']
 	teams[team_name] = new_team
 	
 	for c in data['characters']:
@@ -176,12 +190,12 @@ func make_character_cast_spell(character, cell, damages_infos):
 
 ## CLEAR ##
 func _color_current_character_cell():
-	if (current_character in teams['blue']):
-		current_character.current_cell.change_material('blue')
-	elif (current_character in teams['red']):
-		current_character.current_cell.change_material('red')
-	else:
-		current_character.current_cell.change_material('green')
+#	if (current_character in teams['blue']):
+#		current_character.current_cell.change_material('blue')
+#	elif (current_character in teams['red']):
+#		current_character.current_cell.change_material('red')
+#	else:
+	current_character.current_cell.change_material(current_character.team_color)
 
 func clear_arena():
 	state = 'normal'
@@ -284,7 +298,7 @@ func _on_character_hovered(character):
 func get_character_by_id(id_character):
 	var all_characters = []
 	for name in teams.keys():
-		all_characters += teams[name]
+		all_characters += teams[name].get_all_members()
 		
 	for character in all_characters:
 		if character.id_character == id_character:

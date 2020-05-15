@@ -28,3 +28,9 @@ func remove_member(character : Character):
 func get_member(index : int):
 	if index >= 0 and index < get_child_count():
 		return get_child(index)
+
+func get_all_members():
+	return get_children()
+
+func is_team_dead():
+	return false #HEROES NEVER DIE!

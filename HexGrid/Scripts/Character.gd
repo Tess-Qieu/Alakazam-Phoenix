@@ -14,5 +14,10 @@ var my_name = "No_0ne"
 var start_health = 15 
 var current_health
 
+var team_color
+
 func change_material(material_key):
 	$MeshInstance.set_surface_material(0, Global.materials[material_key])
+
+func is_alive():
+	return current_health > 0
