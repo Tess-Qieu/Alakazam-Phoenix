@@ -12,12 +12,12 @@ _global_script_classes=[ {
 "base": "KinematicBody",
 "class": "Character",
 "language": "GDScript",
-"path": "res://Scripts/Character.gd"
+"path": "res://Scripts/Characters/Character.gd"
 }, {
 "base": "Character",
 "class": "RobotCharacter",
 "language": "GDScript",
-"path": "res://Scripts/Robot_character.gd"
+"path": "res://Scripts/Characters/Robot_character.gd"
 }, {
 "base": "KinematicBody",
 "class": "Spell",

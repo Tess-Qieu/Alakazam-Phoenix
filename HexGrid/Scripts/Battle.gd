@@ -6,7 +6,7 @@ signal ask_cast_spell
 var is_game_local = false
 
 
-var RobotCharacter = preload("res://Scenes/Robot_character.tscn")
+var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
 var teams = {}
 
 var current_character : Character
