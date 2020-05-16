@@ -6,17 +6,6 @@ func _ready():
 	if is_main_scene():
 		$Battle.init_game_local()
 
-## BUTTON EVENTS ##
-func _on_ButtonSpell_pressed():
-	var battle = get_battle()
-	var map = battle.get_node('Map')
-	battle.clear_arena()
-	battle.fov = map.display_field_of_view(battle.current_character.current_cell, 20)
-	battle.state = 'cast_spell'
-	
-func _on_ButtonClear_pressed():
-	get_battle().clear_arena()
-
 
 ## USEFULL FUNCTIONS ##
 func get_battle():
@@ -49,3 +38,20 @@ func add_character_info(character:Character, team:Team):
 	
 	new_team.config_team(team)
 	new_team.add_teammate(character)
+
+
+
+## BUTTON EVENTS ##
+func _on_ButtonSpell_pressed():
+	var battle = get_battle()
+	var map = battle.get_node('Map')
+	battle.clear_arena()
+	battle.fov = map.display_field_of_view(battle.current_character.current_cell, 20)
+	battle.state = 'cast_spell'
+	
+func _on_ButtonClear_pressed():
+	get_battle().clear_arena()
+	
+func _on_ButtonZone_pressed():
+	$Battle.state = 'cast_spell'
+	$Battle.current_spell = 'zone'

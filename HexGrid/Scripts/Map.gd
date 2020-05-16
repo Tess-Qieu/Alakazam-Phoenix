@@ -169,6 +169,32 @@ func display_field_of_view(cell, distance_max):
 
 
 
+## VARIOUS SHAPES SECTION ##
+func _compute_zone(center, radius):
+#	for each -N ≤ x ≤ +N:
+#    	for each max(-N, -x-N) ≤ y ≤ min(+N, -x+N):
+#        	var z = -x-y
+#        	results.append(cube_add(center, Cube(x, y, z)))
+	var z = -center.r - center.q
+	var zone = []
+	for q in range(center.q-radius, center.q+radius+1):
+		for r in range( \
+				max(center.r-radius, -q-z-radius), \
+				min(center.r+radius, -q-z+radius) +1):
+			zone.append(grid[q][r])
+	return zone
+
+func display_zone(center, radius, color_key):
+	var zone = _compute_zone(center, radius)
+	
+	for cell in zone:
+		cell.change_material(color_key)
+
+
+
+
+
+
 ## HANDLE PATH FINDING ##
 func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	

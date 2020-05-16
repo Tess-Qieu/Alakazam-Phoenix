@@ -12,6 +12,7 @@ var teams = {}
 var current_character : Character
 var character_moving = null
 var my_team_name # name of the team the client is controlling
+var current_spell = 'none'
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
 
@@ -271,6 +272,9 @@ func _on_cell_clicked(cell):
 			else:
 				var damages_infos = [] # hit a empty cell
 				make_character_cast_spell(current_character, cell, damages_infos)
+		elif current_spell == 'zone':
+			state = 'normal'
+			clear_arena()
 
 
 
@@ -284,6 +288,10 @@ func _on_cell_hovered(cell):
 		path_serialized = $Map.display_path(current_character.current_cell, 
 								cell, 
 								current_character.current_range_displacement)
+	elif state == 'cast_spell':
+		if current_spell == 'zone':
+			clear_arena()
+			$Map.display_zone(cell, 1, 'green')
 	
 func _on_character_hovered(character):
 	if state == 'normal':
