@@ -181,12 +181,12 @@ func _compute_zone(center, radius):
 		for r in range( \
 				max(center.r-radius, -q-z-radius), \
 				min(center.r+radius, -q-z+radius) +1):
-			zone.append(grid[q][r])
+			if grid[q][r].kind in ["floor", "blocked"]:
+				zone.append(grid[q][r])
 	return zone
 
 func display_zone(center, radius, color_key):
 	var zone = _compute_zone(center, radius)
-	
 	for cell in zone:
 		cell.change_material(color_key)
 

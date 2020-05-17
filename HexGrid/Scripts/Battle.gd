@@ -104,8 +104,7 @@ func init_game_local():
 	get_parent().get_node("EndTurn_Widget/Button").connect("pressed",self,"_on_button_pressed")
 
 func _on_button_pressed():
-	print("Button pressed!")
-
+	print("Turn can't be ended in local game")
 
 
 
@@ -199,7 +198,7 @@ func _color_current_character_cell():
 	current_character.current_cell.change_material(current_character.team_color)
 
 func clear_arena():
-	state = 'normal'
+#	state = 'normal'
 	$Map.clear()
 	_color_current_character_cell()
 
@@ -273,8 +272,9 @@ func _on_cell_clicked(cell):
 				var damages_infos = [] # hit a empty cell
 				make_character_cast_spell(current_character, cell, damages_infos)
 		elif current_spell == 'zone':
-			state = 'normal'
-			clear_arena()
+			pass # TODO: Put here spell throw
+		state = 'normal'
+		clear_arena()
 
 
 
