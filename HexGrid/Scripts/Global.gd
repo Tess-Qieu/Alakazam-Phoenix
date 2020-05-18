@@ -14,6 +14,8 @@ var materials = {'hole': 'ae8257',
 
 
 var screen = null # Scene to show
+var pseudo = ''
+var user_id = -1
 
 
 func _ready():

@@ -10,13 +10,14 @@ const MIN_SELF_Y = 34
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	# warning-ignore:return_value_discarded
 	$Body/Header/ExpandButton.connect("pressed", self,"_toggle_expansion")
 
 func get_team_name():
 	return $Body/Header/Name.text
 
 ## TEAM MANAGEMENT SECTION ##
-func config_team(team : Team):
+func config_team(team: Team):
 	my_team = team
 	$Body/Header/Name.text = team.name
 

@@ -11,7 +11,7 @@ func _process(delta):
 
 func reset(is_my_turn, turn_time):
 	## Resets the timer, and disable the button if it is not the player's turn
-	$Button.disabled = not is_my_turn
+	$ButtonEndTurn.disabled = not is_my_turn
 	$TimerBar.max_value = turn_time
 	$TimerBar.value = 0
 	is_time_running = true

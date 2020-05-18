@@ -9,7 +9,6 @@ func _ready():
 	pass # Replace with function body.
 
 func add_member(character : Character):
-	
 	if character.get_parent() != null:
 		character.get_parent().remove_child(character)
 	
