@@ -9,8 +9,7 @@ var is_connected = null
 
 # Our global variables
 var server_receiver_node = null # Node where information from server is throwed to
-var pseudo = ''
-var user_id = -1
+
 
 
 
@@ -19,7 +18,6 @@ func _ready():
 	_client.connect("connection_error", self, "_on_connection_closed")
 	_client.connect("connection_established", self, "_on_connection_opened")
 	_client.connect("data_received", self, "_on_message")
-#	server_receiver_node = get_tree().get_root().get_node('Game')
 
 
 
@@ -42,9 +40,8 @@ func connect_to_server():
 	else:
 		print('Connection made with the server.')
 
-func change_server_receiver_node(new_receiver='') :
-	var nr = get_tree().get_root().get_node("Game/" + new_receiver)
-	server_receiver_node = nr
+func set_server_receiver_node(node) :
+	server_receiver_node = node
 	
 	
 	
@@ -60,7 +57,8 @@ func _on_connection_opened(_procotols = ''):
 	# Prevent the game that the connection has been made
 	# (I don't really like to use get_parent(), but the network will
 	# always be attached to the Game.)
-	get_parent()._on_connection_to_server()
+	var data = {'action' : 'connection', 'details' : {'pseudo' : Global.pseudo}}
+	send_data(data)
 
 func _on_message():
 	var msg = _client.get_peer(1).get_packet().get_string_from_utf8()
@@ -68,7 +66,7 @@ func _on_message():
 	data = transform_data(data)
 	print('< Server : ' + str(data))
 	
-	Global.server_receiver_node._on_message(data)
+	server_receiver_node._on_message(data)
 
 func _process(_delta):
 	_client.poll()

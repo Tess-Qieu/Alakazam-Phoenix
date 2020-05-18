@@ -36,7 +36,7 @@ func _on_button_pressed():
 
 ## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
-	if data['user id'] == Network.user_id:
+	if data['user id'] == Global.user_id:
 		# stock the name of his team
 		my_team_name = team_name
 	
@@ -176,9 +176,13 @@ func _on_character_hovered(character):
 
 
 ## INHERITABLED FUNCTIONS ##
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
 func ask_cast_spell(character, cell):
 	pass
 
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
 func ask_move(character, path):
 	pass
 	

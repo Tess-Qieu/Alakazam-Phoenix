@@ -7,6 +7,7 @@ const MIN_VBOX_Y = 20
 const MIN_SELF_Y = 34
 
 func _ready():
+	# warning-ignore:return_value_discarded
 	$VBoxContainer/Title/Expand_Button.connect("pressed",self,"_toggle_expansion")
 
 ## GUI MANAGEMENT SECTION ##
@@ -43,7 +44,9 @@ func connect_character(character : Character, team_color):
 	$VBoxContainer/HBoxContainer2/Icon/Team_Bkgnd \
 		.self_modulate = Global.materials[team_color].albedo_color
 	
+	# warning-ignore:return_value_discarded
 	character.connect("character_hurt", self, "update_life" )
+	# warning-ignore:return_value_discarded
 	character.connect("character_die", self, "character_die")
 
 func update_life(new_val):
