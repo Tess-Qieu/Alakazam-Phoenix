@@ -71,7 +71,7 @@ func _add_instance_to_grid(instance, q, r):
 	
 func _instance_cell(cell_type, q, r, kind):
 	var cell = cell_type.instance()
-	cell.init(q, r, kind, self.get_parent())
+	cell.init(q, r, kind, get_parent())
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
 	if kind == "floor":

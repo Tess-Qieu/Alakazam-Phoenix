@@ -21,7 +21,9 @@ func _on_ButtonSpell_pressed():
 func _on_ButtonClear_pressed():
 	node_battle.clear_arena()
 
-
+func _on_ButtonEndTurn_pressed():
+	node_battle.clear_arena()
+	node_battle.ask_end_turn()
 
 
 ## USEFULL FUNCTIONS ##
@@ -42,3 +44,6 @@ func add_character_info(character:Character, team:Team):
 	
 	new_team.config_team(team)
 	new_team.add_teammate(character)
+
+
+

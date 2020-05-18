@@ -5,8 +5,12 @@ func _ready():
 	# Called only when battlescreen is run with f6
 	var teams_infos = get_teams_infos()
 	$Map.generate_grid()
-	.init_battle($Map.grid, teams_infos)
-#	get_parent().get_node("EndTurn_Widget/Button").connect("pressed",self,"_on_button_pressed")
+	init_battle($Map.grid, teams_infos)
+
+
+## BEHAVIOUR FOR ASK ACTIONS ##
+func ask_end_turn(): # /!\ NOT IMPLEMENTED YET IN OFFLINE
+	print('Ask end turn asked but no implementation !')
 
 
 func ask_cast_spell(character, cell):
@@ -24,10 +28,8 @@ func ask_cast_spell(character, cell):
 	make_character_cast_spell(character, cell, damages_infos)
 
 
-
 func ask_move(character, path):
 	make_character_move_following_path_valid(character, path)
-
 
 
 

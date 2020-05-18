@@ -28,9 +28,6 @@ func init_battle(grid, teams_infos):
 	current_character = teams[my_team_name].get_member(0)
 	clear_arena()
 
-func _on_button_pressed():
-	print("Button EndTurn pressed!")
-
 
 
 
@@ -148,7 +145,7 @@ func _on_character_selected(character):
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path_serialized) > 0 :
-				ask_move(current_character, path_serialized)
+			ask_move(current_character, path_serialized)
 	elif state == 'cast_spell':
 		if cell in fov:
 			ask_cast_spell(current_character, cell)
@@ -185,7 +182,9 @@ func ask_cast_spell(character, cell):
 # warning-ignore:unused_argument
 func ask_move(character, path):
 	pass
-	
+
+func ask_end_turn(): 
+	pass
 
 
 ## CLEAR ##

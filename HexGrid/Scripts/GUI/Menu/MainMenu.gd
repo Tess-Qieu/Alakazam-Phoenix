@@ -20,7 +20,6 @@ func _ready():
 
 func _name_selection(new_text):
 	Global.pseudo = new_text
-	print(Global.pseudo)
 	
 func _goto_local_game():
 	# warning-ignore:return_value_discarded
