@@ -1,12 +1,12 @@
 extends Control
 
+var menu = preload('res://Scenes/Menu/MainMenu.tscn')
+
 
 func _ready():
-	Global.init_game()
-	$BattleNetwork/BattleScreen.visible = false
-	$WaitingScreen.visible = true
+	get_tree().change_scene_to(menu)
+#	Network.connect_to_server()
 	
-	$Network.connect_to_server()
 	
 
 

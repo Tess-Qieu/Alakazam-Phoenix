@@ -3,8 +3,7 @@ extends Control
 var Team_Container = preload("res://Scenes/GUI/TeamContainer.tscn")
 
 func _ready():
-	if is_main_scene():
-		$Battle.init_game_local()
+	pass
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed():
@@ -25,14 +24,8 @@ func get_battle():
 		if 'Battle' in node.name:
 			return node
 
-func is_f6(node:Node):
-	return node.filename != ProjectSettings.get_setting('application/run/main_scene')
-
-func is_main_scene():
-	return get_parent() == get_tree().root 
 
 func add_character_info(character:Character, team:Team):
-	
 	# Looking through each team container existing. If one has the same name
 	#  as the character's team name, the character is added, then an early return
 	#  is used.

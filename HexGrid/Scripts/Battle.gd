@@ -1,16 +1,17 @@
 extends Spatial
 
+var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
+var rng = RandomNumberGenerator.new()
+
+
 signal ask_move
 signal ask_cast_spell
 
-var is_game_local = false
 
-
-var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
-var teams = {}
 
 var current_character : Character
 var character_moving = null
+var teams = {}
 var my_team_name # name of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
@@ -19,12 +20,11 @@ var fov = []
 var path_instanced = []
 var path_serialized = []
 
-var rng = RandomNumberGenerator.new()
 
 
 
 ## INITIALISATION ##
-func init(grid, teams_infos, node_battlenetwork):
+func init_battle(grid, teams_infos):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
 	for name in teams_infos.keys():
@@ -32,85 +32,16 @@ func init(grid, teams_infos, node_battlenetwork):
 	
 	current_character = teams[my_team_name].get_member(0)
 	clear_arena()
-	
-	if not is_game_local:
-		# warning-ignore:return_value_discarded
-		connect('ask_move', node_battlenetwork, '_on_ask_move')
-		# warning-ignore:return_value_discarded
-		connect('ask_cast_spell', node_battlenetwork, '_on_ask_cast_spell')
-	
-func init_game_local():
-	# Generate teams and map, then instanciate them
-	# Called only when battlescreen is run with f6
-	is_game_local = true
-	var teams_infos = {'Local redz': 
-						{	'user id': -1,
-							'color': 'red',
-							'characters': 
-								[ {	'health':100, 
-									'id character':1, 
-									'q':0, 
-									'r':0, 
-									'range displacement':5, 
-									'team_color':'red'
-									},
-								{	'health':100, 
-									'id character':4, 
-									'q':1, 
-									'r':3, 
-									'range displacement':5, 
-									'team_color':'red'
-									},
-								{	'health':100, 
-									'id character':5, 
-									'q':3, 
-									'r':5, 
-									'range displacement':5, 
-									'team_color':'red'
-									}
-								]
-						},
-					'Visiter blues': 
-						{	'user id': -1,
-							'color': 'blue',
-							'characters': 
-								[ {	'health':100, 
-									'id character':0,
-									'q':1, 
-									'r':-5, 
-									'range displacement':5, 
-									'team_color':'blue'
-									},
-								{	'health':100, 
-									'id character':2,
-									'q':6, 
-									'r':-5, 
-									'range displacement':5, 
-									'team_color':'blue'
-									},
-								{	'health':100, 
-									'id character':3,
-									'q':6, 
-									'r':-4, 
-									'range displacement':5, 
-									'team_color':'blue'
-									}
-								]
-						}
-					}
-	$Map.generate_grid()
-	init($Map.grid, teams_infos, null)
-	get_parent().get_node("EndTurn_Widget/Button").connect("pressed",self,"_on_button_pressed")
 
 func _on_button_pressed():
-	print("Button pressed!")
+	print("Button EndTurn pressed!")
 
 
 
 
 ## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
-	if data['user id'] == Global.user_id:
+	if data['user id'] == Network.user_id:
 		# stock the name of his team
 		my_team_name = team_name
 	
@@ -129,7 +60,7 @@ func _create_team(team_name, data):
 										c['range displacement'])
 		teams[team_name].add_member(character)
 		# Addition of a character info on the BattleScreen
-		get_parent().add_character_info(character, new_team)
+#		get_parent().add_character_info(character, new_team)
 	
 	add_child(new_team)
 
@@ -188,19 +119,7 @@ func make_character_cast_spell(character, cell, damages_infos):
 
 
 
-## CLEAR ##
-func _color_current_character_cell():
-#	if (current_character in teams['blue']):
-#		current_character.current_cell.change_material('blue')
-#	elif (current_character in teams['red']):
-#		current_character.current_cell.change_material('red')
-#	else:
-	current_character.current_cell.change_material(current_character.team_color)
 
-func clear_arena():
-	state = 'normal'
-	$Map.clear()
-	_color_current_character_cell()
 
 
 
@@ -225,18 +144,6 @@ func _on_character_movement_finished(character, ending_cell):
 
 
 ## OBJECT CLICKED EVENTS ##
-
-func _character_selected_local(character):
-	var damage_amout = 15
-	var is_dead = character.current_health - damage_amout <= 0
-	var damages_infos = [{'id character':character.id_character,
-					'damage': damage_amout,
-					'event': []}]
-	if is_dead:
-		damages_infos[0]['event'] += ['character dead']
-	make_character_cast_spell(current_character, character.current_cell, damages_infos)
-	
-
 func _on_character_selected(character):
 	if not state == 'cast_spell':
 		current_character.unselect()
@@ -247,30 +154,17 @@ func _on_character_selected(character):
 			clear_arena()
 			
 	else:
-		if not is_game_local:
-			emit_signal('ask_cast_spell', current_character, character.current_cell) # for now there is only one spell
-		
-		else:
-			# Game is local, we have to create a response like the server would do
-			_character_selected_local(character)
-
+		ask_cast_spell(current_character, character.current_cell)
 
 
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path_serialized) > 0 :
-			if not is_game_local:
-				emit_signal('ask_move', current_character, path_serialized)
-			else:
-				make_character_move_following_path_valid(current_character, path_serialized)
+				ask_move(current_character, path_serialized)
 	elif state == 'cast_spell':
 		if cell in fov:
-			if not is_game_local:
-				emit_signal('ask_cast_spell', current_character, cell) # for now there is only one spell
-			else:
-				var damages_infos = [] # hit a empty cell
-				make_character_cast_spell(current_character, cell, damages_infos)
+			ask_cast_spell(current_character, cell)
 
 
 
@@ -292,6 +186,25 @@ func _on_character_hovered(character):
 										character.current_range_displacement)
 
 
+
+
+## INHERITABLED FUNCTIONS ##
+func ask_cast_spell(character, cell):
+	pass
+
+func ask_move(character, path):
+	pass
+	
+
+
+## CLEAR ##
+func _color_current_character_cell():
+	current_character.current_cell.change_material(current_character.team_color)
+
+func clear_arena():
+	state = 'normal'
+	$Map.clear()
+	_color_current_character_cell()
 
 
 ## USEFULL FUNCTIONS ##
