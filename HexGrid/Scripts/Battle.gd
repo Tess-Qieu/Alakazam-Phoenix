@@ -156,6 +156,8 @@ func _on_cell_clicked(cell):
 			ask_cast_spell(current_character, cell)
 		elif current_spell == 'zone':
 			pass # TODO: Put here spell throw
+		else:
+			fov = []
 		state = 'normal'
 		clear_arena()
 
@@ -199,7 +201,7 @@ func _color_current_character_cell():
 	current_character.current_cell.change_material(current_character.team_color)
 
 func clear_arena():
-	state = 'normal'
+#	state = 'normal'
 	$Map.clear()
 	_color_current_character_cell()
 
