@@ -2,29 +2,29 @@ extends Control
 
 var Team_Container = preload("res://Scenes/GUI/TeamContainer.tscn")
 
+var node_battle : Node
+
+
+
 func _ready():
-	pass
+	node_battle = get_parent()
+
+
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed():
-	var battle = get_battle()
-	var map = battle.get_node('Map')
-	battle.clear_arena()
-	battle.fov = map.display_field_of_view(battle.current_character.current_cell, 20)
-	battle.state = 'cast_spell'
+	var map = node_battle.get_node('Map')
+	node_battle.clear_arena()
+	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
+	node_battle.state = 'cast_spell'
 	
 func _on_ButtonClear_pressed():
-	get_battle().clear_arena()
+	node_battle.clear_arena()
+
+
 
 
 ## USEFULL FUNCTIONS ##
-func get_battle():
-	# Only solution to find the node Battle which change name	
-	for node in get_children():
-		if 'Battle' in node.name:
-			return node
-
-
 func add_character_info(character:Character, team:Team):
 	# Looking through each team container existing. If one has the same name
 	#  as the character's team name, the character is added, then an early return

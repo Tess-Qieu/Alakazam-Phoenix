@@ -19,7 +19,7 @@ func _ready():
 	_client.connect("connection_error", self, "_on_connection_closed")
 	_client.connect("connection_established", self, "_on_connection_opened")
 	_client.connect("data_received", self, "_on_message")
-	server_receiver_node = get_tree().get_root().get_node('Game')
+#	server_receiver_node = get_tree().get_root().get_node('Game')
 
 
 

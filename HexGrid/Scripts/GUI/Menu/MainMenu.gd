@@ -2,6 +2,7 @@ extends Control
 
 var offlineGame = preload("res://Scenes/BattleOffline.tscn")
 var onlineGame = null#preload("res://Scenes/BattleOnline.tscn")
+var waitingScreen = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

@@ -10,7 +10,21 @@ func _ready():
 
 
 func ask_cast_spell(character, cell):
-	_character_selected_local(character)
+	var target = cell.character_on
+	var damages_infos = []
+	
+	if target != null:
+		var damage_amout = 15
+		var is_dead = target.current_health - damage_amout <= 0
+		damages_infos = [{'id character': target.id_character,
+						'damage': damage_amout,
+						'event': []}]
+		if is_dead:
+			damages_infos[0]['event'] += ['character dead']
+			
+	make_character_cast_spell(character, cell, damages_infos)
+
+
 
 func ask_move(character, path):
 	make_character_move_following_path_valid(character, path)
@@ -21,16 +35,6 @@ func ask_move(character, path):
 
 
 
-
-func _character_selected_local(character):
-	var damage_amout = 15
-	var is_dead = character.current_health - damage_amout <= 0
-	var damages_infos = [{'id character':character.id_character,
-					'damage': damage_amout,
-					'event': []}]
-	if is_dead:
-		damages_infos[0]['event'] += ['character dead']
-	make_character_cast_spell(current_character, character.current_cell, damages_infos)
 
 func get_teams_infos():
 	return {'Local redz': 

@@ -4,15 +4,10 @@ var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
 var rng = RandomNumberGenerator.new()
 
 
-signal ask_move
-signal ask_cast_spell
-
-
-
 var current_character : Character
-var character_moving = null
+var character_moving : Character
 var teams = {}
-var my_team_name # name of the team the client is controlling
+var my_team_name : String # name of the team the client is controlling
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
 
@@ -60,7 +55,7 @@ func _create_team(team_name, data):
 										c['range displacement'])
 		teams[team_name].add_member(character)
 		# Addition of a character info on the BattleScreen
-#		get_parent().add_character_info(character, new_team)
+		$BattleControl.add_character_info(character, new_team)
 	
 	add_child(new_team)
 
@@ -114,15 +109,6 @@ func make_character_cast_spell(character, cell, damages_infos):
 	fov = []
 	clear_arena()
 	state = 'normal'
-
-
-
-
-
-
-
-
-
 
 
 

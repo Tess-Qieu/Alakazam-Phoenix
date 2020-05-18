@@ -15,10 +15,14 @@ var does_target_die
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
 	
+	
+	
 func apply_on_target():
 	var target = cell_targeted.character_on
 	if target != null:
 		target.receive_damage(damage_amout, does_target_die)
+
+
 
 func cast(thrower, target, damages_infos):
 	# Translate the ball in front of the character
@@ -35,10 +39,26 @@ func cast(thrower, target, damages_infos):
 	distance_traveled += 1.5*euclidean_dist(vect)
 	
 	cell_targeted = target
-	damage_amout = damages_infos[0]['damage'] # /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
-	does_target_die = 'character dead' in damages_infos[0]['events'] # GET IF THE TARGET DIED
+	damage_amout = get_damage_amout(damages_infos)# /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
+	does_target_die = is_information_target_die(damages_infos) # ONLY ONE TARGET FOR NOW
 	# SOLUTION TO APPLY DAMAGE AND EFFECT ON CHARACTERS (FOR NOW ON, ONLY ONE TARGET)
 	is_casting = true
+
+
+func get_damage_amout(damages_infos):
+	if len(damages_infos) == 0 :
+		return 0
+	return damages_infos[0]['damage']
+
+func is_information_target_die(damages_infos):
+	if len(damages_infos) == 0:
+		return false
+	if 'events' in damages_infos[0].keys():
+		if 'character dead' in damages_infos[0]['events'] :
+			return true
+	return false
+	
+	
 	
 func _physics_process(delta):
 	if is_casting:
