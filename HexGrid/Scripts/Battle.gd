@@ -4,8 +4,8 @@ var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
 var rng = RandomNumberGenerator.new()
 
 
-var current_character : Character
-var character_moving : Character
+var current_character 
+var character_moving
 var teams = {}
 var my_team_name : String # name of the team the client is controlling
 
@@ -82,6 +82,7 @@ func _update_character_cell_references(character, new_cell):
 	new_cell.character_on = character
 
 func _on_character_die(character):
+	print('character die')
 	character.die(self)
 
 

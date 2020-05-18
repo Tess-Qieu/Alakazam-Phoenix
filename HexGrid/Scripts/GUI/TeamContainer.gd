@@ -16,7 +16,7 @@ func get_team_name():
 	return $Body/Header/Name.text
 
 ## TEAM MANAGEMENT SECTION ##
-func config_team(team : Team):
+func config_team(team: Team):
 	my_team = team
 	$Body/Header/Name.text = team.name
 
