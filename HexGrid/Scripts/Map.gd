@@ -1,10 +1,10 @@
 extends Spatial
 
-var CellSize1 = preload("res://Scenes/CellSize1.tscn")
-var CellSize2 = preload("res://Scenes/CellSize2.tscn")
-var CellSize3 = preload("res://Scenes/CellSize3.tscn")
-var CellSize4 = preload("res://Scenes/CellSize4.tscn")
-var CellSize5 = preload("res://Scenes/CellSize5.tscn")
+var CellSize1 = preload("res://Scenes/Cells/CellSize1.tscn")
+var CellSize2 = preload("res://Scenes/Cells/CellSize2.tscn")
+var CellSize3 = preload("res://Scenes/Cells/CellSize3.tscn")
+var CellSize4 = preload("res://Scenes/Cells/CellSize4.tscn")
+var CellSize5 = preload("res://Scenes/Cells/CellSize5.tscn")
 
 var rng = RandomNumberGenerator.new()
 var grid = {}
