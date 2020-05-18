@@ -5,7 +5,7 @@ signal character_selected
 signal character_movement_finished
 
 ## RESSOURCE IMPORT ##
-var Spell = preload("res://Scenes/Spells/Spell.tscn")
+var Spell = preload("res://Scenes/Spells/RaySpell.tscn")
 
 # Movement variables
 export var speed = 150

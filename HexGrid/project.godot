@@ -9,10 +9,20 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Spell",
+"class": "BombSpell",
+"language": "GDScript",
+"path": "res://Scripts/Spells/BombSpell.gd"
+}, {
 "base": "KinematicBody",
 "class": "Character",
 "language": "GDScript",
 "path": "res://Scripts/Characters/Character.gd"
+}, {
+"base": "Spell",
+"class": "RaySpell",
+"language": "GDScript",
+"path": "res://Scripts/Spells/RaySpell.gd"
 }, {
 "base": "Character",
 "class": "RobotCharacter",
@@ -30,7 +40,9 @@ _global_script_classes=[ {
 "path": "res://Scripts/Team.gd"
 } ]
 _global_script_class_icons={
+"BombSpell": "",
 "Character": "",
+"RaySpell": "",
 "RobotCharacter": "",
 "Spell": "",
 "Team": ""

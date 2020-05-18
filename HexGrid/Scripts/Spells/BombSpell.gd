@@ -1,4 +1,5 @@
 extends Spell
+class_name BombSpell
 
 
 # Declare member variables here. Examples:
