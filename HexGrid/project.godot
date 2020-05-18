@@ -19,6 +19,11 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Scripts/Characters/Character.gd"
 }, {
+"base": "Spell",
+"class": "RaySpell",
+"language": "GDScript",
+"path": "res://Scripts/Spells/RaySpell.gd"
+}, {
 "base": "KinematicBody",
 "class": "Spell",
 "language": "GDScript",
@@ -32,6 +37,7 @@ _global_script_classes=[ {
 _global_script_class_icons={
 "BombSpell": "",
 "Character": "",
+"RaySpell": "",
 "Spell": "",
 "Team": ""
 }

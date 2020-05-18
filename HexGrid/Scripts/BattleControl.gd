@@ -18,9 +18,16 @@ func _on_ButtonSpell_pressed():
 	node_battle.clear_arena()
 	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
 	node_battle.state = 'cast_spell'
+	node_battle.current_spell = 'ray'
 	
 func _on_ButtonClear_pressed():
+	node_battle.state = 'normal'
+	node_battle.current_spell = 'none'
 	node_battle.clear_arena()
+
+func _on_ButtonZone_pressed():
+	node_battle.state = 'cast_spell'
+	node_battle.current_spell = 'zone'
 
 func _on_ButtonEndTurn_pressed():
 	node_battle.clear_arena()
@@ -45,4 +52,5 @@ func add_character_info(character:Character, team:Team):
 	
 	new_team.config_team(team)
 	new_team.add_teammate(character)
+
 

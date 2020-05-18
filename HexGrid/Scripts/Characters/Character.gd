@@ -3,7 +3,7 @@ class_name Character
 
 ## Ressource import ##
 var miniature = preload("res://icon.png")
-var Spell = preload("res://Scenes/Spells/Spell.tscn")
+var Spell = preload("res://Scenes/Spells/RaySpell.tscn")
 
 ## Signals definition ##
 signal character_hurt

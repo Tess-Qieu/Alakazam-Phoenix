@@ -48,6 +48,9 @@ self_modulate = Color( 1, 1, 1, 0.666667 )
 anchor_left = 0.85
 anchor_right = 1.0
 anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ButtonSpell" type="Button" parent="PanelRight"]
 margin_left = 7.0
@@ -69,6 +72,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="ButtonZone" type="Button" parent="PanelRight"]
+margin_left = 7.0
+margin_top = 261.0
+margin_right = 146.0
+margin_bottom = 381.0
+text = "Zone"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="EndTurn_Widget" type="VBoxContainer" parent="."]
 anchor_left = 0.5
