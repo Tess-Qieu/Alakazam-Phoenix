@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/CellSize1.tscn" type="PackedScene" id=1]
-[ext_resource path="res://Scripts/GUI/Menu/Main menu.gd" type="Script" id=2]
+[ext_resource path="res://Scripts/GUI/Menu/MainMenu.gd" type="Script" id=2]
 
 [sub_resource type="Animation" id=1]
 resource_name = "round"
@@ -51,7 +51,7 @@ corner_radius_top_right = 1
 corner_radius_bottom_right = 1
 corner_radius_bottom_left = 1
 
-[node name="Main menu" type="Control"]
+[node name="MainMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 2 )

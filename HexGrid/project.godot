@@ -51,12 +51,13 @@ _global_script_class_icons={
 [application]
 
 config/name="HexGrid"
-run/main_scene="res://Scenes/Menu/Main menu.tscn"
+run/main_scene="res://Scenes/Menu/MainMenu.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
 Global="*res://Scripts/Global.gd"
+Network="*res://Scripts/Network.gd"
 
 [input]
 

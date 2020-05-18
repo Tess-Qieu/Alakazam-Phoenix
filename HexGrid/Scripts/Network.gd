@@ -7,11 +7,23 @@ export var websocket_url = "ws://127.0.0.1:4225"
 var _client = WebSocketClient.new()
 var is_connected = null
 
+# Our global variables
+var server_receiver_node = null # Node where information from server is throwed to
+var pseudo = ''
+var user_id = -1
+
+
+
 func _ready():
 	_client.connect("connection_closed", self, "_on_connection_closed")
 	_client.connect("connection_error", self, "_on_connection_closed")
 	_client.connect("connection_established", self, "_on_connection_opened")
 	_client.connect("data_received", self, "_on_message")
+#	server_receiver_node = get_tree().get_root().get_node('Game')
+
+
+
+
 
 ## NETWORK USAGE ##
 func send_data(data):
@@ -29,6 +41,12 @@ func connect_to_server():
 		set_process(false)
 	else:
 		print('Connection made with the server.')
+
+func change_server_receiver_node(new_receiver='') :
+	var nr = get_tree().get_root().get_node("Game/" + new_receiver)
+	server_receiver_node = nr
+	
+	
 	
 	
 	
