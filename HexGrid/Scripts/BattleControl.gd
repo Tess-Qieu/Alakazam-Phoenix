@@ -14,9 +14,9 @@ func _ready():
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed():
-	var map = node_battle.get_node('Map')
+#	var map = node_battle.get_node('Map')
 	node_battle.clear_arena()
-	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
+#	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
 	node_battle.state = 'cast_spell'
 	node_battle.current_spell = 'ray'
 	
@@ -26,6 +26,7 @@ func _on_ButtonClear_pressed():
 	node_battle.clear_arena()
 
 func _on_ButtonZone_pressed():
+	node_battle.clear_arena()
 	node_battle.state = 'cast_spell'
 	node_battle.current_spell = 'zone'
 

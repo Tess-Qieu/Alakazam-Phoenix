@@ -12,11 +12,13 @@ var cell_targeted = null
 var damage_amout
 var does_target_die
 
+var cast_range = 8
+
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
-	
-	
-	
+
+
+
 func apply_on_target():
 	var target = cell_targeted.character_on
 	if target != null:
@@ -73,3 +75,9 @@ func _physics_process(delta):
 			visible = false
 			queue_free()
 			apply_on_target()
+
+
+func display_touched_cells(map, origin_cell, target_cell, color_key):
+	if map.is_in_fov(origin_cell, cast_range, target_cell):
+		target_cell.change_material(color_key)
+	return target_cell

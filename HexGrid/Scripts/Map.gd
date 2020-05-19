@@ -97,7 +97,7 @@ func instance_map(new_grid):
 
 
 
-## HANDLE FIELD OF VIEW ##
+## HANDLE LINE SECTION
 func _line_step(start : int, end : int, step : float) -> float:
 	# Function used to calulate a step on a line	
 	return start + (end-start)*step
@@ -141,6 +141,16 @@ func _compute_line(start, end):
 	line.append(end)
 	return line
 
+func display_line(cell_start, cell_end, color_key):
+	var line = _compute_line(cell_start, cell_end)
+	for cell in line:
+		cell.change_material(color_key)
+	return line
+
+
+
+
+## HANDLE FIELD OF VIEW ##
 func _compute_field_of_view(cell, distance_max):
 	var cells_visible = []
 	for target in cells_floor:
@@ -163,6 +173,10 @@ func display_field_of_view(cell, distance_max):
 	for c in cells_visible:
 		c.change_material('green')
 	return cells_visible
+
+func is_in_fov(observer_cell, distance_max, target_cell):
+	var fov = _compute_field_of_view(observer_cell, distance_max)
+	return target_cell in fov
 
 
 
@@ -355,6 +369,9 @@ func is_rotation_camera_ask(mouse_position):
 ## USEFULL FUNCTIONS
 func distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
+
+func distance_cells(cell1, cell2):
+	return distance_coord(cell1.q, cell1.r, cell2.q, cell2.r)
 
 func clear():
 	for c in cells_floor:
