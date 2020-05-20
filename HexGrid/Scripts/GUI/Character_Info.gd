@@ -33,7 +33,7 @@ func connect_character(character : Character, team_color):
 	#	Sets the icon background as the team color
 	
 	# Character specific configuration
-	$VBoxContainer/Title/Name.text = character.my_name
+	$VBoxContainer/Title/Name.text = character.name
 	$VBoxContainer/HBoxContainer2/Icon/Character.texture = character.miniature
 	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life/Max.text = \
 		"/{0}".format([character.start_health])

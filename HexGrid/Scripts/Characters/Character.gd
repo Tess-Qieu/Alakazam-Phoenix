@@ -3,7 +3,6 @@ class_name Character
 
 ## Ressource import ##
 var miniature = preload("res://icon.png")
-var Spell = preload("res://Scenes/Spells/RaySpell.tscn")
 
 ## Signals definition ##
 signal character_hurt
@@ -15,9 +14,7 @@ signal character_movement_finished
 const MVT_MARGIN = 0.02 
 var speed = 0
 
-
 ## ID informations ##
-var my_name = "No_0ne"
 var id_character
 var team_color
 
@@ -31,6 +28,10 @@ var current_range_displacement
 var current_cell
 var moving = false
 var destination_cell
+
+## Spells List ##
+var Spells = {'CannonBall' : "res://Scenes/Spells/RaySpell.tscn",
+				'Missile'  : "res://Scenes/Spells/BombSpell.tscn"}
 
 
 ## GENERAL SECTION ##
@@ -51,7 +52,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	current_health = health
 	start_range_displacement = range_displacement
 	current_range_displacement = range_displacement
-	my_name = c_team + "_Joe_{0}".format([rng.randi_range(0,255)])
+	name = c_team + "_Joe_{0}".format([rng.randi_range(0,255)])
 	
 	# warning-ignore:return_value_discarded
 	connect('character_selected', battle_scene, '_on_character_selected', [self])
@@ -65,8 +66,10 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	# warning-ignore:return_value_discarded
 	connect("input_event", self, "_on_Character_input_event")
 	
-	# Miniature update
-	miniature = load("res://Prefabs/Character/Robot_miniature.png")
+	# Loading of each character's spell, in order to prevent loading delay 
+	#  during a game
+	for k in Spells.keys():
+		Spells[k] = load(Spells[k])
 
 func _physics_process(delta):
 	if moving:
@@ -88,7 +91,7 @@ func cast_spell(target, damages_infos):
 	to_look.y = translation.y
 	look_at(to_look, Vector3(0, 1, 0))
 	
-	var spell = Spell.instance()
+	var spell = Spells['CannonBall'].instance()
 	spell.cast(current_cell, target, damages_infos)
 	get_parent().add_child(spell)
 
@@ -158,8 +161,7 @@ func _process_movement_one_cell(delta):
 		
 	else: # If the character has reached the cell (within a margin)
 		# The character is teleported to the exact cell location
-		#  in order to avoid an error accumulation and movement is stopped
-#		moving = false
+		#  in order to avoid an error accumulation
 		teleport_to(destination_cell)
 
 func stop_movement():

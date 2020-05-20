@@ -139,6 +139,9 @@ func _on_character_selected(character):
 			# The client can select only chracter in his own team
 			current_character = character
 			clear_arena()
+		else:
+			#/!\ NOT WORKING, ANIMATION STILL PLAYS ON CHARACTER
+			character.unselect()
 			
 	else:
 		ask_cast_spell(current_character, character.current_cell)
