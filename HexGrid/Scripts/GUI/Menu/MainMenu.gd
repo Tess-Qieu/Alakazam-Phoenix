@@ -1,8 +1,6 @@
 extends Control
 
-var offlineGame = preload("res://Scenes/BattleOffline.tscn")
-var onlineGame = preload("res://Scenes/BattleOnline.tscn")
-var waitingScreen = null
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -23,8 +21,8 @@ func _name_selection(new_text):
 	
 func _goto_local_game():
 	# warning-ignore:return_value_discarded
-	get_tree().change_scene_to(offlineGame)
+	get_tree().change_scene_to(Global.BattleOffline)
 
 func _goto_online_game():
 	# warning-ignore:return_value_discarded
-	get_tree().change_scene_to(onlineGame)
+	get_tree().change_scene_to(Global.WaitingLobby)
