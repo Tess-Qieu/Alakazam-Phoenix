@@ -36,8 +36,6 @@ class Lobby():
             data = {'action': 'player left', 'details': {'user': user.pseudo}}
             await self.notify_all(data)
 
-            self.end_of_lobby()
-
             return False
 
 
@@ -52,9 +50,7 @@ class Lobby():
 
     def end_of_lobby(self):
         # Called when the lobby end
-        self.manager_lobby.destroy_lobby(self)
-
-
+        pass
 
     async def notify_one_player(self, player, data):
         await self.server.send_data(player.websocket, data)

@@ -44,11 +44,11 @@ class Game(Lobby):
 
         self.timer = None
         self.player_on_turn = None
+        self.memory_on_turn = {}
         self.turns = self.players.copy()
         random.shuffle(self.turns)
 
     def begin(self):
-        self.next_player()
         self.timer = Timer(1, self.new_turn) # could be the time while players can place character
 
     def init_teams(self):
@@ -143,6 +143,7 @@ class Game(Lobby):
     async def new_turn(self):
         # Notify the clients when new turn
         self.next_player()
+        self.reset_memory_on_turn()
         data = {'action': 'game',
                 'directive': 'new turn',
                 'details' : {'user id': self.player_on_turn.user_id,
@@ -178,21 +179,21 @@ class Game(Lobby):
                 and character.alive
 
     def is_correct_ask_cast_spell(self, data):
-        # Verify if the ask spell is correct
+        # Verify if the ask spell is correct and that the character has not cast a spell yet this turn
         character = self.get_character_by_id(data['thrower']['id character'])
-        return self.is_correct_ask(character, data)
+        return self.is_correct_ask(character, data) and not self.memory_on_turn['cast spell'][character]
 
     def is_correct_ask_move(self, data):
+        # Verify the ask is correct and that the character has not move yet this turn
         character = self.get_character_by_id(data['id character'])
-        return self.is_correct_ask(character, data)
+        return self.is_correct_ask(character, data) and not self.memory_on_turn['move'][character]
 
 
 
 
     async def ask_move(self, data):
         # Called when the user ask to move a character
-        # Verify that the path is correct
-
+        # Verify that the path is correct and that the character has not move yet this turn
         if not self.is_correct_ask_move(data):
             # if ask isn't correct, then return 
             await self.notify_ask_not_valid(data)
@@ -217,6 +218,10 @@ class Game(Lobby):
             character.q = path[-1][0]
             character.r = path[-1][1]
 
+            # save that the character has made the move
+            # so it can not move again this turn
+            self.memory_on_turn['move'][character] = True
+
             data = {'action': 'game', 
                     'response': 'move',
                     'details': {'id character': id_character,
@@ -233,7 +238,7 @@ class Game(Lobby):
 
     async def ask_cast_spell(self, data):
         # Called when the user ask to move a character
-        # Verify that the path is correct
+        # Verify that the cats spell is correct and that the character has not cast a spell yet this turn
 
         if not self.is_correct_ask_cast_spell(data):
             # if ask isn't correct, then return 
@@ -254,6 +259,10 @@ class Game(Lobby):
         if is_valid:
             # cast the spell
             data_spell_applied = character_thrower.cast_spell(cell_target, self.teams) # return a list
+
+            # save that the character has cast the spell
+            # so it can not cast a spell again this turn
+            self.memory_on_turn['cast spell'][character_thrower] = True
 
             data = {'action': 'game',
                     'response': 'cast spell',
@@ -316,9 +325,26 @@ class Game(Lobby):
                 return user
         return None
 
+    def get_team_by_player(self, user):
+        for team in self.teams:
+            if team.user == self.player_on_turn:
+                return team
+
     def next_player(self):
         if self.player_on_turn is not None:
             self.turns += [self.player_on_turn]
         self.player_on_turn = self.turns.pop(0)
+
+    def reset_memory_on_turn(self):
+        # should be called after self.next_player()
+        current_team = self.get_team_by_player(self.player_on_turn)
+        self.memory_on_turn = {'cast spell': {c: False for c in current_team.characters},
+                                'move': {c: False for c in current_team.characters}
+                                }
+
+
+
+
+
 
 

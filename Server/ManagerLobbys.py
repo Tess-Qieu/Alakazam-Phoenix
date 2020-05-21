@@ -54,6 +54,8 @@ class ManagerLobbys():
 
         id_lobby = lobby.id_lobby
         self.lobbys_manager_id.free_id(id_lobby)
+
+        lobby.end_of_lobby()
         
         del(self.lobbys[id_lobby])
         del(lobby)
@@ -71,11 +73,10 @@ class ManagerLobbys():
 
         elif user.current_lobby is not None:
             # If user is in a Lobby
-            lobby = user.current_lobby
-            game_continue = await lobby._quit_lobby(user)
-
+            game_continue = await user.current_lobby._quit_lobby(user)
             if not game_continue:
-                self.destroy_lobby(lobby)
+                self.destroy_lobby(user.current_lobby)
+
 
 
 
