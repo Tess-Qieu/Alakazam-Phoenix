@@ -61,7 +61,7 @@ class Game(Lobby):
                 team.add_member(new_character)
             return team
 
-        cells = self.map.random_cells_floor(2)
+        cells = self.map.random_cells_floor(6)
         random.shuffle(self.players)
         self.teams += [_create_team(self, "Devil's Flame", 'red', self.players[0], cells[:len(cells)//2])]
         self.teams += [_create_team(self, "Ocean's Deep", 'blue', self.players[1], cells[len(cells)//2:])]
