@@ -1,0 +1,29 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/WaitingLobby.gd" type="Script" id=1]
+
+[node name="WaitingLobby" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -80.126
+margin_top = -12.9236
+margin_right = 76.874
+margin_bottom = 18.0764
+text = "Waiting for an opponent.
+Please wait..."
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}

@@ -34,7 +34,7 @@ func ask_move(character, path):
 
 
 
-
+# ------------------
 
 
 func get_teams_infos():

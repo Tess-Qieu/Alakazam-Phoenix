@@ -1,20 +1,17 @@
 extends 'res://Scripts/Battle.gd'
 
-
-var lobby_id
 var is_my_turn = false
 
 
 func _ready():
 	Network.set_server_receiver_node(self)
-	Network.connect_to_server()
-	
+	ask_ready() # TEMPORARY SOLUTION TO SAY READY, LATER THERE WILL BE A BUTTON
 
 ## COMMUCATION WITH SERVER
 func send_data(data):
 	# We add the game lobby id
 	# We can add the state of the game too
-	data['details']['lobby id'] = lobby_id
+	data['details']['lobby id'] = Global.lobby_id
 	data['details']['user id'] = Global.user_id
 	Network.send_data(data)
 	
@@ -23,29 +20,13 @@ func _on_message(data):
 		print("NetworkError: no key action in data")
 		return
 		
-	if data['action'] == 'connection':
-		# Validation connection from server
-		if 'user id' in data['details'].keys():
-			Global.user_id = data['details']['user id']
-			ask_to_play() # TEMPORARY SOLUTION TO LAUNCH A GAME, LATER THERE WILL BE A BUTTON
-		else:
-			print('NetworkError: no key accept in details for connection.')
+	
 	
 	elif data['action'] == 'player left':
 		player_left(data)
 	
 	elif data['action'] == 'observator left':
 		observator_left(data)
-	
-	elif data['action'] == 'ask to wait':
-		# The server is looking for a contestant
-		# Nothing to do until next message from server
-		pass
-	
-	elif data['action'] == 'new game':
-		# New game, we go into Battle mode now
-		new_game(data)
-		ask_ready() # TEMPORARY SOLUTION TO SAY READY, LATER THERE WILL BE A BUTTON
 		
 	
 	elif data['action'] == 'game':
@@ -70,8 +51,7 @@ func _on_message(data):
 				new_turn(data['details'])
 	
 	elif data['action'] == 'game over':
-		print('Game over.')
-		get_tree().quit()
+		game_over(data['details'])
 		
 		
 	else :
@@ -82,10 +62,6 @@ func _on_message(data):
 
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
-func ask_to_play():
-	var data = {'action' : 'ask to play', 'details' : {}} # put team infos here
-	Network.send_data(data)
-
 func ask_ready():
 	var data = {'action' : 'new game', 'details' : {'ready' : true}}
 	send_data(data)
@@ -137,13 +113,6 @@ func ask_cast_spell(thrower, target): # for now, useless to precise which spell 
 
 
 ## GAME ##
-func new_game(data):
-	# Init the new Battle	
-	lobby_id = data['details']['lobby id']
-	var grid_infos = data['details']['grid']
-	var teams_infos = data['details']['teams']
-	init_battle(grid_infos, teams_infos)
-
 func new_turn(data):
 	is_my_turn = data['user id'] == Global.user_id
 	print('My turn : {0}'.format([is_my_turn]))
@@ -164,23 +133,24 @@ func cast_spell_valid(data):
 
 
 
-## PLAYER/OBSERSATOR LEFT##
-func player_left(data): # NOT IMPLEMENTED YET
-	# Destroy the Battle, go back to menu, ask to play
+## PLAYER/OBSERSATOR LEFT AND RETURN TO WAITING LOBBY##
+func player_left(data):
 	print('Player {0} left the game'.format([data['details']['user']]))
-	get_tree().quit()
+	destroy_battle_and_return_to_waitingLobby()
 
-#	Global.change_screen('WaitingScreen')
-#	Global.change_server_receiver_node()
-
-	# remove old battle, create a new one
-#	get_battle().queue_free()
-#	var new_battle = Battle.instance()
-#	new_battle.set_name('Battle')
-#	$BattleScreen.add_child(new_battle)
-#
-#	ask_to_play
-	pass 
-
-func observator_left(data): # NOT IMPLEMENTED YET
+func observator_left(data):
 	print('Observator {0} left the game'.format([data['details']['user']]))
+
+func game_over(data):
+	var victory = data['victory']
+	if victory:
+		print('Game over. You won !')
+	else:
+		print('Game over. You loose !')
+	destroy_battle_and_return_to_waitingLobby()
+	
+func destroy_battle_and_return_to_waitingLobby():
+	# Destroy the Battle, go back to WaitingLobby	
+	# warning-ignore:return_value_discarded
+	get_tree().change_scene_to(Global.WaitingLobby)
+	self.queue_free()

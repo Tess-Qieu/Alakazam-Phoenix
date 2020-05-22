@@ -1,5 +1,9 @@
 extends Node
 
+var BattleOnline = preload('res://Scenes/BattleOnline.tscn')
+var BattleOffline = preload("res://Scenes/BattleOffline.tscn")
+var WaitingLobby = preload("res://Scenes/WaitingLobby.tscn")
+
 var materials = {'hole': 'ae8257', 
 				'floor': "e6cab8", 
 				'full': '352f2b',
@@ -16,6 +20,7 @@ var materials = {'hole': 'ae8257',
 var screen = null # Scene to show
 var pseudo = ''
 var user_id = -1
+var lobby_id = -1
 
 
 func _ready():

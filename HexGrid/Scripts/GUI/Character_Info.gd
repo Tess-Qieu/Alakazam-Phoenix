@@ -1,8 +1,6 @@
 extends PanelContainer
 
 
-onready var current_life_txt = $VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life/Value
-onready var current_life_bar = $VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life_Bar
 const MIN_VBOX_Y = 20
 const MIN_SELF_Y = 34
 
@@ -37,7 +35,7 @@ func connect_character(character : Character, team_color):
 	$VBoxContainer/HBoxContainer2/Icon/Character.texture = character.miniature
 	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life/Max.text = \
 		"/{0}".format([character.start_health])
-	current_life_bar.max_value = character.start_health
+	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life_Bar.max_value = character.start_health
 	update_life(character.current_health)
 	
 	# Team relative configuration
@@ -52,8 +50,8 @@ func connect_character(character : Character, team_color):
 func update_life(new_val):
 	## Update life value in both text info and lifebar info
 	
-	current_life_bar.value = new_val
-	current_life_txt.text = "{0}".format([new_val])
+	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life_Bar.value = new_val
+	$VBoxContainer/HBoxContainer2/Infos/Health_Bar/Life/Value.text = "{0}".format([new_val])
 
 func character_die():
 	## Update of the info when the character dies
