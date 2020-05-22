@@ -1,6 +1,7 @@
 extends 'res://Scripts/Battle.gd'
 
 var is_my_turn = false
+var memory_on_turn # memory of what action have been made by which character this turn
 
 
 func _ready():
@@ -81,8 +82,9 @@ func ask_end_turn():
 	send_data(data)
 
 func ask_move(character, path):
-	if not is_my_turn :
+	if not is_my_turn or memory_on_turn['move'][character]:
 		# Client should not send ask for a play if it's not his turn to play
+		# Or if the character has already move this turn
 		return
 
 	var data = {'action': 'game',
@@ -95,8 +97,9 @@ func ask_move(character, path):
 func ask_cast_spell(thrower, target): # for now, useless to precise which spell to use
 	# thrower is the character which cast the spell
 	# target is the cell where the spelle is cast
-	if not is_my_turn :
+	if not is_my_turn or memory_on_turn['cast spell'][thrower]:
 		# Client should not send ask for a play if it's not his turn to play
+		# Or if the thrower has already cast a spell this turn
 		return
 
 	var data = {'action': 'game',
@@ -114,16 +117,19 @@ func ask_cast_spell(thrower, target): # for now, useless to precise which spell 
 
 ## GAME ##
 func new_turn(data):
+	self._retrieve_game_infos(data)
 	is_my_turn = data['user id'] == Global.user_id
 	print('My turn : {0}'.format([is_my_turn]))
 	$BattleControl/EndTurn_Widget.reset(is_my_turn, data['turn time'])
 
 func move_valid(data):
+	self._retrieve_game_infos(data)
 	var character = get_character_by_id(data['id character'])
 	var path_valid = data['path']
 	make_character_move_following_path_valid(character, path_valid)
 
 func cast_spell_valid(data):
+	self._retrieve_game_infos(data)
 	var character_thrower = get_character_by_id(data['thrower']['id character'])
 	var cell_target = get_cell_by_coords(data['target'][0], data['target'][1])
 	var damages_infos = data['damages']
@@ -154,3 +160,20 @@ func destroy_battle_and_return_to_waitingLobby():
 	# warning-ignore:return_value_discarded
 	get_tree().change_scene_to(Global.WaitingLobby)
 	self.queue_free()
+	
+
+
+## USEFULL FUNCTIONS ##
+func _retrieve_memory_on_turn(data):
+	var old_memo = data['memory on turn']
+	var new_memo = {}
+	for action in old_memo:
+		new_memo[action] = {}
+		for character_id in old_memo[action].keys():
+			var character = get_character_by_id(character_id)
+			new_memo[action][character] = old_memo[action][character_id]
+	memory_on_turn = new_memo
+	
+func _retrieve_game_infos(data):
+	_retrieve_memory_on_turn(data)
+
