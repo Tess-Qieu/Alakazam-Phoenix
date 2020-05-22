@@ -13,6 +13,9 @@ var damage_amout
 var does_target_die
 
 var cast_range = 8
+var start_cooldown = 10
+var current_cooldown
+var miniature = preload("res://icon.png")
 
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
