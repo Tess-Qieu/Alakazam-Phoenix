@@ -58,32 +58,6 @@ margin_top = 7.0
 margin_right = 85.16
 margin_bottom = 593.0
 
-[node name="ButtonSpell" type="Button" parent="PanelRight/SpellListContainer"]
-margin_right = 78.0
-margin_bottom = 20.0
-text = "Spell"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ButtonClear" type="Button" parent="PanelRight/SpellListContainer"]
-margin_top = 24.0
-margin_right = 78.0
-margin_bottom = 44.0
-text = "Clear"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ButtonZone" type="Button" parent="PanelRight/SpellListContainer"]
-margin_top = 48.0
-margin_right = 78.0
-margin_bottom = 68.0
-text = "Zone"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="EndTurn_Widget" type="VBoxContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 1.0
@@ -115,7 +89,4 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonSpell" to="." method="_on_ButtonSpell_pressed"]
-[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonClear" to="." method="_on_ButtonClear_pressed"]
-[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonZone" to="." method="_on_ButtonZone_pressed"]
 [connection signal="pressed" from="EndTurn_Widget/ButtonEndTurn" to="." method="_on_ButtonEndTurn_pressed"]

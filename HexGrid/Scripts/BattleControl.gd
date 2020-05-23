@@ -14,22 +14,21 @@ func _ready():
 
 
 ## BUTTON EVENTS ##
-func _on_ButtonSpell_pressed():
-#	var map = node_battle.get_node('Map')
-	node_battle.clear_arena()
-#	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
-	node_battle.state = 'cast_spell'
-	node_battle.current_spell = 'ray'
+func _on_ButtonSpell_pressed(spell_button):
+#	node_battle.clear_arena()
+#	node_battle.state = 'cast_spell'
+#	node_battle.current_spell = spell_button.name
+	print("casting: {0}".format([spell_button.name]))
 	
-func _on_ButtonClear_pressed():
-	node_battle.state = 'normal'
-	node_battle.current_spell = 'none'
-	node_battle.clear_arena()
+#func _on_ButtonClear_pressed():
+#	node_battle.state = 'normal'
+#	node_battle.current_spell = 'none'
+#	node_battle.clear_arena()
 
-func _on_ButtonZone_pressed():
-	node_battle.clear_arena()
-	node_battle.state = 'cast_spell'
-	node_battle.current_spell = 'zone'
+#func _on_ButtonZone_pressed():
+#	node_battle.clear_arena()
+#	node_battle.state = 'cast_spell'
+#	node_battle.current_spell = 'zone'
 
 func _on_ButtonEndTurn_pressed():
 	node_battle.clear_arena()
@@ -59,7 +58,8 @@ func update_spell_list(character : Character):
 	for child in $PanelRight/SpellListContainer.get_children():
 		child.queue_free()
 		
-	for spell in character.Spells.values():
+	for spell_key in character.Spells.keys():
 		var spell_bt = SpellButton.instance()
 		$PanelRight/SpellListContainer.add_child(spell_bt)
-		spell_bt.initialize(spell.instance())
+		spell_bt.initialize(spell_key, character.Spells[spell_key].instance().miniature)
+		spell_bt.connect("pressed", self, "_on_ButtonSpell_pressed", [spell_bt])
