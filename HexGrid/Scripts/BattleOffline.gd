@@ -6,11 +6,13 @@ func _ready():
 	var teams_infos = get_teams_infos()
 	$Map.generate_grid()
 	init_battle($Map.grid, teams_infos)
+	next_turn()
 
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
-func ask_end_turn(): # /!\ NOT IMPLEMENTED YET IN OFFLINE
-	print('Ask end turn asked but no implementation !')
+func ask_end_turn(): 
+	print('Turn end, new turn.')
+	next_turn()
 
 
 func ask_cast_spell(character, cell):
@@ -32,6 +34,15 @@ func ask_move(character, path):
 	make_character_move_following_path_valid(character, path)
 
 
+# warning-ignore:unused_argument
+func choose_next_team(data=null):
+	var list_keys = teams.keys()
+	var next_index = -1
+	if current_team != null:
+		next_index = (list_keys.find(current_team.name) + 1) % len(list_keys)
+	else:
+		next_index = 0
+	current_team = teams[list_keys[next_index]]
 
 
 # ------------------

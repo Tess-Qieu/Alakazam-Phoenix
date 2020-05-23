@@ -15,7 +15,7 @@ func _ready():
 func _on_ButtonSpell_pressed():
 	var map = node_battle.get_node('Map')
 	node_battle.clear_arena()
-	node_battle.fov = map.display_field_of_view(node_battle.current_character.current_cell, 20)
+	node_battle.fov = map.display_field_of_view(node_battle.character_selected.current_cell, 20)
 	node_battle.state = 'cast_spell'
 	
 func _on_ButtonClear_pressed():
