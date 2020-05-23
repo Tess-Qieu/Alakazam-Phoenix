@@ -29,6 +29,7 @@ func init_battle(grid, teams_infos):
 		_create_team(name, teams_infos[name])
 	
 	current_character = teams[my_team_name].get_member(0)
+	current_character.select()
 	clear_arena()
 
 
@@ -133,15 +134,14 @@ func _on_character_movement_finished(character, ending_cell):
 ## OBJECT CLICKED EVENTS ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
-		current_character.unselect()
-		# select character
-		if teams[my_team_name].has_member(character):
-			# The client can select only chracter in his own team
-			current_character = character
-			clear_arena()
-		else:
-			#/!\ NOT WORKING, ANIMATION STILL PLAYS ON CHARACTER
-			character.unselect()
+		if current_character != character:
+			# select character
+			if teams[my_team_name].has_member(character):
+				current_character.unselect()
+				# The client can select only chracter in his own team
+				current_character = character
+				character.select()
+				clear_arena()
 			
 	else:
 		ask_cast_spell(current_character, character.current_cell)

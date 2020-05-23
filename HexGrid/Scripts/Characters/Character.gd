@@ -78,6 +78,9 @@ func _physics_process(delta):
 func unselect():
 	$AnimationPlayer.stop()
 
+func select():
+	$AnimationPlayer.play("Wait")
+
 func is_alive():
 	return current_health > 0
 
@@ -179,14 +182,9 @@ func _on_Character_input_event(_camera, event, _click_position, \
 								_click_normal, _shape_idx):
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
-		# A different material is applied on each button
+		
 		if event.button_index == BUTTON_LEFT :
 			emit_signal("character_selected")
-			$AnimationPlayer.play("Wait")
-			
-		elif event.button_index == BUTTON_RIGHT:
-			pass
-			
 
 ## INHERETED FUNCTIONS ##
 # warning-ignore:unused_argument
