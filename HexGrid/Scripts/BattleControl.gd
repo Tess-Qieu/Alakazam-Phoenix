@@ -15,10 +15,10 @@ func _ready():
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed(spell_button):
-#	node_battle.clear_arena()
-#	node_battle.state = 'cast_spell'
-#	node_battle.current_spell = spell_button.name
-	print("casting: {0}".format([spell_button.name]))
+	node_battle.clear_arena()
+	node_battle.state = 'cast_spell'
+	node_battle.current_spell = spell_button.name
+#	print("casting: {0}".format([spell_button.name]))
 	
 #func _on_ButtonClear_pressed():
 #	node_battle.state = 'normal'

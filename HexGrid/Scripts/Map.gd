@@ -134,7 +134,8 @@ func _compute_line(start, end):
 		
 		for q in list_q:
 			for r in list_r:
-				if grid[q][r] != null:
+				if grid[q][r] != null and grid[q][r].kind != 'hole' \
+					and grid[q][r].kind != 'full' :
 					line.append(grid[q][r])
 	
 	# Addition of ending cell
@@ -360,7 +361,8 @@ func rotate_camera(mouse_position):
 		$CameraScrollPath.rotate_y(-angle)
 		
 func is_rotation_camera_ask(mouse_position):
-	if Input.is_mouse_button_pressed(BUTTON_RIGHT) and mouse_position != last_mouse_position:
+	if Input.is_mouse_button_pressed(BUTTON_RIGHT) \
+		and mouse_position != last_mouse_position:
 		return true
 	return false
 	

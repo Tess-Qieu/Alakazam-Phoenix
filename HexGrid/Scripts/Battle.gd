@@ -181,9 +181,12 @@ func _on_cell_hovered(cell):
 								cell, 
 								current_character.current_range_displacement)
 	elif state == 'cast_spell':
-		if current_spell == 'zone':
-			clear_arena()
-			$Map.display_zone(cell, 1, 'green')
+		clear_arena()
+		current_character.Spells[current_spell].instance().display_touched_cells( \
+			$Map, current_character.current_cell, cell, 'skyblue')
+#		if current_spell == 'zone':
+#			clear_arena()
+#			$Map.display_zone(cell, 1, 'green')
 	
 func _on_character_hovered(character):
 	if state == 'normal':
