@@ -12,10 +12,12 @@ var cell_targeted = null
 var damage_amout
 var does_target_die
 
-var cast_range = 3
+var cast_range = [1,3]
 var start_cooldown = 10
 var current_cooldown
 var miniature = preload("res://icon.png")
+var fov_type = 'fov'
+var impact_type = 'cell'
 
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
@@ -81,6 +83,6 @@ func _physics_process(delta):
 
 
 func display_touched_cells(map, origin_cell, target_cell, color_key):
-	if map.is_in_fov(origin_cell, cast_range, target_cell):
+	if map.is_in_fov(origin_cell, cast_range[1], target_cell, cast_range[0]):
 		target_cell.change_material(color_key)
 	return target_cell

@@ -148,9 +148,9 @@ func display_line(cell_start, cell_end, color_key):
 		cell.change_material(color_key)
 	return line
 
-func _compute_straight_lines(cell_start, max_dist):
-	var cells = [cell_start]
-	for x in range(1, max_dist+1):
+func _compute_straight_lines(cell_start, max_dist, min_dist = 0):
+	var cells = []
+	for x in range(min_dist, max_dist+1):
 		# List of supposed coordinates
 		var coords = [	[cell_start.q+x, cell_start.r  ],
 						[cell_start.q+x, cell_start.r-x],
@@ -158,28 +158,30 @@ func _compute_straight_lines(cell_start, max_dist):
 						[cell_start.q-x, cell_start.r+x],
 						[cell_start.q  , cell_start.r+x],
 						[cell_start.q  , cell_start.r-x]]
+		
 		# Test if coordinates are in grid and cell kind
 		for coord in coords:
 			if grid.has(coord[0]):
 				if grid[coord[0]].has(coord[1]):
-					if grid[coord[0]][coord[1]].kind in OK_CELLS:
-						cells.append(grid[coord[0]][coord[1]])
+					var cell = grid[coord[0]][coord[1]]
+					if cell.kind in OK_CELLS and not cell in cells:
+						cells.append(cell)
 	
 	return cells
 
-func display_straight_lines(cell_start, max_dist, color_key):
-	var list = _compute_straight_lines(cell_start, max_dist)
+func display_straight_lines(cell_start, max_dist, color_key, min_dist = 0):
+	var list = _compute_straight_lines(cell_start, max_dist, min_dist)
 	for cell in list:
 		cell.change_material(color_key)
 	return list
 
 
 ## HANDLE FIELD OF VIEW ##
-func _compute_field_of_view(cell, distance_max):
+func _compute_field_of_view(cell, max_dist, min_dist = 0):
 	var cells_visible = []
 	for target in cells_floor:
-		
-		if distance_coord(cell.q, cell.r, target.q, target.r) <= distance_max:
+		var dist = distance_coord(cell.q, cell.r, target.q, target.r)
+		if dist <= max_dist and dist >= min_dist :
 			var line = _compute_line(cell, target)
 			line += _compute_line(target, cell)
 			
@@ -192,14 +194,14 @@ func _compute_field_of_view(cell, distance_max):
 				
 	return cells_visible
 
-func display_field_of_view(cell, distance_max, color_key):
-	var cells_visible = _compute_field_of_view(cell, distance_max)
+func display_field_of_view(cell, max_dist, color_key, min_dist = 0):
+	var cells_visible = _compute_field_of_view(cell, max_dist, min_dist)
 	for c in cells_visible:
 		c.change_material(color_key)
 	return cells_visible
 
-func is_in_fov(observer_cell, distance_max, target_cell):
-	var fov = _compute_field_of_view(observer_cell, distance_max)
+func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
+	var fov = _compute_field_of_view(observer_cell, max_dist, min_dist)
 	return target_cell in fov
 
 
@@ -268,7 +270,7 @@ func _serialize_path(path):
 func _compute_path(start, end, distance_max):
 	# Function calculating a path between two cells
 	if distance_coord(start.q, start.r, end.q, end.r) > distance_max:
-		# If the distance between start and end is taller than distance_max
+		# If the distance between start and end is greater than distance_max
 		# then no path < distance_max can be found
 		return []
 		
@@ -401,3 +403,27 @@ func distance_cells(cell1, cell2):
 func clear():
 	for c in cells_floor:
 		c.change_material('floor')
+
+func manage_fov(spell : Spell, origin_cell, color_key):
+	var fov
+	match spell.fov_type:
+		'straight_lines':
+			fov = display_straight_lines(origin_cell, spell.cast_range[1],
+										color_key, spell.cast_range[0])
+		'fov':
+			fov = display_field_of_view(origin_cell, spell.cast_range[1], 
+										color_key, spell.cast_range[0])
+		_:
+			fov = display_field_of_view(origin_cell, spell.cast_range[1], 
+										color_key, spell.cast_range[0])
+	return fov
+
+func manage_impact(spell : Spell, origin_cell, target_cell, color_key):
+	match spell.impact_type:
+		'cell':
+			target_cell.change_material(color_key)
+			
+		'zone':
+			display_zone(target_cell, spell.impact_range, color_key)
+		_:
+			target_cell.change_material(color_key)

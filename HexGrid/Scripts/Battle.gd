@@ -181,11 +181,9 @@ func _on_cell_hovered(cell):
 								current_character.current_range_displacement)
 	elif state == 'cast_spell':
 		clear_arena()
-		current_character.Spells[current_spell].display_touched_cells( \
-			$Map, current_character.current_cell, cell, 'royalblue')
-#		if current_spell == 'zone':
-#			clear_arena()
-#			$Map.display_zone(cell, 1, 'green')
+		if cell in fov:
+			$Map.manage_impact(current_character.Spells[current_spell], 
+							current_character.current_cell, cell, 'royalblue')
 	
 func _on_character_hovered(character):
 	if state == 'normal':
@@ -217,9 +215,8 @@ func _color_current_character_cell():
 
 func display_fov():
 	if current_character.Spells.has(current_spell):
-		fov = $Map.display_field_of_view(current_character.current_cell, \
-							current_character.Spells[current_spell].cast_range,\
-							"skyblue")
+		fov = $Map.manage_fov(current_character.Spells[current_spell], 
+							current_character.current_cell, "skyblue")
 
 func _color_fov_cells():
 	for cell in fov:

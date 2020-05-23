@@ -7,7 +7,8 @@ func _ready():
 
 func _init():
 	miniature = load("res://Prefabs/Character/Spells/Cannon.png")
-	cast_range = 10
+	cast_range = [0, 10]
+	fov_type = 'straight_lines'
 
 #func display_touched_cells(map, origin_cell, target_cell, color_key):
 #	var line
