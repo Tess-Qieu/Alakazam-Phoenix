@@ -25,7 +25,7 @@ func init_battle(grid, teams_infos):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
 	for name in teams_infos.keys():
-		_create_team(name, teams_infos[name])	
+		_create_team(name, teams_infos[name])
 
 func next_team(data=null):
 	choose_next_team(data)
@@ -159,14 +159,14 @@ func _on_cell_clicked(cell):
 
 
 func _on_cell_hovered(cell):
-	if state == 'normal':
+	if state == 'normal' and _has_not_already_done_action(character_selected, 'move'):
 		clear_arena()
 		path_serialized = $Map.display_path(character_selected.current_cell, 
 								cell, 
 								character_selected.current_range_displacement)
 	
 func _on_character_hovered(character):
-	if state == 'normal':
+	if state == 'normal' and _has_not_already_done_action(character, 'move'):
 		clear_arena()
 		$Map.display_displacement_range(character.current_cell, 
 										character.current_range_displacement)
@@ -194,7 +194,6 @@ func _ask_move(character, path):
 	if not _is_character_turn(character):
 		print('Impossible request: not character turn.')
 	elif not _has_not_already_done_action(character, 'move'):
-		print(memory_on_turn)
 		print('Impossible request: character has already moved this turn')
 	else:
 		ask_move(character, path)
@@ -261,8 +260,9 @@ func _update_memory_on_turn(action, character):
 func _reset_memory_on_turn():
 	for action in memory_on_turn.keys():
 		memory_on_turn[action] = {}
-		for character in current_team.get_all_members():
-			memory_on_turn[action][character] = false
+		for team in teams.values():
+			for character in team.get_all_members():
+				memory_on_turn[action][character] = false
 
 func _has_not_already_done_action(character, action):
 	return not memory_on_turn[action][character]

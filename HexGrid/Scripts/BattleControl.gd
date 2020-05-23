@@ -44,6 +44,17 @@ func add_character_info(character:Character, team:Team):
 	
 	new_team.config_team(team)
 	new_team.add_teammate(character)
+	
+# warning-ignore:unused_argument
+func _process(delta):
+	# disable or enable spell button
+	if node_battle.memory_on_turn != null :
+		# we have to wait until it receives informations from the server to be set
+		if node_battle.character_selected in node_battle.memory_on_turn['cast spell'].keys():
+			if node_battle.memory_on_turn['cast spell'][node_battle.character_selected] :
+				$PanelRight/ButtonSpell.disabled = true
+			else:
+				$PanelRight/ButtonSpell.disabled = false
 
 
 

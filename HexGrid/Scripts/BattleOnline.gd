@@ -4,6 +4,10 @@ func _ready():
 	Network.set_server_receiver_node(self)
 	ask_ready() # TEMPORARY SOLUTION TO SAY READY, LATER THERE WILL BE A BUTTON
 
+func init_battle(grid, teams_infos):
+	.init_battle(grid, teams_infos)
+	next_turn({'user id': Global.user_id})
+
 ## COMMUCATION WITH SERVER
 func send_data(data):
 	# We add the game lobby id
@@ -86,10 +90,12 @@ func ask_cast_spell(thrower, target): # for now, useless to precise which spell 
 	send_data(data)
 
 func choose_next_team(data=null):
+	print(teams)
 	for team in teams.values():
+		print('hello   ', team.user_id)
 		if team.user_id == data['user id']:
 			current_team = team
-
+		print(team.user_id)
 
 
 
