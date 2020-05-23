@@ -89,13 +89,10 @@ func ask_cast_spell(thrower, target): # for now, useless to precise which spell 
 				}
 	send_data(data)
 
-func choose_next_team(data=null):
-	print(teams)
+func choose_next_current_team(data=null):
 	for team in teams.values():
-		print('hello   ', team.user_id)
 		if team.user_id == data['user id']:
 			current_team = team
-		print(team.user_id)
 
 
 

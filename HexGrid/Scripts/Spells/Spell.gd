@@ -53,8 +53,8 @@ func get_damage_amout(damages_infos):
 func is_information_target_die(damages_infos):
 	if len(damages_infos) == 0:
 		return false
-	if 'event' in damages_infos[0].keys():
-		if 'character dead' in damages_infos[0]['event'] :
+	if 'events' in damages_infos[0].keys():
+		if 'character dead' in damages_infos[0]['events'] :
 			return true
 	return false
 	

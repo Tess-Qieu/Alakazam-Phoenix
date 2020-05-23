@@ -39,7 +39,6 @@ func ask_to_play():
 
 func new_game(data):
 	# Init the new Battle	
-	
 	var lobby_id = data['details']['lobby id']
 	var grid_infos = data['details']['grid']
 	var teams_infos = data['details']['teams']

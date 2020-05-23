@@ -27,20 +27,21 @@ func init_battle(grid, teams_infos):
 	for name in teams_infos.keys():
 		_create_team(name, teams_infos[name])
 
-func next_team(data=null):
-	choose_next_team(data)
+func choose_next_character_selected():
+	# if the current_team belongs to the client then we choose the first character from its team
+	# else we have to find its team to select a character from it
 	if current_team.user_id == Global.user_id:
 		_select_character(current_team.get_member(0))
-		
 	else:
-		# if the current_team does not belongs to the player
-		# then we have to find its team to select a character from it
 		for team in teams.values():
 			if team.user_id == Global.user_id:
 				_select_character(team.get_member(0))
 
 func next_turn(data=null):
-	next_team(data)
+	# Select the next current_team and character_selected on the next turn
+	# Then reset memory on turn
+	choose_next_current_team(data)
+	choose_next_character_selected()
 	_reset_memory_on_turn()
 	clear_arena()
 
@@ -216,7 +217,7 @@ func ask_end_turn():
 	pass
 
 # warning-ignore:unused_argument
-func choose_next_team(data=null):
+func choose_next_current_team(data=null):
 	pass
 
 

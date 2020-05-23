@@ -35,7 +35,7 @@ func ask_move(character, path):
 
 
 # warning-ignore:unused_argument
-func choose_next_team(data=null):
+func choose_next_current_team(data=null):
 	var list_keys = teams.keys()
 	var next_index = -1
 	if current_team != null:
