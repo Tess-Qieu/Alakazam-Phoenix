@@ -12,7 +12,7 @@ var cell_targeted = null
 var damage_amout
 var does_target_die
 
-var cast_range = 8
+var cast_range = 3
 var start_cooldown = 10
 var current_cooldown
 var miniature = preload("res://icon.png")

@@ -11,6 +11,7 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
+const OK_CELLS = ['floor', 'blocked']
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -40,7 +41,7 @@ func _random_kind():
 	
 func _generate_one_gridline(line_size, r):
 	var kind = ''
-	var half = line_size / 2 if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
+	var half = line_size / 2  if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
 	var q = -RAY -r if r <= 0 else -RAY
 	# first part : random
 	for i in range(half):
@@ -134,8 +135,7 @@ func _compute_line(start, end):
 		
 		for q in list_q:
 			for r in list_r:
-				if grid[q][r] != null and grid[q][r].kind != 'hole' \
-					and grid[q][r].kind != 'full' :
+				if grid[q][r] != null and grid[q][r].kind in OK_CELLS:
 					line.append(grid[q][r])
 	
 	# Addition of ending cell
@@ -148,7 +148,30 @@ func display_line(cell_start, cell_end, color_key):
 		cell.change_material(color_key)
 	return line
 
+func _compute_straight_lines(cell_start, max_dist):
+	var cells = [cell_start]
+	for x in range(1, max_dist+1):
+		# List of supposed coordinates
+		var coords = [	[cell_start.q+x, cell_start.r  ],
+						[cell_start.q+x, cell_start.r-x],
+						[cell_start.q-x, cell_start.r  ],
+						[cell_start.q-x, cell_start.r+x],
+						[cell_start.q  , cell_start.r+x],
+						[cell_start.q  , cell_start.r-x]]
+		# Test if coordinates are in grid and cell kind
+		for coord in coords:
+			if grid.has(coord[0]):
+				if grid[coord[0]].has(coord[1]):
+					if grid[coord[0]][coord[1]].kind in OK_CELLS:
+						cells.append(grid[coord[0]][coord[1]])
+	
+	return cells
 
+func display_straight_lines(cell_start, max_dist, color_key):
+	var list = _compute_straight_lines(cell_start, max_dist)
+	for cell in list:
+		cell.change_material(color_key)
+	return list
 
 
 ## HANDLE FIELD OF VIEW ##
@@ -169,10 +192,10 @@ func _compute_field_of_view(cell, distance_max):
 				
 	return cells_visible
 
-func display_field_of_view(cell, distance_max):
+func display_field_of_view(cell, distance_max, color_key):
 	var cells_visible = _compute_field_of_view(cell, distance_max)
 	for c in cells_visible:
-		c.change_material('green')
+		c.change_material(color_key)
 	return cells_visible
 
 func is_in_fov(observer_cell, distance_max, target_cell):
@@ -196,7 +219,7 @@ func _compute_zone(center, radius):
 		for r in range( \
 				max(center.r-radius, -q-z-radius), \
 				min(center.r+radius, -q-z+radius) +1):
-			if grid[q][r].kind in ["floor", "blocked"]:
+			if grid[q][r].kind in OK_CELLS:
 				zone.append(grid[q][r])
 	return zone
 

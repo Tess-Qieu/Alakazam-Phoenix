@@ -15,20 +15,10 @@ func _ready():
 
 ## BUTTON EVENTS ##
 func _on_ButtonSpell_pressed(spell_button):
-	node_battle.clear_arena()
 	node_battle.state = 'cast_spell'
 	node_battle.current_spell = spell_button.name
-#	print("casting: {0}".format([spell_button.name]))
-	
-#func _on_ButtonClear_pressed():
-#	node_battle.state = 'normal'
-#	node_battle.current_spell = 'none'
-#	node_battle.clear_arena()
-
-#func _on_ButtonZone_pressed():
-#	node_battle.clear_arena()
-#	node_battle.state = 'cast_spell'
-#	node_battle.current_spell = 'zone'
+	node_battle.display_fov()
+	node_battle.clear_arena()
 
 func _on_ButtonEndTurn_pressed():
 	node_battle.clear_arena()
@@ -61,5 +51,6 @@ func update_spell_list(character : Character):
 	for spell_key in character.Spells.keys():
 		var spell_bt = SpellButton.instance()
 		$PanelRight/SpellListContainer.add_child(spell_bt)
-		spell_bt.initialize(spell_key, character.Spells[spell_key].instance().miniature)
+		spell_bt.initialize(spell_key, character.Spells[spell_key].miniature)
 		spell_bt.connect("pressed", self, "_on_ButtonSpell_pressed", [spell_bt])
+

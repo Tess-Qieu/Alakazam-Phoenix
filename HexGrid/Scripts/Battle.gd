@@ -163,8 +163,7 @@ func _on_cell_clicked(cell):
 	elif state == 'cast_spell':
 		if cell in fov:
 			ask_cast_spell(current_character, cell)
-		elif current_spell == 'zone':
-			pass # TODO: Put here spell throw
+		fov = []
 		state = 'normal'
 		clear_arena()
 
@@ -182,8 +181,8 @@ func _on_cell_hovered(cell):
 								current_character.current_range_displacement)
 	elif state == 'cast_spell':
 		clear_arena()
-		current_character.Spells[current_spell].instance().display_touched_cells( \
-			$Map, current_character.current_cell, cell, 'skyblue')
+		current_character.Spells[current_spell].display_touched_cells( \
+			$Map, current_character.current_cell, cell, 'royalblue')
 #		if current_spell == 'zone':
 #			clear_arena()
 #			$Map.display_zone(cell, 1, 'green')
@@ -216,10 +215,20 @@ func ask_end_turn():
 func _color_current_character_cell():
 	current_character.current_cell.change_material(current_character.team_color)
 
+func display_fov():
+	if current_character.Spells.has(current_spell):
+		fov = $Map.display_field_of_view(current_character.current_cell, \
+							current_character.Spells[current_spell].cast_range,\
+							"skyblue")
+
+func _color_fov_cells():
+	for cell in fov:
+		cell.change_material("skyblue")
+
 func clear_arena():
-	fov = []
 	$Map.clear()
 	_color_current_character_cell()
+	_color_fov_cells()
 
 
 ## USEFULL FUNCTIONS ##

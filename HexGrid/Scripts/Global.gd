@@ -13,7 +13,8 @@ var materials = {'hole': 'ae8257',
 				'red': 'df4828',
 				'green': '79cc2b',
 				'skyblue': '87ceeb',
-				'grey': 'c6beba'
+				'grey': 'c6beba',
+				'royalblue' : '4169E1'
 				} 
 
 

@@ -69,7 +69,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	# Loading of each character's spell, in order to prevent loading delay 
 	#  during a game
 	for k in Spells.keys():
-		Spells[k] = load(Spells[k])
+		Spells[k] = load(Spells[k]).instance()
 
 func _physics_process(delta):
 	if moving:
@@ -94,9 +94,9 @@ func cast_spell(target, damages_infos):
 	to_look.y = translation.y
 	look_at(to_look, Vector3(0, 1, 0))
 	
-	var spell = Spells['CannonBall'].instance()
-	spell.cast(current_cell, target, damages_infos)
-	get_parent().add_child(spell)
+#	var spell = Spells['CannonBall'].instance()
+#	spell.cast(current_cell, target, damages_infos)
+#	get_parent().add_child(spell)
 
 
 

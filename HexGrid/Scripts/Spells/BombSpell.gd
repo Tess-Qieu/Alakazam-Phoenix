@@ -11,6 +11,7 @@ func _ready():
 	
 func _init():
 	miniature = load("res://Prefabs/Character/Spells/Missile64.png")
+	cast_range = 4
 
 func display_touched_cells(map, origin_cell, target_cell, color_key):
 	var line
