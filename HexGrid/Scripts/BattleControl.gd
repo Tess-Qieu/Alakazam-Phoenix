@@ -1,6 +1,7 @@
 extends Control
 
 var Team_Container = preload("res://Scenes/GUI/TeamContainer.tscn")
+var SpellButton = preload("res://Scenes/GUI/SpellButton.tscn")
 
 var node_battle : Node
 
@@ -54,4 +55,11 @@ func add_character_info(character:Character, team:Team):
 	new_team.config_team(team)
 	new_team.add_teammate(character)
 
-
+func update_spell_list(character : Character):
+	for child in $PanelRight/SpellListContainer.get_children():
+		child.queue_free()
+		
+	for spell in character.Spells.values():
+		var spell_bt = SpellButton.instance()
+		$PanelRight/SpellListContainer.add_child(spell_bt)
+		spell_bt.initialize(spell.instance())

@@ -30,6 +30,7 @@ func init_battle(grid, teams_infos):
 	
 	current_character = teams[my_team_name].get_member(0)
 	current_character.select()
+	$BattleControl.update_spell_list(current_character)
 	clear_arena()
 
 
@@ -134,14 +135,21 @@ func _on_character_movement_finished(character, ending_cell):
 ## OBJECT CLICKED EVENTS ##
 func _on_character_selected(character):
 	if not state == 'cast_spell':
-		if current_character != character:
-			# select character
-			if teams[my_team_name].has_member(character):
-				current_character.unselect()
-				# The client can select only chracter in his own team
-				current_character = character
-				character.select()
-				clear_arena()
+		# Update if selected character is a new character in player's team
+		if current_character != character \
+		and teams[my_team_name].has_member(character):
+			# unselect previous character
+			current_character.unselect()
+			
+			# Save and select new character
+			current_character = character
+			character.select()
+			
+			# Map refresh
+			clear_arena()
+			
+			# Update spell list
+			$BattleControl.update_spell_list(character)
 			
 	else:
 		ask_cast_spell(current_character, character.current_cell)

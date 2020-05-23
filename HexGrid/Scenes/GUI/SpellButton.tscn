@@ -4,7 +4,7 @@
 [ext_resource path="res://Scripts/GUI/SpellButton.gd" type="Script" id=2]
 [ext_resource path="res://Prefabs/GUI/Fonts/DroidSans.ttf" type="DynamicFontData" id=3]
 
-[sub_resource type="StyleBoxFlat" id=2]
+[sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.211765, 0.2, 0.239216, 0.890196 )
 border_width_left = 1
 border_width_top = 1
@@ -15,11 +15,11 @@ corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=2]
 size = 40
 font_data = ExtResource( 3 )
 
-[sub_resource type="StyleBoxFlat" id=1]
+[sub_resource type="StyleBoxFlat" id=3]
 content_margin_left = 3.0
 content_margin_right = 3.0
 content_margin_top = 1.0
@@ -51,8 +51,8 @@ margin_bottom = 32.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
-custom_styles/normal = SubResource( 2 )
-custom_fonts/font = SubResource( 3 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
 text = "9"
 align = 1
 valign = 1
@@ -71,7 +71,7 @@ margin_right = 15.0
 margin_bottom = 0.0299911
 grow_vertical = 0
 size_flags_horizontal = 0
-custom_styles/normal = SubResource( 1 )
+custom_styles/normal = SubResource( 3 )
 text = "A"
 align = 1
 valign = 1
@@ -80,6 +80,7 @@ __meta__ = {
 }
 
 [node name="PopupPanel" type="PopupPanel" parent="."]
+self_modulate = Color( 1, 1, 1, 0.74902 )
 margin_right = 8.0
 margin_bottom = 8.0
 popup_exclusive = true

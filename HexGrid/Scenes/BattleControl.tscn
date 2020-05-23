@@ -43,40 +43,42 @@ scroll_horizontal_enabled = false
 margin_right = 190.8
 size_flags_horizontal = 3
 
-[node name="PanelRight" type="Panel" parent="."]
+[node name="PanelRight" type="PanelContainer" parent="."]
 self_modulate = Color( 1, 1, 1, 0.666667 )
-anchor_left = 0.85
+anchor_left = 0.91
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ButtonSpell" type="Button" parent="PanelRight"]
+[node name="SpellListContainer" type="VBoxContainer" parent="PanelRight"]
 margin_left = 7.0
 margin_top = 7.0
-margin_right = 146.6
-margin_bottom = 127.0
+margin_right = 85.16
+margin_bottom = 593.0
+
+[node name="ButtonSpell" type="Button" parent="PanelRight/SpellListContainer"]
+margin_right = 78.0
+margin_bottom = 20.0
 text = "Spell"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ButtonClear" type="Button" parent="PanelRight"]
-margin_left = 7.0
-margin_top = 134.0
-margin_right = 146.6
-margin_bottom = 254.0
+[node name="ButtonClear" type="Button" parent="PanelRight/SpellListContainer"]
+margin_top = 24.0
+margin_right = 78.0
+margin_bottom = 44.0
 text = "Clear"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="ButtonZone" type="Button" parent="PanelRight"]
-margin_left = 7.0
-margin_top = 261.0
-margin_right = 146.0
-margin_bottom = 381.0
+[node name="ButtonZone" type="Button" parent="PanelRight/SpellListContainer"]
+margin_top = 48.0
+margin_right = 78.0
+margin_bottom = 68.0
 text = "Zone"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -113,7 +115,7 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="pressed" from="PanelRight/ButtonSpell" to="." method="_on_ButtonSpell_pressed"]
-[connection signal="pressed" from="PanelRight/ButtonClear" to="." method="_on_ButtonClear_pressed"]
-[connection signal="pressed" from="PanelRight/ButtonZone" to="." method="_on_ButtonZone_pressed"]
+[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonSpell" to="." method="_on_ButtonSpell_pressed"]
+[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonClear" to="." method="_on_ButtonClear_pressed"]
+[connection signal="pressed" from="PanelRight/SpellListContainer/ButtonZone" to="." method="_on_ButtonZone_pressed"]
 [connection signal="pressed" from="EndTurn_Widget/ButtonEndTurn" to="." method="_on_ButtonEndTurn_pressed"]
