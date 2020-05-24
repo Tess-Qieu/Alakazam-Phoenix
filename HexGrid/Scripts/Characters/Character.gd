@@ -17,6 +17,7 @@ var speed = 0
 ## ID informations ##
 var id_character
 var team_color
+var user_id
 
 ## Stats informations ##
 var start_health = 15 
@@ -35,7 +36,7 @@ var Spells = {'CannonBall' : "res://Scenes/Spells/RaySpell.tscn",
 
 
 ## GENERAL SECTION ##
-func init(cell, c_team, c_id_character, health, range_displacement,  battle_scene):
+func init(cell, c_team, c_id_character, c_user_id, health, range_displacement,  battle_scene):
 	
 	var rng = RandomNumberGenerator.new()
 	rng.randomize()
@@ -47,6 +48,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	change_material(c_team)
 	
 	id_character = c_id_character
+	user_id = c_user_id
 	
 	start_health = health
 	current_health = health
@@ -55,7 +57,7 @@ func init(cell, c_team, c_id_character, health, range_displacement,  battle_scen
 	name = c_team + "_Joe_{0}".format([rng.randi_range(0,255)])
 	
 	# warning-ignore:return_value_discarded
-	connect('character_selected', battle_scene, '_on_character_selected', [self])
+	connect('character_selected', battle_scene, '_on_character_clicked', [self])
 	# warning-ignore:return_value_discarded
 	connect('mouse_entered', battle_scene, '_on_character_hovered', [self])
 	# warning-ignore:return_value_discarded

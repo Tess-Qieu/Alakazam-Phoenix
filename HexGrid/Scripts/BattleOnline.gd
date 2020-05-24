@@ -1,11 +1,12 @@
 extends 'res://Scripts/Battle.gd'
 
-var is_my_turn = false
-
-
 func _ready():
 	Network.set_server_receiver_node(self)
 	ask_ready() # TEMPORARY SOLUTION TO SAY READY, LATER THERE WILL BE A BUTTON
+
+func init_battle(grid, teams_infos):
+	.init_battle(grid, teams_infos)
+	next_turn({'user id': Global.user_id})
 
 ## COMMUCATION WITH SERVER
 func send_data(data):
@@ -20,14 +21,11 @@ func _on_message(data):
 		print("NetworkError: no key action in data")
 		return
 		
-	
-	
 	elif data['action'] == 'player left':
 		player_left(data)
-	
+		
 	elif data['action'] == 'observator left':
 		observator_left(data)
-		
 	
 	elif data['action'] == 'game':
 		# The game is running
@@ -53,7 +51,6 @@ func _on_message(data):
 	elif data['action'] == 'game over':
 		game_over(data['details'])
 		
-		
 	else :
 		print("NetworkError: action {0} not known.".format([data['action']]))
 
@@ -67,13 +64,6 @@ func ask_ready():
 	send_data(data)
 	
 func ask_end_turn(): 
-	## Request from the client to the server to end his turn before 
-	#   the timer's end
-	if not is_my_turn or state != 'normal':
-		# Client should not ask to end his turn if it's not his turn to play
-		#  of if the Battle is still busy
-		return
-#
 	var data = {'action': 'game',
 				'ask': 'end turn',
 				'details': {}}
@@ -81,10 +71,6 @@ func ask_end_turn():
 	send_data(data)
 
 func ask_move(character, path):
-	if not is_my_turn :
-		# Client should not send ask for a play if it's not his turn to play
-		return
-
 	var data = {'action': 'game',
 				'ask': 'move', 
 				'details': {'id character' : character.id_character,
@@ -95,10 +81,6 @@ func ask_move(character, path):
 func ask_cast_spell(thrower, target): # for now, useless to precise which spell to use
 	# thrower is the character which cast the spell
 	# target is the cell where the spelle is cast
-	if not is_my_turn :
-		# Client should not send ask for a play if it's not his turn to play
-		return
-
 	var data = {'action': 'game',
 				'ask': 'cast spell',
 				'details': {'thrower': {'id character': thrower.id_character},
@@ -107,14 +89,17 @@ func ask_cast_spell(thrower, target): # for now, useless to precise which spell 
 				}
 	send_data(data)
 
+func choose_next_current_team(data=null):
+	for team in teams.values():
+		if team.user_id == data['user id']:
+			current_team = team
 
 
 
-
-
-## GAME ##
+## BEHAVIOUR WHEN THE SERVER VALID AN ACTION ##
 func new_turn(data):
-	is_my_turn = data['user id'] == Global.user_id
+	next_turn(data)
+	var is_my_turn = data['user id'] == Global.user_id
 	print('My turn : {0}'.format([is_my_turn]))
 	$BattleControl/EndTurn_Widget.reset(is_my_turn, data['turn time'])
 

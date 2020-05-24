@@ -147,7 +147,8 @@ class Game(Lobby):
         data = {'action': 'game',
                 'directive': 'new turn',
                 'details' : {'user id': self.player_on_turn.user_id,
-                             'turn time': TIME_TURN}}
+                             'turn time': TIME_TURN,
+                             'memory on turn': self.serialize_memory_on_turn()}}
         self.timer = Timer(TIME_TURN, self.new_turn)
         await self.notify_all(data)
 
@@ -225,7 +226,8 @@ class Game(Lobby):
             data = {'action': 'game', 
                     'response': 'move',
                     'details': {'id character': id_character,
-                                'path': path}}
+                                'path': path,
+                                'memory on turn': self.serialize_memory_on_turn()}}
             
             await self.notify_all(data)
 
@@ -268,7 +270,8 @@ class Game(Lobby):
                     'response': 'cast spell',
                     'details': {'thrower': {'id character': id_thrower},
                                 'target': coord_target,
-                                'damages': data_spell_applied}}
+                                'damages': data_spell_applied,
+                                'memory on turn': self.serialize_memory_on_turn()}}
 
             await self.notify_all(data)
 
@@ -342,6 +345,12 @@ class Game(Lobby):
                                 'move': {c: False for c in current_team.characters}
                                 }
 
+    def serialize_memory_on_turn(self):
+        memory_serialized = {}
+        for action, mem in self.memory_on_turn.items():
+            mem_s = {character.id_character : boolean for character, boolean in mem.items()} 
+            memory_serialized[action] = mem_s
+        return memory_serialized
 
 
 

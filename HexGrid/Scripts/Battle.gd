@@ -4,15 +4,18 @@ var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
 var rng = RandomNumberGenerator.new()
 
 
-var current_character : Character
-var character_moving : Character
+
+var selected_character: Character
 
 var current_spell = 'none'
 
 var teams = {}
-var my_team_name : String # name of the team the client is controlling
+var current_team: Team
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
+var memory_on_turn = {'move': {}, 'cast spell': {}} # memory of what action have been made by which character this turn
+var character_moving
+
 
 var fov = []
 var path_instanced = []
@@ -21,37 +24,52 @@ var path_serialized = []
 
 
 
-## INITIALISATION ##
+## INITIALISATION / CONTROL GAME ##
 func init_battle(grid, teams_infos):
 	# Instanciate map and characters
 	$Map.instance_map(grid)
 	for name in teams_infos.keys():
 		_create_team(name, teams_infos[name])
 	
-	current_character = teams[my_team_name].get_member(0)
-	current_character.select()
-	$BattleControl.update_spell_list(current_character)
-	clear_arena()
+	# DON'T FORGET TO MOVE FOLLOWING LINES TO THE CORRECT FUNCTION
+	#selected_character.select()
+	#$BattleControl.update_spell_list(selected_character)
 
+func choose_next_selected_character():
+	# if the current_team belongs to the client then we choose the first character from its team
+	# else we have to find its team to select a character from it
+	if current_team.user_id == Global.user_id:
+		_select_character(current_team.get_member(0))
+	else:
+		for team in teams.values():
+			if team.user_id == Global.user_id:
+				_select_character(team.get_member(0))
+
+func next_turn(data=null):
+	# Select the next current_team and selected_character on the next turn
+	# Then reset memory on turn
+	choose_next_current_team(data)
+	choose_next_selected_character()
+	_reset_memory_on_turn()
+	clear_arena()
 
 
 ## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
-	if data['user id'] == Global.user_id:
-		# stock the name of his team
-		my_team_name = team_name
-	
+	# Create a team in function of informations in data
 	# init the team
 	var new_team = Team.new()
 	new_team.name = team_name
 	new_team.color_key = data['color']
-	teams[team_name] = new_team
+	new_team.user_id = data['user id']
+	teams[team_name] = new_team	
 	
 	for c in data['characters']:
 		var character = _create_character(new_team.color_key, 
 										c['q'], 
 										c['r'],
 										c['id character'],
+										data['user id'],
 										c['health'], 
 										c['range displacement'])
 		teams[team_name].add_member(character)
@@ -60,10 +78,10 @@ func _create_team(team_name, data):
 	
 	add_child(new_team)
 
-func _create_character(team, q, r, id_character, health, range_displacement):
+func _create_character(team, q, r, id_character, user_id, health, range_displacement):
 	var cell = $Map.grid[q][r]
 	var character = RobotCharacter.instance()
-	character.init(cell, team, id_character, health, range_displacement, self)
+	character.init(cell, team, id_character, user_id, health, range_displacement, self)
 	
 	_update_character_cell_references(character, cell)
 	add_child(character)
@@ -71,12 +89,10 @@ func _create_character(team, q, r, id_character, health, range_displacement):
 
 func _update_character_cell_references(character, new_cell):
 	## Update references from cell to character and from character to cell
-	
 	# if the character had a cell reference
 	if character.current_cell != null:
 		# The previous cell forgets the character reference
 		character.current_cell.character_on = null
-	
 	# The character's new cell reference and kind are update
 	character.current_cell = new_cell
 	# The new cell gets a reference to the player on it
@@ -104,13 +120,14 @@ func make_character_move_following_path_valid(character, path_valid):
 	for coord in path_valid:
 		path_instanced += [$Map.grid[coord[0]][coord[1]]]
 	_make_character_moving_move_one_step()
-
+	_update_memory_on_turn('move', character)
 
 func make_character_cast_spell(character, cell, damages_infos):
 	character.cast_spell(cell, damages_infos)
 	fov = []
 	clear_arena()
 	state = 'normal'
+	_update_memory_on_turn('cast spell', character)
 
 
 
@@ -132,37 +149,22 @@ func _on_character_movement_finished(character, ending_cell):
 
 
 
-## OBJECT CLICKED EVENTS ##
-func _on_character_selected(character):
-	if not state == 'cast_spell':
-		# Update if selected character is a new character in player's team
-		if current_character != character \
-		and teams[my_team_name].has_member(character):
-			# unselect previous character
-			current_character.unselect()
-			
-			# Save and select new character
-			current_character = character
-			character.select()
-			
-			# Map refresh
-			clear_arena()
-			
-			# Update spell list
-			$BattleControl.update_spell_list(character)
-			
+## OBJECT EVENTS ##
+func _on_character_clicked(character):
+	if not state == 'cast_spell' and _can_player_control_character(character):
+		_select_character(character)
+	
 	else:
-		ask_cast_spell(current_character, character.current_cell)
-
-
+		_ask_cast_spell(selected_character, character.current_cell)
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
 		if len(path_serialized) > 0 :
-			ask_move(current_character, path_serialized)
+			_ask_move(selected_character, path_serialized)
+	
 	elif state == 'cast_spell':
 		if cell in fov:
-			ask_cast_spell(current_character, cell)
+			_ask_cast_spell(selected_character, cell)
 		fov = []
 		state = 'normal'
 		clear_arena()
@@ -170,26 +172,50 @@ func _on_cell_clicked(cell):
 
 
 
-
-
-## OBJECT HOVERED EVENTS ##
 func _on_cell_hovered(cell):
-	if state == 'normal':
+	if state == 'normal' and _has_not_already_done_action(selected_character, 'move'):
 		clear_arena()
-		path_serialized = $Map.display_path(current_character.current_cell, 
+		path_serialized = $Map.display_path(selected_character.current_cell, 
 								cell, 
-								current_character.current_range_displacement)
+								selected_character.current_range_displacement)
 	elif state == 'cast_spell':
 		clear_arena()
 		if cell in fov:
-			$Map.manage_impact(current_character.Spells[current_spell], 
-							current_character.current_cell, cell, 'royalblue')
+			$Map.manage_impact(selected_character.Spells[current_spell], 
+							selected_character.current_cell, cell, 'royalblue')
 	
 func _on_character_hovered(character):
-	if state == 'normal':
+	if state == 'normal' and _has_not_already_done_action(character, 'move'):
 		clear_arena()
 		$Map.display_displacement_range(character.current_cell, 
 										character.current_range_displacement)
+
+
+
+
+
+
+## ASK FUNCTIONS ##
+func _ask_cast_spell(character, cell):
+	# Verify that the character hasn't already cast a spell this turn
+	# Run ask_cast_spell function if it doesn't
+	if not _is_character_turn(character):
+		print('Impossible request: not character turn.')
+	elif not _has_not_already_done_action(character, 'cast spell'):
+		print('Impossible request: character has already cast a spell this turn')
+	else:
+		ask_cast_spell(character, cell)
+
+
+func _ask_move(character, path):
+	# Verify that the character hasn't already moved this turn
+	# Run ask_move function if it doesn't
+	if not _is_character_turn(character):
+		print('Impossible request: not character turn.')
+	elif not _has_not_already_done_action(character, 'move'):
+		print('Impossible request: character has already moved this turn')
+	else:
+		ask_move(character, path)
 
 
 
@@ -199,7 +225,7 @@ func _on_character_hovered(character):
 # warning-ignore:unused_argument
 func ask_cast_spell(character, cell):
 	pass
-
+	
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
 func ask_move(character, path):
@@ -208,24 +234,42 @@ func ask_move(character, path):
 func ask_end_turn(): 
 	pass
 
+# warning-ignore:unused_argument
+func choose_next_current_team(data=null):
+	pass
 
-## CLEAR ##
-func _color_current_character_cell():
-	current_character.current_cell.change_material(current_character.team_color)
 
+
+
+
+
+
+
+## DISPLAY FUNCTIONS ##
 func display_fov():
-	if current_character.Spells.has(current_spell):
-		fov = $Map.manage_fov(current_character.Spells[current_spell], 
-							current_character.current_cell, "skyblue")
+	if selected_character.Spells.has(current_spell):
+		fov = $Map.manage_fov(selected_character.Spells[current_spell], 
+							selected_character.current_cell, "skyblue")
 
 func _color_fov_cells():
 	for cell in fov:
 		cell.change_material("skyblue")
+	
+func _color_selected_character_cell():
+	selected_character.current_cell.change_material(selected_character.team_color)
 
 func clear_arena():
 	$Map.clear()
-	_color_current_character_cell()
+	
+	if selected_character != null:
+		_color_selected_character_cell()
+	
 	_color_fov_cells()
+
+
+
+
+
 
 
 ## USEFULL FUNCTIONS ##
@@ -241,3 +285,42 @@ func get_character_by_id(id_character):
 
 func get_cell_by_coords(q, r):
 	return $Map.grid[q][r]
+	
+
+func _select_character(character):
+	# TODO: ADD TREATMENT ONLY IF SELECTED CHARACTER IS DIFFERENT FROM THE PREVIOUS ONE
+	if selected_character != null:
+		selected_character.unselect()
+	
+	# Select character
+	# The client can select only chracter in his own team
+	if current_team.has_member(character):
+		
+		# Save and select new character
+		selected_character = character
+		character.select()
+			
+		# Update spell list
+		$BattleControl.update_spell_list(character)
+	
+	clear_arena()
+	
+
+func _update_memory_on_turn(action, character):
+	memory_on_turn[action][character] = true
+
+func _reset_memory_on_turn():
+	for action in memory_on_turn.keys():
+		memory_on_turn[action] = {}
+		for team in teams.values():
+			for character in team.get_all_members():
+				memory_on_turn[action][character] = false
+
+func _has_not_already_done_action(character, action):
+	return not memory_on_turn[action][character]
+	
+func _is_character_turn(character):
+	return current_team.has_member(character)
+	
+func _can_player_control_character(character):
+	return character.user_id == Global.user_id
