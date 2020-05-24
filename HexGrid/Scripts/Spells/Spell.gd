@@ -9,7 +9,7 @@ var distance_to_make = 0
 var distance_traveled = 0
 var cell_targeted = null
 
-var damage_amout
+var damage_amount
 var does_target_die
 
 var cast_range = [1,3]
@@ -27,7 +27,7 @@ func euclidean_dist(vec):
 func apply_on_target():
 	var target = cell_targeted.character_on
 	if target != null:
-		target.receive_damage(damage_amout, does_target_die)
+		target.receive_damage(damage_amount, does_target_die)
 
 
 
@@ -46,13 +46,13 @@ func cast(thrower, target, damages_infos):
 	distance_traveled += 1.5*euclidean_dist(vect)
 	
 	cell_targeted = target
-	damage_amout = get_damage_amout(damages_infos)# /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
+	damage_amount = get_damage_amount(damages_infos)# /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
 	does_target_die = is_information_target_die(damages_infos) # ONLY ONE TARGET FOR NOW
 	# SOLUTION TO APPLY DAMAGE AND EFFECT ON CHARACTERS (FOR NOW ON, ONLY ONE TARGET)
 	is_casting = true
 
 
-func get_damage_amout(damages_infos):
+func get_damage_amount(damages_infos):
 	if len(damages_infos) == 0 :
 		return 0
 	return damages_infos[0]['damage']
