@@ -13,7 +13,10 @@ var teams = {}
 var current_team: Team
 
 var state = 'normal' # ['normal', 'cast_spell', 'movement']
-var memory_on_turn = {'move': {}, 'cast spell': {}} # memory of what action have been made by which character this turn
+
+# memory of what action have been made by which character this turn
+var memory_on_turn = {'move': {}, 'cast spell': {}} 
+
 var character_moving
 
 
@@ -30,10 +33,6 @@ func init_battle(grid, teams_infos):
 	$Map.instance_map(grid)
 	for name in teams_infos.keys():
 		_create_team(name, teams_infos[name])
-	
-	# DON'T FORGET TO MOVE FOLLOWING LINES TO THE CORRECT FUNCTION
-	#selected_character.select()
-	#$BattleControl.update_spell_list(selected_character)
 
 func choose_next_selected_character():
 	# if the current_team belongs to the client then we choose the first character from its team
@@ -151,11 +150,13 @@ func _on_character_movement_finished(character, ending_cell):
 
 ## OBJECT EVENTS ##
 func _on_character_clicked(character):
-	if not state == 'cast_spell' and _can_player_control_character(character):
-		_select_character(character)
-	
-	else:
+	if state == 'cast_spell' and character.current_cell in fov:
 		_ask_cast_spell(selected_character, character.current_cell)
+	
+	elif _can_player_control_character(character):
+		fov = []
+		state = 'normal'
+		_select_character(character)
 
 func _on_cell_clicked(cell):
 	if state == 'normal':
@@ -288,23 +289,23 @@ func get_cell_by_coords(q, r):
 	
 
 func _select_character(character):
-	# TODO: ADD TREATMENT ONLY IF SELECTED CHARACTER IS DIFFERENT FROM THE PREVIOUS ONE
-	if selected_character != null:
-		selected_character.unselect()
-	
-	# Select character
 	# The client can select only chracter in his own team
 	if current_team.has_member(character):
-		
-		# Save and select new character
-		selected_character = character
-		character.select()
+		# if the new character is diferent from the previous one
+		if character != selected_character:
+			# if a character is already selected
+			if selected_character != null:
+				# unselect previous character
+				selected_character.unselect()
 			
-		# Update spell list
-		$BattleControl.update_spell_list(character)
-	
+			# Save and select new character
+			selected_character = character
+			character.select()
+			
+			# Update spell list
+			$BattleControl.update_spell_list(character)
+	fov = []
 	clear_arena()
-	
 
 func _update_memory_on_turn(action, character):
 	memory_on_turn[action][character] = true

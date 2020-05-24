@@ -149,6 +149,7 @@ func display_line(cell_start, cell_end, color_key):
 	return line
 
 func _compute_straight_lines(cell_start, max_dist, min_dist = 0):
+	##/!\ BUG DETECTED : LINES ARE NOT BLOCKED ON FULL CELLS OR CHARACTERS
 	var cells = []
 	for x in range(min_dist, max_dist+1):
 		# List of supposed coordinates
