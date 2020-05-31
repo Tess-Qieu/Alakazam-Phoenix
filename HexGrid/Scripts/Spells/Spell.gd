@@ -80,9 +80,3 @@ func _physics_process(delta):
 			visible = false
 			queue_free()
 			apply_on_target()
-
-
-func display_touched_cells(map, origin_cell, target_cell, color_key):
-	if map.is_in_fov(origin_cell, cast_range[1], target_cell, cast_range[0]):
-		target_cell.change_material(color_key)
-	return target_cell

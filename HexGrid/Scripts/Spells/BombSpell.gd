@@ -13,9 +13,3 @@ func _init():
 	miniature = load("res://Prefabs/Character/Spells/Missile64.png")
 	cast_range = [2,4]
 	impact_type = 'zone'
-
-func display_touched_cells(map, origin_cell, target_cell, color_key):
-	var line
-	if map.is_in_fov(origin_cell, cast_range[1], target_cell, cast_range[0]):
-		line = map.display_zone(target_cell, impact_range, color_key)
-	return line
