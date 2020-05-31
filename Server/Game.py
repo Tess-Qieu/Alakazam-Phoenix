@@ -247,14 +247,16 @@ class Game(Lobby):
             await self.notify_ask_not_valid(data)
             return
 
-
+        
         id_thrower = data['thrower']['id character']
         coord_target = data['target']
+        spell_name = data['spell name']
 
         character_thrower = self.get_character_by_id(id_thrower)
         cell_thrower = self.map.get_cell(character_thrower.q, character_thrower.r)
         cell_target = self.map.get_cell(coord_target[0], coord_target[1])
 
+        # TODO: Replace with fov management throught Map
         is_valid = self.map.is_target_in_field_of_view(cell_thrower, cell_target)
 
 

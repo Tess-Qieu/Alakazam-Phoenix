@@ -151,7 +151,7 @@ func _on_character_movement_finished(character, ending_cell):
 ## OBJECT EVENTS ##
 func _on_character_clicked(character):
 	if state == 'cast_spell' and character.current_cell in fov:
-		_ask_cast_spell(selected_character, character.current_cell)
+		_ask_cast_spell(selected_character, current_spell, character.current_cell)
 	
 	elif _can_player_control_character(character):
 		fov = []
@@ -165,7 +165,7 @@ func _on_cell_clicked(cell):
 	
 	elif state == 'cast_spell':
 		if cell in fov:
-			_ask_cast_spell(selected_character, cell)
+			_ask_cast_spell(selected_character, current_spell, cell)
 		fov = []
 		state = 'normal'
 		clear_arena()
@@ -197,7 +197,7 @@ func _on_character_hovered(character):
 
 
 ## ASK FUNCTIONS ##
-func _ask_cast_spell(character, cell):
+func _ask_cast_spell(character, spell_name, cell):
 	# Verify that the character hasn't already cast a spell this turn
 	# Run ask_cast_spell function if it doesn't
 	if not _is_character_turn(character):
@@ -205,7 +205,7 @@ func _ask_cast_spell(character, cell):
 	elif not _has_not_already_done_action(character, 'cast spell'):
 		print('Impossible request: character has already cast a spell this turn')
 	else:
-		ask_cast_spell(character, cell)
+		ask_cast_spell(character, spell_name, cell)
 
 
 func _ask_move(character, path):
@@ -224,7 +224,7 @@ func _ask_move(character, path):
 ## INHERITABLED FUNCTIONS ##
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
-func ask_cast_spell(character, cell):
+func ask_cast_spell(character, spell_name, cell):
 	pass
 	
 # warning-ignore:unused_argument

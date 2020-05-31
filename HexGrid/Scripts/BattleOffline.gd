@@ -15,7 +15,7 @@ func ask_end_turn():
 	next_turn()
 
 
-func ask_cast_spell(character, cell):
+func ask_cast_spell(character, spell_name, cell):
 	var target = cell.character_on
 	var damages_infos = []
 	

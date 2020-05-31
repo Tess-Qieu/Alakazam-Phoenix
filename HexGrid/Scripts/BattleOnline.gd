@@ -78,12 +78,13 @@ func ask_move(character, path):
 							}}
 	send_data(data)
 
-func ask_cast_spell(thrower, target): # for now, useless to precise which spell to use
-	# thrower is the character which cast the spell
-	# target is the cell where the spelle is cast
+func ask_cast_spell(thrower, spell_name, target): 
+	# thrower is the character which casts the spell
+	# target is the cell where the spell is casted
 	var data = {'action': 'game',
 				'ask': 'cast spell',
 				'details': {'thrower': {'id character': thrower.id_character},
+							'spell name': spell_name,
 							'target': [target.q, target.r]
 							}
 				}
