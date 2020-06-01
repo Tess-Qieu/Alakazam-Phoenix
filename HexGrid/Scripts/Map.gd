@@ -11,7 +11,8 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
-const OK_CELLS = ['floor', 'blocked']
+const SELECTABLE_CELLS = ['floor', 'blocked']
+const BLOCKING_VIEW = ['full', 'border']
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -135,7 +136,7 @@ func _compute_line(start, end):
 		
 		for q in list_q:
 			for r in list_r:
-				if grid[q][r] != null and grid[q][r].kind in OK_CELLS:
+				if grid[q][r] != null:
 					line.append(grid[q][r])
 	
 	# Addition of ending cell
@@ -147,34 +148,6 @@ func display_line(cell_start, cell_end, color_key):
 	for cell in line:
 		cell.change_material(color_key)
 	return line
-
-func _compute_straight_lines(cell_start, max_dist, min_dist = 0):
-	##/!\ BUG DETECTED : LINES ARE NOT BLOCKED ON FULL CELLS OR CHARACTERS
-	var cells = []
-	for x in range(min_dist, max_dist+1):
-		# List of supposed coordinates
-		var coords = [	[cell_start.q+x, cell_start.r  ],
-						[cell_start.q+x, cell_start.r-x],
-						[cell_start.q-x, cell_start.r  ],
-						[cell_start.q-x, cell_start.r+x],
-						[cell_start.q  , cell_start.r+x],
-						[cell_start.q  , cell_start.r-x]]
-		
-		# Test if coordinates are in grid and cell kind
-		for coord in coords:
-			if grid.has(coord[0]):
-				if grid[coord[0]].has(coord[1]):
-					var cell = grid[coord[0]][coord[1]]
-					if cell.kind in OK_CELLS and not cell in cells:
-						cells.append(cell)
-	
-	return cells
-
-func display_straight_lines(cell_start, max_dist, color_key, min_dist = 0):
-	var list = _compute_straight_lines(cell_start, max_dist, min_dist)
-	for cell in list:
-		cell.change_material(color_key)
-	return list
 
 
 ## HANDLE FIELD OF VIEW ##
@@ -205,6 +178,52 @@ func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
 	var fov = _compute_field_of_view(observer_cell, max_dist, min_dist)
 	return target_cell in fov
 
+func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0):
+	## Computes a field of view composed of 6 straight lines
+	# from a given cell and within a range of distance
+	
+	var cells = []
+	## LINES COMPUTATION
+	# coordinates structure : [one_line[min[q,r], max[q,r]]]
+	var coords = [	[	[cell_start.q+min_dist, cell_start.r         ],
+						[cell_start.q+max_dist, cell_start.r         ]	],
+					[	[cell_start.q+min_dist, cell_start.r-min_dist],
+						[cell_start.q+max_dist, cell_start.r-max_dist]	],
+					[	[cell_start.q-min_dist, cell_start.r         ],
+						[cell_start.q-max_dist, cell_start.r         ]	],
+					[	[cell_start.q-min_dist, cell_start.r+min_dist],
+						[cell_start.q-max_dist, cell_start.r+max_dist]	],
+					[	[cell_start.q         , cell_start.r+min_dist],
+						[cell_start.q         , cell_start.r+max_dist]	],
+					[	[cell_start.q         , cell_start.r-min_dist],
+						[cell_start.q         , cell_start.r-max_dist]	]	]
+	
+	## FOV STRAIGHT LINES
+	# Each pair of coordinates represents the first and last cell of a line
+	for c in coords:
+		# line computation
+		var current_line = _compute_line(grid[c[0][0]][c[0][1]], grid[c[1][0]][c[1][1]])
+		# The visibility of each cell is tested
+		for cell in current_line:
+			var view_line = _compute_line(cell_start, cell)
+			view_line += _compute_line(cell, cell_start)
+			
+			var visible = true
+			for elt in view_line:
+				if elt.kind in BLOCKING_VIEW:
+					visible = false
+					
+			if visible and cell.kind in SELECTABLE_CELLS:
+				cells.append(cell)
+	
+	return cells
+
+func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
+	var list = _compute_straight_lines_fov(cell_start, max_dist, min_dist)
+	for cell in list:
+		cell.change_material(color_key)
+	return list
+
 
 
 
@@ -222,7 +241,7 @@ func _compute_zone(center, radius):
 		for r in range( \
 				max(center.r-radius, -q-z-radius), \
 				min(center.r+radius, -q-z+radius) +1):
-			if grid[q][r].kind in OK_CELLS:
+			if grid[q][r].kind in SELECTABLE_CELLS:
 				zone.append(grid[q][r])
 	return zone
 
@@ -409,8 +428,8 @@ func manage_fov(spell : Spell, origin_cell, color_key):
 	var fov
 	match spell.fov_type:
 		'straight_lines':
-			fov = display_straight_lines(origin_cell, spell.cast_range[1],
-										color_key, spell.cast_range[0])
+			fov = display_straight_lines_fov(origin_cell, spell.cast_range[1],
+											color_key, spell.cast_range[0])
 		'fov':
 			fov = display_field_of_view(origin_cell, spell.cast_range[1], 
 										color_key, spell.cast_range[0])
