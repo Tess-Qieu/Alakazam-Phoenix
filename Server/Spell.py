@@ -4,7 +4,7 @@ Created on 31 mai 2020
 @author: Gauth
 '''
 
-class MyClass(object):
+class Spell(object):
 	'''
 	classdocs
 	'''
