@@ -21,3 +21,18 @@ class Spell(object):
 		'''
 		Constructor
 		'''
+
+class RaySpell(Spell) :
+	'''
+	classdocs
+	'''
+	cast_range = [0,10]
+	fov_type = 'straight_lines'
+	
+class BombSpell(Spell):
+	'''
+	classdocs
+	'''
+	cast_range   = [2,4]
+	impact_type  = 'zone'
+	impact_range = 2
