@@ -231,10 +231,6 @@ func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
 
 ## VARIOUS SHAPES SECTION ##
 func _compute_zone(center, radius):
-#	for each -N ≤ x ≤ +N:
-#    	for each max(-N, -x-N) ≤ y ≤ min(+N, -x+N):
-#        	var z = -x-y
-#        	results.append(cube_add(center, Cube(x, y, z)))
 	var z = -center.r - center.q
 	var zone = []
 	for q in range(center.q-radius, center.q+radius+1):

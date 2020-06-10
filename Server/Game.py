@@ -266,7 +266,7 @@ class Game(Lobby):
 
 		if is_valid:
 			# Get impacted cells
-# 			touched_cells = self.map.get_touched_cells(spell, cell_thrower, cell_target)
+			touched_cells = self.map.get_touched_cells(spell, cell_thrower, cell_target)
 			# Give impacted cell to Spell to compute damage info
 # 			data_spell_applied = character_thrower.Spells[spell_name].compute_damages_on(touched_cells)
 			

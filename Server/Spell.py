@@ -21,6 +21,9 @@ class Spell(object):
 		'''
 		Constructor
 		'''
+	
+	def compute_damages_on(self, touched_cells):
+		return {}
 
 class RaySpell(Spell) :
 	'''

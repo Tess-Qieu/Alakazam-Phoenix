@@ -164,9 +164,31 @@ class Map():
 				return False
 			current_cell = cell
 		return True
+	
+	## VARIOUS SHAPES SECTION ##
+	def _compute_zone(self, center, radius, selection_filter = ['floor','blocked']):
+		zone = []
+		z = -center.q -center.r
+		
+		for q in range(center.q-radius, center.q+radius+1):
+			for r in range( max(center.r-radius, -q-z-radius), \
+							min(center.r+radius, -q-z+radius) +1):
+				
+				if self.grid[q][r].kind in selection_filter:
+					zone.append(self.grid[q][r])
+		return zone
 
+	
+	## VISION SECTION ##
+	
 	def has_vision_on(self, cell_from, cell_target, blocked_by=['border', 'full']):
-
+		''' Function computing a field of view (fov) from a cell
+			 and returning if an other cell is in this fov
+			Cell kinds blocking the fov are listed in blocked_by in order
+			 to make the fov computation more generic
+			
+			@author: Gauth
+		'''
 		if cell_from is None or cell_target is None:
 			return False
 
@@ -177,19 +199,15 @@ class Map():
 				return False
 		return True
 
-	def is_target_in_fov(self, spell : Spell, caster_cell, target_cell):
-		if spell.fov_type == 'straight_lines':
-			return self.is_target_in_straight_line_fov(caster_cell, target_cell, \
-													spell.cast_range[0], \
-													spell.cast_range[1])
-		elif spell.fov_type == 'fov':
-			return self.has_vision_on(caster_cell, target_cell)
-		else:
-			return False
-
 	def is_target_in_straight_line_fov(self, origin : Cell, target : Cell, \
 											 min_dist=0, max_dist=0):
-		
+		''' Function computing a field of view (fov) from a cell
+			 and returning if an other cell is in this fov
+			In this function the fov is limited to straight line from the
+			 origin cell and within minimal and maximal distances
+			
+			@author: Gauth
+		'''
 		# Incorrect data protection
 		if origin == None or target == None:
 			return False
@@ -203,3 +221,34 @@ class Map():
 			or ((target.q - origin.q) == (target.r - origin.r)):
 			
 			return self.has_vision_on(origin, target)
+
+	def is_target_in_fov(self, spell : Spell, caster_cell, target_cell):
+		''' Function managing if a character on a given cell can cast a spell
+			 on a target cell, based on the field of view (fov) type of the spell
+			 
+			@author: Gauth
+		'''
+		if spell.fov_type == 'straight_lines':
+			return self.is_target_in_straight_line_fov(caster_cell, target_cell, \
+													spell.cast_range[0], \
+													spell.cast_range[1])
+		elif spell.fov_type == 'fov': 
+			return self.has_vision_on(caster_cell, target_cell)
+		else:
+			return False
+	
+	def get_touched_cells(self, spell : Spell, caster_cell, target_cell):
+		''' Function computing which cells are touched by spell, based on the 
+			 impact type of the spell.
+			
+			@precondition: target_cell must be in the field of view of the given
+			 spell, casted from the caster_spell
+			
+			@author: Gauth
+		'''
+		if spell.impact_type == 'cell':
+			return [target_cell]
+		elif spell.impact_type == 'zone':
+			# Blocked cells are the one with a player on it
+			return self._compute_zone(caster_cell, spell.impact_range, ['blocked'])
+		return []
