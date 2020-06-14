@@ -2,6 +2,7 @@
 
 import random
 from Spell import RaySpell, BombSpell 
+from Map import Cell
 
 def distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
@@ -15,11 +16,14 @@ class Character():
 	Spells = {'CannonBall'	: RaySpell,
 			 	'Missile'	: BombSpell }
 	
-	def __init__(self, team_color, user, q, r, id_character):
+	# Cell on the Map where the character is currently placed
+	current_cell : Cell
+	
+	def __init__(self, team_color, user, #cell, \
+						id_character):
 		self.team_color = team_color
 		self.user = user
-		self.q = q
-		self.r = r
+# 		self.current_cell = cell
 		self.id_character = id_character
 
 		self.health = 100
@@ -38,8 +42,8 @@ class Character():
 	def serialize(self):
 		# Serialize the object to send it to the clients
 		data = {'team_color': self.team_color,
-				'q': self.q,
-				'r': self.r,
+				'q': self.current_cell.q,
+				'r': self.current_cell.r,
 				'id character': self.id_character,
 				'health': self.health,
 				'range displacement': self.range_displacement}

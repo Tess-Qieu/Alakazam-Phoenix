@@ -58,9 +58,10 @@ class Game(Lobby):
 		def _create_team(self, team_name, color_team, user, cells):
 			team = Team(team_name, color_team, user, [])
 			for c in cells:
-				new_character = Character(team.team_color, user, c.q, c.r, \
+				new_character = Character(team.team_color, user, # c, \
 										self.character_manager_id.get_new_id())
 				team.add_member(new_character)
+				self._update_character_cell(new_character, c)
 			return team
 
 		cells = self.map.random_cells_floor(6)
@@ -210,7 +211,7 @@ class Game(Lobby):
 		character = self.get_character_by_id(id_character)
 
 		# Verify if the path is valid
-		cell_start = self.map.get_cell(character.q, character.r)
+		cell_start = character.current_cell
 		path_in_cell = [self.map.get_cell(c[0], c[1]) for c in path]
 
 		is_valid = self.map.is_path_valid(cell_start, path_in_cell) 
@@ -218,8 +219,7 @@ class Game(Lobby):
 		# Send the response to the clients
 		if is_valid and len(path) <= character.range_displacement: 
 			# make the move
-			character.q = path[-1][0]
-			character.r = path[-1][1]
+			self._update_character_cell(character, path[-1])
 
 			# save that the character has made the move
 			# so it can not move again this turn
@@ -255,7 +255,7 @@ class Game(Lobby):
 		spell_name = data['spell name']
 
 		character_thrower = self.get_character_by_id(id_thrower)
-		cell_thrower = self.map.get_cell(character_thrower.q, character_thrower.r)
+		cell_thrower = character_thrower.current_cell
 		cell_target = self.map.get_cell(coord_target[0], coord_target[1])
 		
 		spell = character_thrower.Spells[spell_name]
@@ -268,7 +268,10 @@ class Game(Lobby):
 			# Get impacted cells
 			touched_cells = self.map.get_touched_cells(spell, cell_thrower, cell_target)
 			# Give impacted cell to Spell to compute damage info
-# 			data_spell_applied = character_thrower.Spells[spell_name].compute_damages_on(touched_cells)
+			data_spell_applied = character_thrower.Spells[spell_name] \
+									.compute_damages_on(cell_target, \
+														touched_cells, \
+														self.teams)
 			
 			# cast the spell
 			data_spell_applied = character_thrower.cast_spell(cell_target, self.teams) # return a list
@@ -363,7 +366,20 @@ class Game(Lobby):
 			memory_serialized[action] = mem_s
 		return memory_serialized
 
-
+	def _update_character_cell(self, character, new_cell):
+		# Data protection
+		if character is None:
+			return # TODO: RAISE A NULL ERROR
+		elif new_cell is None:
+			return # TODO: RAISE A NULL ERROR
+		elif new_cell.kind != 'floor':
+			return # TODO: RAISE A WORKFLOW ERROR
+		
+		if not character.current_cell is None:
+			character.current_cell.kind = 'floor'
+		
+		character.current_cell = new_cell
+		new_cell.kind = 'blocked'
 
 
 

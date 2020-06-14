@@ -1,5 +1,5 @@
 import random
-from collections import namedtuple
+# from collections import namedtuple
 from Spell import Spell
 
 
@@ -7,7 +7,21 @@ def distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
 
-Cell = namedtuple('Cell', ['q', 'r', 'kind'])
+# Cell = namedtuple('Cell', ['q', 'r', 'kind'])
+
+class Cell():
+	''' Class representing a cell on the Map 
+		
+		@author: Gauth
+	'''
+	q = 0
+	r = 0
+	kind = 'border'
+	
+	def __init__(self, q, r, kind):
+		self.q = q
+		self.r = r
+		self.kind = kind
 
 
 class Map():
@@ -56,7 +70,7 @@ class Map():
 	def _compute_line(self, start, end):
 		
 		def _line_step(start, end, step):
-			# Function used to calulate a step on a line	
+			# Function used to calculate a step on a line	
 			return start + (end - start) * step
 		
 		# Line calculation between two cells
@@ -155,7 +169,7 @@ class Map():
 		if cell_start is None:
 			return False
 		for c in path:
-			if c is None:
+			if c is None or c.kind != 'floor':
 				return False
 
 		current_cell = cell_start
@@ -166,7 +180,8 @@ class Map():
 		return True
 	
 	## VARIOUS SHAPES SECTION ##
-	def _compute_zone(self, center, radius, selection_filter = ['floor','blocked']):
+	def _compute_zone(self, center, radius, selection_filter = ['floor', \
+																'blocked']):
 		zone = []
 		z = -center.q -center.r
 		
@@ -181,7 +196,8 @@ class Map():
 	
 	## VISION SECTION ##
 	
-	def has_vision_on(self, cell_from, cell_target, blocked_by=['border', 'full']):
+	def has_vision_on(self, cell_from, cell_target, blocked_by = ['border', \
+																  'full']):
 		''' Function computing a field of view (fov) from a cell
 			 and returning if an other cell is in this fov
 			Cell kinds blocking the fov are listed in blocked_by in order
@@ -223,8 +239,9 @@ class Map():
 			return self.has_vision_on(origin, target)
 
 	def is_target_in_fov(self, spell : Spell, caster_cell, target_cell):
-		''' Function managing if a character on a given cell can cast a spell
-			 on a target cell, based on the field of view (fov) type of the spell
+		''' Function managing if a character placed on a given cell can cast 
+			 a spell on a targeted cell, based on the field of view (fov) type
+			 of the spell
 			 
 			@author: Gauth
 		'''
@@ -249,6 +266,5 @@ class Map():
 		if spell.impact_type == 'cell':
 			return [target_cell]
 		elif spell.impact_type == 'zone':
-			# Blocked cells are the one with a player on it
-			return self._compute_zone(caster_cell, spell.impact_range, ['blocked'])
+			return self._compute_zone(caster_cell, spell.impact_range)
 		return []
