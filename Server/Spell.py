@@ -3,6 +3,8 @@ Created on 31 mai 2020
 
 @author: Gauth
 '''
+import random
+
 
 class Spell(object):
 	'''
@@ -22,8 +24,39 @@ class Spell(object):
 		Constructor
 		'''
 	
-	def compute_damages_on(self, touched_cells):
-		return {}
+	def compute_damages_on(self, target_cell, touched_cells, team_list, \
+								caster_team ):
+		# target cell is note used here, could be used to compute damages
+		#  based on distance from the targeted cell
+		targets = []
+		# Touched characters research
+		for team in team_list:
+			for character in team:
+				if character.current_cell in touched_cells:
+					targets.append(character)
+		
+		damages = []
+		for elt in targets:
+			damages += [random.randint(min, max+1)]
+		
+		# Apply damages to characters and create data
+		data = []
+		for i, c in enumerate(targets):
+			# apply damage
+			damage = damages[i]
+			c.health -= damage
+			data_one_target = { 'id character': c.id_character, \
+								'damage': damage, \
+								'events': []}
+
+			# Verify if character still alive	   
+			if c.health <= 0:
+				c.die()
+				data_one_target['events'] += ['character dead']
+
+			data += [data_one_target]
+
+		return data
 
 class RaySpell(Spell) :
 	'''

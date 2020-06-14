@@ -266,16 +266,16 @@ class Game(Lobby):
 
 		if is_valid:
 			# Get impacted cells
-			touched_cells = self.map.get_touched_cells(spell, cell_thrower, cell_target)
+			touched_cells = self.map.get_touched_cells( spell, \
+														cell_thrower,\
+													 	cell_target)
 			# Give impacted cell to Spell to compute damage info
 			data_spell_applied = character_thrower.Spells[spell_name] \
-									.compute_damages_on(cell_target, \
-														touched_cells, \
-														self.teams)
+				.compute_damages_on(cell_target, \
+									touched_cells, \
+									self.teams, \
+							self.get_character_team(character_thrower))
 			
-			# cast the spell
-			data_spell_applied = character_thrower.cast_spell(cell_target, self.teams) # return a list
-
 			# Save that the character has cast the spell
 			# so it can not cast a spell again this turn
 			self.memory_on_turn['cast spell'][character_thrower] = True
@@ -334,6 +334,13 @@ class Game(Lobby):
 			if c.id_character == id_character:
 				return c
 		print(f'NetworkValueError: no character with id {id_character}.')
+		return None
+	
+	def get_character_team(self, character):
+		for t in self.teams:
+			if character in t:
+				return t
+		
 		return None
 
 	def get_player_by_id(self, user_id):
