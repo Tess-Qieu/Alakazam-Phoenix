@@ -26,11 +26,13 @@ class Spell(object):
 	
 	def compute_damages_on(self, target_cell, touched_cells, team_list, \
 								caster_team ):
-		# target cell is note used here, could be used to compute damages
+		# target_cell is not used here, but could be used to deal damages
 		#  based on distance from the targeted cell
 		targets = []
 		# Touched characters research
 		for team in team_list:
+			if team == caster_team:
+				continue # Damages dealt only on opposing team
 			for character in team:
 				if character.current_cell in touched_cells:
 					targets.append(character)
