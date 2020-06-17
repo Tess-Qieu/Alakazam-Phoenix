@@ -121,8 +121,8 @@ func make_character_move_following_path_valid(character, path_valid):
 	_make_character_moving_move_one_step()
 	_update_memory_on_turn('move', character)
 
-func make_character_cast_spell(character, cell, damages_infos):
-	character.cast_spell(cell, damages_infos)
+func make_character_cast_spell(character, cell, spell_name, damages_infos):
+	character.cast_spell(cell, spell_name, damages_infos)
 	fov = []
 	clear_arena()
 	state = 'normal'

@@ -284,6 +284,7 @@ class Game(Lobby):
 					'response': 'cast spell',
 					'details': {'thrower': {'id character': id_thrower},
 								'target': coord_target,
+								'spell name': spell_name,
 								'damages': data_spell_applied,
 								'memory on turn': self.serialize_memory_on_turn()}}
 

@@ -27,7 +27,7 @@ func ask_cast_spell(character, spell_name, cell):
 						'event': []}]
 		if is_dead:
 			damages_infos[0]['event'] += ['character dead']
-	make_character_cast_spell(character, cell, damages_infos)
+	make_character_cast_spell(character, cell, spell_name, damages_infos)
 
 
 func ask_move(character, path):

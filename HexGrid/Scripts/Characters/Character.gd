@@ -91,14 +91,16 @@ func is_alive():
 
 
 ## THROW SPELL SECTION ##
-func cast_spell(target, damages_infos):
+func cast_spell(target, spell_id, damages_infos):
 	var to_look = target.translation
 	to_look.y = translation.y
 	look_at(to_look, Vector3(0, 1, 0))
 	
+	Spells[spell_id].cast(current_cell, target, damages_infos)
 #	var spell = Spells['CannonBall'].instance()
 #	spell.cast(current_cell, target, damages_infos)
-#	get_parent().add_child(spell)
+	if Spells[spell_id].get_parent() == null:
+		add_child(Spells[spell_id])
 
 
 

@@ -112,8 +112,9 @@ func move_valid(data):
 func cast_spell_valid(data):
 	var character_thrower = get_character_by_id(data['thrower']['id character'])
 	var cell_target = get_cell_by_coords(data['target'][0], data['target'][1])
+	var spell_name = data['spell name']
 	var damages_infos = data['damages']
-	make_character_cast_spell(character_thrower, cell_target, damages_infos)
+	make_character_cast_spell(character_thrower, cell_target, spell_name, damages_infos)
 
 
 

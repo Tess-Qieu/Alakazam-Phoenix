@@ -37,13 +37,14 @@ func cast(thrower, target, damages_infos):
 	translation.x = thrower.translation.x
 	translation.y = 2
 	translation.z = thrower.translation.z
+	visible = true
 	
 	vect = target.translation - thrower.translation
 	distance_to_make = euclidean_dist(vect)
 	vect = vect / distance_to_make
 	
 	translation += 1*vect
-	distance_traveled += 1.5*euclidean_dist(vect)
+	distance_traveled = 1.5*euclidean_dist(vect)
 	
 	cell_targeted = target
 	damage_amount = get_damage_amount(damages_infos)# /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
@@ -78,5 +79,5 @@ func _physics_process(delta):
 		if collision != null or distance_traveled >= distance_to_make:
 			is_casting = false
 			visible = false
-			queue_free()
+#			queue_free()
 			apply_on_target()
