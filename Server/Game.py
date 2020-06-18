@@ -28,7 +28,7 @@ class Timer():
 
 
 class Game(Lobby):
-	''' Administrate a game depending clients actions '''
+	''' Manage a game depending clients actions '''
 
 	## INITIALISATION ##
 	def __init__(self, server, manager_lobby, id_lobby, players, observators):
@@ -219,7 +219,9 @@ class Game(Lobby):
 		# Send the response to the clients
 		if is_valid and len(path) <= character.range_displacement: 
 			# make the move
-			self._update_character_cell(character, path[-1])
+			self._update_character_cell(character, \
+										self.map.get_cell( path[-1][0], \
+														   path[-1][1] ) )
 
 			# save that the character has made the move
 			# so it can not move again this turn
@@ -383,11 +385,11 @@ class Game(Lobby):
 		elif new_cell.kind != 'floor':
 			return # TODO: RAISE A WORKFLOW ERROR
 		
-		if not character.current_cell is None:
-			character.current_cell.kind = 'floor'
+		if not character.get_current_cell() is None:
+			character.get_current_cell().kind = 'floor'
 		
-		character.current_cell = new_cell
 		new_cell.kind = 'blocked'
+		character.set_current_cell(new_cell)
 
 
 

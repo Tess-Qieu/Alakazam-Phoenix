@@ -10,19 +10,17 @@ class Spell(object):
 	'''
 	classdocs
 	'''
-	cast_range = [1,3]
-	start_cooldown = 10
-	current_cooldown = start_cooldown
-	fov_type = 'fov'
-	impact_type = 'cell'
-	damage_amount = -1
 
-	
-
-	def __init__(self, params):
+	def __init__(self):
 		'''
 		Constructor
 		'''
+		self.cast_range = [1,3]
+		self.start_cooldown = 10
+		self.current_cooldown = self.start_cooldown
+		self.fov_type = 'fov'
+		self.impact_type = 'cell'
+		self.damage_amount = -1
 	
 	def compute_damages_on(self, target_cell, touched_cells, team_list, \
 								caster_team ):
@@ -64,13 +62,16 @@ class RaySpell(Spell) :
 	'''
 	classdocs
 	'''
-	cast_range = [0,10]
-	fov_type = 'straight_lines'
+	def __init__(self):
+		self.cast_range = [0,10]
+		self.fov_type = 'straight_lines'
 	
 class BombSpell(Spell):
 	'''
 	classdocs
 	'''
-	cast_range   = [2,4]
-	impact_type  = 'zone'
-	impact_range = 2
+	
+	def __init__(self):
+		self.cast_range   = [2,4]
+		self.impact_type  = 'zone'
+		self.impact_range = 2

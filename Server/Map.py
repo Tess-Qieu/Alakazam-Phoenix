@@ -43,6 +43,10 @@ class Map():
 		for q in self.grid.keys():
 			grid_serialized[q] = {}
 			for r in self.grid[q].keys():
+# 				if (self.get_cell(q, r).kind == 'blocked'):
+# 					grid_serialized[q][r] = 'floor'
+# 				else:
+# 					grid_serialized[q][r] = self.get_cell(q, r).kind
 				grid_serialized[q][r] = self.get_cell(q, r).kind
 		return grid_serialized
 

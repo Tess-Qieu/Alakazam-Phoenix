@@ -36,6 +36,8 @@ func init(_q, _r, _kind, battle_scene):
 		connect("cell_clicked", battle_scene, "_on_cell_clicked", [self])
 
 func change_material(material_key):
+	if material_key == 'blocked':
+		material_key = 'floor'
 	$Circle.set_surface_material(0, Global.materials[material_key])
 
 func set_character(new_character):

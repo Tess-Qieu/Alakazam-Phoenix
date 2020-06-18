@@ -1,5 +1,6 @@
 extends Spatial
 
+var Cell = preload("res://Scripts/Cell.gd")
 var CellSize1 = preload("res://Scenes/Cells/CellSize1.tscn")
 var CellSize2 = preload("res://Scenes/Cells/CellSize2.tscn")
 var CellSize3 = preload("res://Scenes/Cells/CellSize3.tscn")
@@ -76,7 +77,7 @@ func _instance_cell(cell_type, q, r, kind):
 	cell.init(q, r, kind, get_parent())
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
-	if kind == "floor":
+	if kind in SELECTABLE_CELLS:
 		cells_floor += [cell]
 
 func instance_map(new_grid):
@@ -86,7 +87,7 @@ func instance_map(new_grid):
 			var kind = grid[q][r]
 			if kind == 'hole':
 				_instance_cell(CellSize1, q, r, kind)
-			elif kind == 'floor': 
+			elif kind == 'floor' or kind == 'blocked': 
 				_instance_cell(CellSize2, q, r, kind)
 			elif kind == 'full':
 				_instance_cell(CellSize3, q, r, kind)
@@ -217,6 +218,12 @@ func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0):
 				cells.append(cell)
 	
 	return cells
+
+func add_step(path, direction : Vector3):
+	if direction.length() > 1:
+		return
+	# Third coordinate computation
+	var z0 = -path[-1].q -path[-1].r
 
 func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
 	var list = _compute_straight_lines_fov(cell_start, max_dist, min_dist)

@@ -4,6 +4,7 @@ import random
 from Spell import RaySpell, BombSpell 
 from Map import Cell
 
+
 def distance_coord(q1, r1, q2, r2):
 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
@@ -13,11 +14,11 @@ class Character():
 	
 	# List of spells the character knows
 	#  At runtime, class references are converted to instances
-	Spells = {'CannonBall'	: RaySpell,
-			 	'Missile'	: BombSpell }
+	Spells = {'CannonBall'	: RaySpell(),
+			 	'Missile'	: BombSpell() }
 	
-	# Cell on the Map where the character is currently placed
-	current_cell : Cell
+# 	# Cell on the Map where the character is currently placed
+# 	current_cell : Cell
 	
 	def __init__(self, team_color, user, id_character):
 		
@@ -29,9 +30,12 @@ class Character():
 		self.range_displacement = 5
 		self.alive = True
 		
-		# Spells instantiation
-		for s in self.Spells.keys():
-			self.Spells[s] = self.Spells[s]()
+		self.current_cell : Cell = None
+		
+# 		# Spells instantiation
+# 		for s in self.Spells.keys():
+# 			# TODO: Work out this instantiation
+# 			self.Spells[s] = self.Spells[s]() 
 
 	def die(self):
 		# Make the character die, /!\ MAYBE NEED TO RAISE SOMETHING FOR GAME
@@ -48,6 +52,12 @@ class Character():
 				'range displacement': self.range_displacement}
 		return data
 
+	def set_current_cell(self, new_cell):
+		if not new_cell is None:
+			self.current_cell = new_cell
+	
+	def get_current_cell(self):
+		return self.current_cell
 
 # 	def _find_targets(self, cell_target, team, zone=1):
 # 		# Find the character targeted by the spell
