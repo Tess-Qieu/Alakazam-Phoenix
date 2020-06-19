@@ -58,6 +58,14 @@ margin_top = 7.0
 margin_right = 85.16
 margin_bottom = 593.0
 
+[node name="Button" type="Button" parent="."]
+margin_left = 939.0
+margin_top = 472.704
+margin_right = 1017.0
+margin_bottom = 584.704
+toggle_mode = true
+text = "Test"
+
 [node name="EndTurn_Widget" type="VBoxContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 1.0
@@ -89,4 +97,5 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
+[connection signal="toggled" from="Button" to="." method="_on_Button_toggled"]
 [connection signal="pressed" from="EndTurn_Widget/ButtonEndTurn" to="." method="_on_ButtonEndTurn_pressed"]

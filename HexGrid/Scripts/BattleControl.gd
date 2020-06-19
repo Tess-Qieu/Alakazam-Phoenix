@@ -69,3 +69,10 @@ func update_spell_list(character : Character):
 func toggle_spell_buttons(disabled : bool):
 	for node in $PanelRight/SpellListContainer.get_children():
 		node.disabled = disabled
+
+
+func _on_Button_toggled(button_pressed):
+	if button_pressed:
+		node_battle.state = 'test'
+	else:
+		node_battle.state = 'normal'

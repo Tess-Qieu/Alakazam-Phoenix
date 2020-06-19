@@ -24,6 +24,7 @@ var fov = []
 var path_instanced = []
 var path_serialized = []
 
+var test_path = []
 
 
 
@@ -169,6 +170,9 @@ func _on_cell_clicked(cell):
 		fov = []
 		state = 'normal'
 		clear_arena()
+	
+	elif state == 'test':
+		test_path = [cell]
 
 
 
@@ -184,6 +188,10 @@ func _on_cell_hovered(cell):
 		if cell in fov:
 			$Map.manage_impact(selected_character.Spells[current_spell], 
 							selected_character.current_cell, cell, 'royalblue')
+							
+	elif state == 'test':
+		clear_arena()
+		cell.change_material('green')
 	
 func _on_character_hovered(character):
 	if state == 'normal' and _has_not_already_done_action(character, 'move'):

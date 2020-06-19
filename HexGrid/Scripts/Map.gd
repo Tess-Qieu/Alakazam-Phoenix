@@ -222,8 +222,21 @@ func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0):
 func add_step(path, direction : Vector3):
 	if direction.length() > 1:
 		return
-	# Third coordinate computation
-	var z0 = -path[-1].q -path[-1].r
+	
+	var new_cell
+	var last_cell = grid[path[-1].q][path[-1].r]
+	
+	if direction == Vector3.RIGHT or direction ==  Vector3.LEFT:
+		new_cell = grid[last_cell.q + int(direction.x)][last_cell.r]
+	elif direction == Vector3.UP or direction ==  Vector3.DOWN:
+		new_cell = grid[last_cell.q][last_cell.r + int(direction.y)]
+	elif direction == Vector3.FORWARD or direction ==  Vector3.BACK:
+		# Moving 1z = moving (1q-1r)
+		new_cell = grid[last_cell.q + int(direction.z)]\
+						[last_cell.r - int(direction.z)]
+	
+	if new_cell != null and new_cell.kind in SELECTABLE_CELLS:
+		path.append(new_cell)
 
 func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
 	var list = _compute_straight_lines_fov(cell_start, max_dist, min_dist)
