@@ -48,6 +48,8 @@ func set_character(new_character):
 	else:
 		kind = 'floor'
 
+func get_coord_vect3():
+	return Vector3(q, r, -q-r)
 
 
 ## EVENT HANDLING SECTION ##

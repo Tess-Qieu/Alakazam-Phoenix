@@ -179,63 +179,57 @@ func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
 	var fov = _compute_field_of_view(observer_cell, max_dist, min_dist)
 	return target_cell in fov
 
-func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0):
+func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0, \
+												kind_filter = SELECTABLE_CELLS):
 	## Computes a field of view composed of 6 straight lines
 	# from a given cell and within a range of distance
-	
+	var paths = {}
 	var cells = []
-	## LINES COMPUTATION
-	# coordinates structure : [one_line[min[q,r], max[q,r]]]
-	var coords = [	[	[cell_start.q+min_dist, cell_start.r         ],
-						[cell_start.q+max_dist, cell_start.r         ]	],
-					[	[cell_start.q+min_dist, cell_start.r-min_dist],
-						[cell_start.q+max_dist, cell_start.r-max_dist]	],
-					[	[cell_start.q-min_dist, cell_start.r         ],
-						[cell_start.q-max_dist, cell_start.r         ]	],
-					[	[cell_start.q-min_dist, cell_start.r+min_dist],
-						[cell_start.q-max_dist, cell_start.r+max_dist]	],
-					[	[cell_start.q         , cell_start.r+min_dist],
-						[cell_start.q         , cell_start.r+max_dist]	],
-					[	[cell_start.q         , cell_start.r-min_dist],
-						[cell_start.q         , cell_start.r-max_dist]	]	]
 	
-	## FOV STRAIGHT LINES
-	# Each pair of coordinates represents the first and last cell of a line
-	for c in coords:
-		# line computation
-		var current_line = _compute_line(grid[c[0][0]][c[0][1]], grid[c[1][0]][c[1][1]])
-		# The visibility of each cell is tested
-		for cell in current_line:
-			var view_line = _compute_line(cell_start, cell)
-			view_line += _compute_line(cell, cell_start)
+	# In direction of each neighbor
+	for n in _neighbors(cell_start):
+		var last_size = 0
+		paths[n] = [cell_start] #path initialized with the starting cell
+		# loop while the path is getting longer and within the max distance
+		while paths[n].size() <= max_dist and paths[n].size() > last_size:
+			last_size = paths[n].size()
+			# Computing a step more
+			var vect = n.get_coord_vect3()-cell_start.get_coord_vect3()
 			
-			var visible = true
-			for elt in view_line:
-				if elt.kind in BLOCKING_VIEW:
-					visible = false
-					
-			if visible and cell.kind in SELECTABLE_CELLS:
-				cells.append(cell)
+			add_step(paths[n], \
+					 vect,\
+					 kind_filter)
+		
+		# Distance filter and addition to exit value
+		for c in paths[n].slice(min_dist, max_dist):
+			if not (c in cells):
+				cells.append(c)
 	
 	return cells
 
-func add_step(path, direction : Vector3):
-	if direction.length() > 1:
-		return
-	
+func add_step(path, direction : Vector3, kind_filter = SELECTABLE_CELLS):
+		
 	var new_cell
 	var last_cell = grid[path[-1].q][path[-1].r]
 	
-	if direction == Vector3.RIGHT or direction ==  Vector3.LEFT:
-		new_cell = grid[last_cell.q + int(direction.x)][last_cell.r]
-	elif direction == Vector3.UP or direction ==  Vector3.DOWN:
-		new_cell = grid[last_cell.q][last_cell.r + int(direction.y)]
-	elif direction == Vector3.FORWARD or direction ==  Vector3.BACK:
-		# Moving 1z = moving (1q-1r)
-		new_cell = grid[last_cell.q + int(direction.z)]\
-						[last_cell.r - int(direction.z)]
+	if direction.length() == 1 :
+		if direction == Vector3.RIGHT or direction ==  Vector3.LEFT:
+			new_cell = grid[last_cell.q + int(direction.x)][last_cell.r]
+		elif direction == Vector3.UP or direction ==  Vector3.DOWN:
+			new_cell = grid[last_cell.q][last_cell.r + int(direction.y)]
+		elif direction == Vector3.FORWARD or direction ==  Vector3.BACK:
+			# Moving 1z = moving (1q-1r)
+			new_cell = grid[last_cell.q + int(direction.z)]\
+							[last_cell.r - int(direction.z)]
+	elif direction.length_squared() == 2:
+		new_cell = grid[last_cell.q + int(direction.x)]\
+						[last_cell.r + int(direction.y)]
+	else:
+		print("Vecteur direction incorrect : {0}".format([direction]))
+		print("    length : {0}".format([direction.length()]))
+		return
 	
-	if new_cell != null and new_cell.kind in SELECTABLE_CELLS:
+	if new_cell != null and new_cell.kind in kind_filter:
 		path.append(new_cell)
 
 func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
