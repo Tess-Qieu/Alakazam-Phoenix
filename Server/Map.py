@@ -212,8 +212,8 @@ class Map():
 		if cell_from is None or cell_target is None:
 			return False
 
-		first_line = self._compute_line(self, cell_from, cell_target)
-		second_line = self._compute_line(self, cell_target, cell_from)
+		first_line = self._compute_line(cell_from, cell_target)
+		second_line = self._compute_line(cell_target, cell_from)
 		for c in first_line + second_line:
 			if c.kind in blocked_by:
 				return False
