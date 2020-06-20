@@ -341,7 +341,7 @@ class Game(Lobby):
 	
 	def get_character_team(self, character):
 		for t in self.teams:
-			if character in t:
+			if t.is_in_team(character):
 				return t
 		
 		return None

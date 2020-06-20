@@ -31,7 +31,7 @@ class Spell(object):
 		for team in team_list:
 			if team == caster_team:
 				continue # Damages dealt only on opposing team
-			for character in team:
+			for character in team.characters:
 				if character.current_cell in touched_cells:
 					targets.append(character)
 		
