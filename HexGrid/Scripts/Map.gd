@@ -180,7 +180,8 @@ func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
 	return target_cell in fov
 
 func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0, \
-												kind_filter = SELECTABLE_CELLS):
+									block_filter = BLOCKING_VIEW, \
+									select_filter = SELECTABLE_CELLS ):
 	## Computes a field of view composed of 6 straight lines
 	# from a given cell and within a range of distance
 	var paths = {}
@@ -196,40 +197,64 @@ func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0, \
 			# Computing a step more
 			var vect = n.get_coord_vect3()-cell_start.get_coord_vect3()
 			
-			add_step(paths[n], \
-					 vect,\
-					 kind_filter)
+			add_step(paths[n], vect)
 		
 		# Distance filter and addition to exit value
 		for c in paths[n].slice(min_dist, max_dist):
-			if not (c in cells):
-				cells.append(c)
+			if c.kind in block_filter:
+				break
+			else:
+				if not (c in cells) and c.kind in select_filter:
+					cells.append(c)
 	
 	return cells
 
-func add_step(path, direction : Vector3, kind_filter = SELECTABLE_CELLS):
-		
-	var new_cell
+func add_step(path, direction : Vector3 ):
+	# Add a cell to an array given a direction.
+	# The direction can be given in two formats:
+	#  > (axisQ, axisR, axisZ), meaning a desired movement of +/- 1 cell on the 
+	#	given axis. Only one composant must be set to +/- 1.
+	#	Examples: (1,0,0), (0,-1,0)
+	#  > (coordQ, coordR, coordZ), meaning a set of coordinates in a Q,R,Z 
+	#	representation of an hexagonal grid. These coordinates are equivalent
+	#	to a vector, which, applied to an original cell, gives a destination cell.
+	#	This vector must respect q+r+z = 0 and represent a one-cell translation,
+	#	ie, its squared length must be 2.
+	#	Examples: (1,0,-1), (0,-1,1)
+	
+	# Size protection: the path must contain at least one cell
+	if path.size() <1: return
+	# next cell in the given direction
+	var new_cell = null
+	# last cell in the given path
 	var last_cell = grid[path[-1].q][path[-1].r]
 	
+	# Axis only based movement
 	if direction.length() == 1 :
 		if direction == Vector3.RIGHT or direction ==  Vector3.LEFT:
 			new_cell = grid[last_cell.q + int(direction.x)][last_cell.r]
 		elif direction == Vector3.UP or direction ==  Vector3.DOWN:
 			new_cell = grid[last_cell.q][last_cell.r + int(direction.y)]
 		elif direction == Vector3.FORWARD or direction ==  Vector3.BACK:
-			# Moving 1z = moving (1q-1r)
+			# Moving 1z = moving (+1q-1r)
 			new_cell = grid[last_cell.q + int(direction.z)]\
 							[last_cell.r - int(direction.z)]
+	
+	# Coordinates based movement
 	elif direction.length_squared() == 2:
-		new_cell = grid[last_cell.q + int(direction.x)]\
-						[last_cell.r + int(direction.y)]
+		var new_q = last_cell.q + int(direction.x)
+		var new_r = last_cell.r + int(direction.y)
+		
+		if grid.has(new_q) and grid[new_q].has(new_r):
+			new_cell = grid[new_q][new_r]
+	
 	else:
 		print("Vecteur direction incorrect : {0}".format([direction]))
-		print("    length : {0}".format([direction.length()]))
+		print("  length: {0} | squared length: {1}".format(\
+				[direction.length(), direction.length_squared()] ))
 		return
 	
-	if new_cell != null and new_cell.kind in kind_filter:
+	if new_cell != null:
 		path.append(new_cell)
 
 func display_straight_lines_fov(cell_start, max_dist, color_key, min_dist = 0):
