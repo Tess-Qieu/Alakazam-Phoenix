@@ -63,8 +63,11 @@ class RaySpell(Spell) :
 	classdocs
 	'''
 	def __init__(self):
+		Spell.__init__(self)
+		
 		self.cast_range = [0,10]
 		self.fov_type = 'straight_lines'
+		
 	
 class BombSpell(Spell):
 	'''
@@ -72,6 +75,8 @@ class BombSpell(Spell):
 	'''
 	
 	def __init__(self):
+		Spell.__init__(self)
+		
 		self.cast_range   = [2,4]
 		self.impact_type  = 'zone'
 		self.impact_range = 2
