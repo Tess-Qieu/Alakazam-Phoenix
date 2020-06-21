@@ -198,6 +198,14 @@ func _on_character_hovered(character):
 		clear_arena()
 		$Map.display_displacement_range(character.current_cell, 
 										character.current_range_displacement)
+	
+	elif state == 'cast_spell':
+		clear_arena()
+		if character.current_cell in fov:
+			$Map.manage_impact(selected_character.Spells[current_spell], 
+								selected_character.current_cell, \
+								character.current_cell, \
+								'royalblue')
 
 
 
