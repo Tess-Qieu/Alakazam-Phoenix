@@ -29,12 +29,12 @@ class Spell(object):
 		targets = []
 		# Touched characters research
 		for team in team_list:
-			if team == caster_team:
-				continue # Damages dealt only on opposing team
-			for character in team.characters:
-				if character.current_cell in touched_cells:
-					targets.append(character)
-		
+			if team != caster_team:
+				# Damages dealt only on opposing team
+				for character in team.get_all_members():
+					if character.current_cell in touched_cells:
+						targets.append(character)
+			
 		damages = []
 		for elt in targets:
 			damages.append(random.randint(self.damage_amount[0], \

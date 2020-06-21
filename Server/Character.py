@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-import random
-from Spell import RaySpell, BombSpell 
-from Map import Cell
+from Spell import RaySpell, BombSpell
 
 
 def distance_coord(q1, r1, q2, r2):
@@ -31,11 +29,6 @@ class Character():
 		self.alive = True
 		
 		self.current_cell : Cell = None
-		
-# 		# Spells instantiation
-# 		for s in self.Spells.keys():
-# 			# TODO: Work out this instantiation
-# 			self.Spells[s] = self.Spells[s]() 
 
 	def die(self):
 		# Make the character die, /!\ MAYBE NEED TO RAISE SOMETHING FOR GAME

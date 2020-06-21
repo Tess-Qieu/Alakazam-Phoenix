@@ -22,6 +22,9 @@ class Team():
         if index >0 and index < self.characters.length:
             return self.characters[index]
     
+    def get_all_members(self):
+    	return self.characters
+    
     def is_in_team(self, character):
         return (character in self.characters)
 
