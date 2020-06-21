@@ -243,14 +243,15 @@ class Map():
 			return self.has_vision_on(origin, target)
 
 	def is_target_in_fov(self, spell : Spell, caster_cell, target_cell):
-		''' Function managing if a character placed on a given cell can cast 
-			 a spell on a targeted cell, based on the field of view (fov) type
-			 of the spell
+		''' Function managing if a character placed on a given cell 
+			 can cast a spell on a targeted cell, based on the field of 
+			 view (fov) type of the spell
 			 
 			@author: Gauth
 		'''
 		if spell.fov_type == 'straight_lines':
-			return self.is_target_in_straight_line_fov(caster_cell, target_cell, \
+			return self.is_target_in_straight_line_fov(caster_cell, \
+													target_cell, \
 													spell.cast_range[0], \
 													spell.cast_range[1])
 		elif spell.fov_type == 'fov': 
@@ -259,16 +260,19 @@ class Map():
 			return False
 	
 	def get_touched_cells(self, spell : Spell, caster_cell, target_cell):
-		''' Function computing which cells are touched by spell, based on the 
-			 impact type of the spell.
+		''' Function computing which cells are touched by spell, based on 
+			 the impact type of the spell.
 			
-			@precondition: target_cell must be in the field of view of the given
-			 spell, casted from the caster_spell
+			Currently unused, caster spell can be needed to compute 
+			 geometries based on a caster-target orientation
+			
+			@precondition: target_cell must be in the field of view of the 
+			 given spell, casted from the caster_spell
 			
 			@author: Gauth
 		'''
 		if spell.impact_type == 'cell':
 			return [target_cell]
 		elif spell.impact_type == 'zone':
-			return self._compute_zone(caster_cell, spell.impact_range)
+			return self._compute_zone(target_cell, spell.impact_range)
 		return []
