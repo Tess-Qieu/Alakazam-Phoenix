@@ -34,9 +34,7 @@ func apply_on_target():
 func cast(thrower, target, damages_infos):
 	# Translate the ball in front of the character
 	# and prepare the throw
-	translation.x = thrower.translation.x
-	translation.y = 2
-	translation.z = thrower.translation.z
+	translation = Vector3(0, 2, 0) # set to origin, 2m high
 	visible = true
 	
 	vect = target.translation - thrower.translation
