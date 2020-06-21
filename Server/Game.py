@@ -172,20 +172,35 @@ class Game(Lobby):
 	## ACTIONS TO DO WHEN ASK FROM CLIENT ##
 
 	def is_correct_user_id(self, data):
-		return data['user id'] == self.player_on_turn.user_id
+		result = data['user id'] == self.player_on_turn.user_id
+		if not result:
+			data['reason'] = ['invalid player_on_turn id']
+		return result
 
 	def is_correct_character_user(self, character):
 		return character.user.user_id == self.player_on_turn.user_id
 
 	def is_correct_ask(self, character, data):
+		character_user = self.is_correct_character_user(character)
+		if not character_user:
+			data['reason'] = ['character not controlled by player on turn']
+		
+		if not character.alive:
+			data['reason'] = ['character not alive']
+		
 		return self.is_correct_user_id(data) \
-				and self.is_correct_character_user(character) \
+				and  character_user\
 				and character.alive
 
 	def is_correct_ask_cast_spell(self, data):
 		# Verify if the ask spell is correct and that the character has not cast a spell yet this turn
 		character = self.get_character_by_id(data['thrower']['id character'])
-		return self.is_correct_ask(character, data) and not self.memory_on_turn['cast spell'][character]
+		
+		casting_done = self.memory_on_turn['cast spell'][character]
+		if casting_done:
+			data['reason'] = ['character already casted a spell']
+		
+		return self.is_correct_ask(character, data) and not casting_done
 
 	def is_correct_ask_move(self, data):
 		# Verify the ask is correct and that the character has not move yet this turn
@@ -292,8 +307,8 @@ class Game(Lobby):
 
 			await self.notify_all(data)
 
-		else:
-			# spell not valid, tell the user who asked
+		else: # spell not valid, tell it to the user who asked
+			data['reason'] = ['Cell not in fov']
 			await self.notify_ask_not_valid(data)
 
 
