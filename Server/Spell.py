@@ -20,7 +20,7 @@ class Spell(object):
 		self.current_cooldown = self.start_cooldown
 		self.fov_type = 'fov'
 		self.impact_type = 'cell'
-		self.damage_amount = -1
+		self.damage_amount = [-1,-1]
 	
 	def compute_damages_on(self, target_cell, touched_cells, team_list, \
 								caster_team ):
@@ -37,7 +37,8 @@ class Spell(object):
 		
 		damages = []
 		for elt in targets:
-			damages += [random.randint(min, max+1)]
+			damages.append(random.randint(self.damage_amount[0], \
+											self.damage_amount[1]))
 		
 		# Apply damages to characters and create data
 		data = []
@@ -64,7 +65,7 @@ class RaySpell(Spell) :
 	'''
 	def __init__(self):
 		Spell.__init__(self)
-		
+		self.damage_amount = [28,32]
 		self.cast_range = [0,10]
 		self.fov_type = 'straight_lines'
 		
@@ -76,7 +77,7 @@ class BombSpell(Spell):
 	
 	def __init__(self):
 		Spell.__init__(self)
-		
+		self.damage_amount = [10,15]
 		self.cast_range   = [2,4]
 		self.impact_type  = 'zone'
 		self.impact_range = 2
