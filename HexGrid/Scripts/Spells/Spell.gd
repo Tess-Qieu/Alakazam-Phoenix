@@ -11,6 +11,8 @@ var cell_targeted = null
 
 var damage_amount
 var does_target_die
+# Variable allowing to memorize damages information untill applying them
+var damages_info_memory
 
 var cast_range = [1,3]
 var start_cooldown = 10
@@ -25,9 +27,18 @@ func euclidean_dist(vec):
 
 
 func apply_on_target():
-	var target = cell_targeted.character_on
-	if target != null:
-		target.receive_damage(damage_amount, does_target_die)
+	# Damages informations are like this:
+	#	id character: ID as int
+	#	damage		: Amount as int
+	#	events		: array of string
+	#	character	: reference to touched character
+	for info in damages_info_memory:
+		if info['character'] != null: 
+			var is_dead = 'character dead' in info['events']
+			info['character'].receive_damage(info['damage'], is_dead)
+	
+	# Reset memory
+	damages_info_memory = {}
 
 
 
@@ -44,10 +55,11 @@ func cast(thrower, target, damages_infos):
 	translation += 1*vect
 	distance_traveled = 1.5*euclidean_dist(vect)
 	
+	# Save information until applying damages
+	damages_info_memory = damages_infos 
+	
+	# Activate animation
 	cell_targeted = target
-	damage_amount = get_damage_amount(damages_infos)# /!\ UGLY SOLUTION, TEMPORARY WHILE WE CHOOSE A BETTER
-	does_target_die = is_information_target_die(damages_infos) # ONLY ONE TARGET FOR NOW
-	# SOLUTION TO APPLY DAMAGE AND EFFECT ON CHARACTERS (FOR NOW ON, ONLY ONE TARGET)
 	is_casting = true
 
 

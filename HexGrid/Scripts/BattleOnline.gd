@@ -114,6 +114,8 @@ func cast_spell_valid(data):
 	var cell_target = get_cell_by_coords(data['target'][0], data['target'][1])
 	var spell_name = data['spell name']
 	var damages_infos = data['damages']
+	for info in damages_infos:
+		info['character'] = get_character_by_id(info['id character'])
 	make_character_cast_spell(character_thrower, cell_target, spell_name, damages_infos)
 
 
