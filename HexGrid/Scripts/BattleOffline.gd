@@ -130,37 +130,3 @@ func get_teams_infos():
 								]
 						}
 					}
-
-
-func _unhandled_key_input(event):
-	if event is InputEventKey and not event.pressed:
-		var direction = Vector3.ZERO
-		if event.scancode == KEY_Q :
-			if event.shift:
-				# move towards -Q
-				direction = Vector3(-1,0,0)
-			else:
-				# move towards +Q
-				direction = Vector3(1,0,0)
-		elif event.scancode == KEY_R :
-			if event.shift:
-				# move towards -R
-				direction = Vector3(0,-1,0)
-			else:
-				# move towards +R
-				direction = Vector3(0,1,0)
-		elif event.scancode == KEY_Z :
-			if event.shift:
-				# move towards -Z
-				direction = Vector3(0,0,-1)
-			else:
-				# move towards +Z
-				direction = Vector3(0,0,1)
-		else:
-			return
-		$Map.add_step(test_path, direction)
-		clear_arena()
-		for c in test_path:
-			c.change_material('green')
-		
-	get_tree().set_input_as_handled()
