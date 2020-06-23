@@ -51,6 +51,9 @@ func set_character(new_character):
 func get_coord_vect3():
 	return Vector3(q, r, -q-r)
 
+func has_character_on():
+	return character_on != null
+
 
 ## EVENT HANDLING SECTION ##
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):

@@ -9,7 +9,7 @@ var distance_to_make = 0
 var distance_traveled = 0
 var cell_targeted = null
 
-var damage_amount
+var damage_amount = [-1,-1]
 var does_target_die
 # Variable allowing to memorize damages information untill applying them
 var damages_info_memory
