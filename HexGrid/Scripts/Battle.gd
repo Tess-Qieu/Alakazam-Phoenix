@@ -1,8 +1,6 @@
 extends Spatial
 
 var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
-var rng = RandomNumberGenerator.new()
-
 
 
 var selected_character: Character
@@ -99,7 +97,7 @@ func _update_character_cell_references(character, new_cell):
 	new_cell.character_on = character
 
 func _on_character_die(character):
-	print('character die')
+	print('Character {0} dead'.format([character.name]))
 	character.die(self)
 
 
@@ -186,7 +184,7 @@ func _on_cell_hovered(cell):
 	elif state == 'cast_spell':
 		clear_arena()
 		if cell in fov:
-			$Map.manage_impact(selected_character.Spells[current_spell], 
+			$Map.display_impact(selected_character.Spells[current_spell], 
 							selected_character.current_cell, cell, 'royalblue')
 							
 	elif state == 'test':
@@ -202,7 +200,7 @@ func _on_character_hovered(character):
 	elif state == 'cast_spell':
 		clear_arena()
 		if character.current_cell in fov:
-			$Map.manage_impact(selected_character.Spells[current_spell], 
+			$Map.display_impact(selected_character.Spells[current_spell], 
 								selected_character.current_cell, \
 								character.current_cell, \
 								'royalblue')
@@ -340,4 +338,4 @@ func _is_character_turn(character):
 	return current_team.has_member(character)
 	
 func _can_player_control_character(character):
-	return character.user_id == Global.user_id
+	return character.user_id == Global.user_id and character.is_alive()

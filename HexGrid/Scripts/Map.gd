@@ -473,12 +473,22 @@ func manage_fov(spell : Spell, origin_cell, color_key):
 										color_key, spell.cast_range[0])
 	return fov
 
-func manage_impact(spell : Spell, origin_cell, target_cell, color_key):
+func display_impact(spell : Spell, origin_cell, target_cell, color_key):
+	var cells = get_impact(spell, origin_cell, target_cell)
+	
+	for c in cells:
+		c.change_material(color_key)
+
+func get_impact(spell : Spell, origin_cell, target_cell):
+	var cells = []
 	match spell.impact_type:
 		'cell':
-			target_cell.change_material(color_key)
-			
+			cells.append(target_cell)
+		
 		'zone':
-			display_zone(target_cell, spell.impact_range, color_key)
-		_:
-			target_cell.change_material(color_key)
+			cells = _compute_zone(target_cell, spell.impact_range)
+		
+		_: # Remarkable and constant default behaviour
+			cells.append(grid[0][0]) 
+		
+	return cells
