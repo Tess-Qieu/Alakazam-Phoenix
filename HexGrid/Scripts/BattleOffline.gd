@@ -4,7 +4,6 @@ var rng = RandomNumberGenerator.new()
 
 
 
-
 func _ready():
 	rng.randomize()
 	# Generate teams and map, then instanciate them
@@ -38,33 +37,21 @@ func ask_cast_spell(character, spell_name, target_cell):
 	# In this function, damage_infos computation
 	
 	var damages_infos = []
-	var damage_amount
-	var target_character
-	var info = {}
 	var spell : Spell = character.Spells[spell_name]
 	
 	var touched_cells = $Map.get_impact(spell,\
 										character.current_cell, \
 										target_cell)
 	
-	for cell in touched_cells:
-		if cell.has_character_on():
-			info = {}
-			target_character = cell.character_on
-			
-			damage_amount = rng.randi_range(spell.damage_amount[0], \
-											spell.damage_amount[1])
-			
-			var is_dead = target_character.current_health - damage_amount <= 0
-			info = {'id character': target_character.id_character,
-					'damage'	: damage_amount,
-					'events'	: [],
-					'character'	: target_character
-					}
-			if is_dead:
-				info['events'] += ['character dead']
-			
-			damages_infos.append(info)
+	var caster_team = null
+	for t in teams.values():
+		if t.has_member(character):
+			caster_team = t
+			break
+		
+	damages_infos = spell.compute_damages_on(target_cell, \
+											touched_cells, \
+											caster_team)
 			
 	make_character_cast_spell(character, target_cell, spell_name, damages_infos)
 

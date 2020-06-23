@@ -1,6 +1,8 @@
 extends KinematicBody
 class_name Spell
 
+var rng = RandomNumberGenerator.new()
+
 export var speed = 10
 
 var is_casting = false
@@ -24,7 +26,45 @@ var impact_type = 'cell'
 func euclidean_dist(vec):
 	return sqrt(pow(vec.x, 2) + pow(vec.z, 2))
 
+func _ready():
+	rng.randomize()
 
+func compute_damages_on(target_cell, touched_cells, caster_team):
+	# target_cell is not used here, but could be used to deal damages
+	#  based on distance from the targeted cell
+	
+	var damages_info = []
+	var target_character = null
+	var dmg
+	var is_dead = false
+	var info
+	
+	# Touched characters research
+	for cell in touched_cells:
+		if cell.has_character_on():
+			# Damages dealt only on opposing team
+			if not caster_team.has_member(cell.character_on):
+				
+				info = {}
+				target_character = cell.character_on
+				
+				dmg = rng.randi_range(damage_amount[0], \
+										damage_amount[1])
+				
+				info = {'id character'	: target_character.id_character,
+						'damage'		: dmg,
+						'events'		: [],
+						'character'		: target_character
+						}
+				
+				is_dead = target_character.current_health - dmg <= 0
+				
+				if is_dead:
+					info['events'] += ['character dead']
+				
+				damages_info.append(info)
+	
+	return damages_info
 
 func apply_on_target():
 	# Damages informations are like this:
