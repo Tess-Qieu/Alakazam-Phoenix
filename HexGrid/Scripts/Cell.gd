@@ -54,6 +54,9 @@ func get_coord_vect3():
 func has_character_on():
 	return character_on != null
 
+func get_coords_string():
+	return "({0};{1})".format([q,r])
+
 
 ## EVENT HANDLING SECTION ##
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
