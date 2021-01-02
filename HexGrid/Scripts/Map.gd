@@ -285,8 +285,67 @@ func display_zone(center, radius, color_key):
 	for cell in zone:
 		cell.change_material(color_key)
 
+func _compute_triangle_recursive(current_cell, cell_ref, height, direction, \
+									triangle, block_filter, select_filter):
+	if distance_cells(current_cell, cell_ref) == height-1:
+		return
+	else:
+#		print("DEBUG: aimed cell : ({0};{1})".format([current_cell.q + direction.x,current_cell.r + direction.y]))
+		# this cell indicates the aimed direction in a 2 cells range
+		var target_cell = grid[int(current_cell.q + direction.x)][int(current_cell.r + direction.y)]
+		
+		# Looking for closest neighbor of target_cell 
+		# --> Gives 2 cells in the wright direction
+		for n in _neighbors(current_cell):
+			if not (n in triangle) and distance_cells(n, target_cell) == 1 \
+				and not(n.kind in block_filter):
+				if n.kind in select_filter:
+					triangle.append(n)
+				# Continues the triangle contruction from the new cell
+				_compute_triangle_recursive(n, cell_ref, height, direction, \
+											triangle, block_filter, select_filter)
 
+func _compute_triangle(cell_top, cell_target, height, \
+									block_filter = BLOCKING_VIEW, \
+									select_filter = SELECTABLE_CELLS):
+	# Computes a triangle from a given cell to a target cell
+	
+	var direction = cell_target.get_coord_vect3() - cell_top.get_coord_vect3()
+#	print("DEBUG: Direction is {0}".format([direction]))
+#	print("DEBUG: cell top is {0}, cell target is {1}".format( \
+#			[cell_top.get_coords_string(), cell_target.get_coords_string()]))
+	# Early return if the cells are not correctly aligned
+	if not( (# Target on x axis:
+			direction.x == -2*direction.y and direction.x == -2*direction.z)
+		or
+			(# Target on y axis:
+			direction.y == -2*direction.x and direction.y == -2*direction.z)
+		or 
+			(# Target on z axis:
+			direction.z == -2*direction.x and direction.z == -2*direction.y)
+			):
+		print("{0} and {1} are not aligned".format(
+			[cell_top.get_coords_string(), cell_target.get_coords_string()]))
+		return
+	
+	# Vectorial direction computation
+	var vect_dir : Vector3 = cell_target.get_coord_vect3() \
+								- cell_top.get_coord_vect3()
+	vect_dir = (vect_dir*2)/distance_cells(cell_target, cell_top)
+	
+	var triangle = [cell_top]
+	_compute_triangle_recursive(cell_top, cell_top, height, vect_dir, triangle, \
+								block_filter, select_filter)
+	return triangle
 
+func display_triangle(cell_top, cell_target, height, color_key):
+	var triangle = _compute_triangle(cell_top, cell_target, height)
+	
+	if triangle == null:
+		print("Triangle is empty\n")
+	else:
+		for cell in triangle:
+			cell.change_material(color_key)
 
 
 

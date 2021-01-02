@@ -158,6 +158,7 @@ func _on_character_clicked(character):
 		_select_character(character)
 
 func _on_cell_clicked(cell):
+#	print(state)
 	if state == 'normal':
 		if len(path_serialized) > 0 :
 			_ask_move(selected_character, path_serialized)
@@ -170,7 +171,9 @@ func _on_cell_clicked(cell):
 		clear_arena()
 	
 	elif state == 'test':
-		test_path = [cell]
+		#test_path = [cell]
+		clear_arena()
+		$Map.display_triangle(selected_character.current_cell, cell, 3, 'green')
 
 
 
@@ -187,9 +190,9 @@ func _on_cell_hovered(cell):
 			$Map.display_impact(selected_character.Spells[current_spell], 
 							selected_character.current_cell, cell, 'royalblue')
 							
-	elif state == 'test':
-		clear_arena()
-		cell.change_material('green')
+#	elif state == 'test':
+#		clear_arena()
+#		cell.change_material('green')
 	
 func _on_character_hovered(character):
 	if state == 'normal' and _has_not_already_done_action(character, 'move'):
