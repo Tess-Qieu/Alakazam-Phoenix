@@ -25,17 +25,6 @@ func _on_ButtonEndTurn_pressed():
 	node_battle.ask_end_turn()
 
 
-func _on_Button_toggled(button_pressed):
-	if button_pressed:
-#		print("Get down!")
-		node_battle.state = 'test'
-		node_battle.clear_arena()
-	else:
-#		print("Get up!")
-		node_battle.state = 'normal'
-		node_battle.clear_arena()
-
-
 ## USEFULL FUNCTIONS ##
 func add_character_info(character:Character, team:Team):
 	# Looking through each team container existing. If one has the same name

@@ -170,10 +170,9 @@ func _on_cell_clicked(cell):
 		state = 'normal'
 		clear_arena()
 	
-	elif state == 'test':
-		#test_path = [cell]
-		clear_arena()
-		$Map.display_triangle(selected_character.current_cell, cell, 4, 'green')
+#	elif state == 'test':
+#		#test_path = [cell]
+#		clear_arena()
 
 
 

@@ -64,7 +64,7 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 margin_left = -60.0
-margin_top = -30.0
+margin_top = -26.0
 margin_right = 60.0
 grow_horizontal = 2
 grow_vertical = 0
@@ -73,25 +73,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Button" type="Button" parent="EndTurn_Widget"]
+[node name="ButtonEndTurn" type="Button" parent="EndTurn_Widget"]
 margin_right = 120.0
 margin_bottom = 20.0
-toggle_mode = true
-text = "TEST"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="ButtonEndTurn" type="Button" parent="EndTurn_Widget"]
-margin_top = 24.0
-margin_right = 120.0
-margin_bottom = 44.0
 text = "End of Turn"
 
 [node name="TimerBar" type="ProgressBar" parent="EndTurn_Widget"]
-margin_top = 48.0
+margin_top = 24.0
 margin_right = 120.0
-margin_bottom = 50.0
+margin_bottom = 26.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 custom_styles/fg = SubResource( 1 )
@@ -99,5 +89,4 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
-[connection signal="toggled" from="EndTurn_Widget/Button" to="." method="_on_Button_toggled"]
 [connection signal="pressed" from="EndTurn_Widget/ButtonEndTurn" to="." method="_on_ButtonEndTurn_pressed"]
