@@ -173,7 +173,7 @@ func _on_cell_clicked(cell):
 	elif state == 'test':
 		#test_path = [cell]
 		clear_arena()
-		$Map.display_triangle(selected_character.current_cell, cell, 3, 'green')
+		$Map.display_triangle(selected_character.current_cell, cell, 4, 'green')
 
 
 

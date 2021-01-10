@@ -348,6 +348,76 @@ func display_triangle(cell_top, cell_target, height, color_key):
 			cell.change_material(color_key)
 
 
+func _compute_hexa_points(cell_origin, radius, isEvenRangePointy = true, \
+							 select_filter = SELECTABLE_CELLS):
+	# Computes the 6 corners of an hexagon, based on a given cell and a radius
+	# By default, even and odd radius are not managed the same way :
+	# For an odd range, the returned cells have a side parallel to the origin cell
+	#   Example : with radius = 1, the returned cells are the direct neighbors
+	# For an even range, the default behaviour is returning the cells that have
+	# a corner pointing to the origin cell. 
+	#
+	# Example with radius = 2
+	# DEFAULT EVEN RADIUS BEHEVIOUR      ## MODIFIED EVEN RADIUS BEHAVIOUR 
+	#                                    ## (identical to odd radius behaviour)
+	# \ / \ / \ / \ /  # O = Origin Cell ## \ / \ / \ / \ /  #
+	#  | X |   |   |   # X=Returned cell ##  |   |   |   |   #
+	# / \ / \ / \ / \  #                 ## / \ / \ / \ / \  #
+	#|   |   | O |   | #                 ##| X |   | O |   | #
+	# \ / \ / \ / \ /  #                 ## \ / \ / \ / \ /  #
+	#  | X |   |   |   #                 ##  |   |   |   |   #
+	# / \ / \ / \ / \  #                 ## / \ / \ / \ / \  #
+	#|   |   | X |   | #                 ##|   | X |   | X | #
+	# \ / \ / \ / \ /  #                 ## \ / \ / \ / \ /  #
+	#
+	var points = []
+	var points_vect3 = []
+	
+	# Getting origin coordinates in a vect3 format
+	var origin_coord : Vector3 = cell_origin.get_coord_vect3()
+	
+	if radius < 1: #value protection
+		print("Radius can't be less than 1. Provided radius: {0}".format([radius]))
+		return
+	
+	# Compute each of six coordinates
+	if isEvenRangePointy:
+		points_vect3.append( origin_coord + Vector3(radius, int(-radius/2), int(-radius/2)) )
+		points_vect3.append( origin_coord + Vector3(-radius, int(radius/2), int(radius/2)) )
+		points_vect3.append( origin_coord + Vector3(int(-radius/2), radius, int(-radius/2)) )
+		points_vect3.append( origin_coord + Vector3(int(radius/2), -radius, int(radius/2)) )
+		points_vect3.append( origin_coord + Vector3(int(-radius/2), int(-radius/2), radius) )
+		points_vect3.append( origin_coord + Vector3(int(radius/2), int(radius/2), -radius) )
+	else:
+		points_vect3.append( origin_coord + Vector3(0.0, radius, -radius) )
+		points_vect3.append( origin_coord + Vector3(0.0, -radius, radius) )
+		points_vect3.append( origin_coord + Vector3(radius, 0.0, -radius) )
+		points_vect3.append( origin_coord + Vector3(-radius, 0.0, radius) )
+		points_vect3.append( origin_coord + Vector3(radius, -radius, 0.0) )
+		points_vect3.append( origin_coord + Vector3(-radius, radius, 0.0) )
+		
+	# Addition of each cell in output list
+	for c in points_vect3:
+		var cell = grid[int(c.x)][int(c.y)]
+#		print(cell.get_coords_string())
+		if cell.kind in select_filter:
+			points.append( cell )
+#		else:
+#			print("DEBUG: {0} not selectable".format([cell.kind]))
+	
+	return points
+
+func display_hexa_points(cell_origin, radius, color_key):
+	var points = _compute_hexa_points(cell_origin, radius)
+	
+#	print("DEBUG: In display_hexa_points : point.len={0}".format([points.size()]))
+	
+	for c in points:
+		c.change_material(color_key)
+	
+	return points
+
+
 
 ## HANDLE PATH FINDING ##
 func _neighbors (cell):
@@ -420,7 +490,7 @@ func _compute_path(start, end, distance_max):
 		return []
 		
 	# The path is calculated from end to start, then reversed	
-	var _path = [end]	
+	var _path = [end]
 	current_cell = came_from[end]
 	while current_cell != start and current_cell != null:
 		_path.append(current_cell)
@@ -519,7 +589,7 @@ func clear():
 		c.change_material('floor')
 
 func manage_fov(spell : Spell, origin_cell, color_key):
-	var fov
+	var fov = []
 	match spell.fov_type:
 		'straight_lines':
 			fov = display_straight_lines_fov(origin_cell, spell.cast_range[1],
@@ -527,6 +597,8 @@ func manage_fov(spell : Spell, origin_cell, color_key):
 		'fov':
 			fov = display_field_of_view(origin_cell, spell.cast_range[1], 
 										color_key, spell.cast_range[0])
+		'hexa_points':
+			fov = display_hexa_points(origin_cell, spell.cast_range[0], color_key)
 		_:
 			fov = display_field_of_view(origin_cell, spell.cast_range[1], 
 										color_key, spell.cast_range[0])
@@ -546,6 +618,9 @@ func get_impact(spell : Spell, origin_cell, target_cell):
 		
 		'zone':
 			cells = _compute_zone(target_cell, spell.impact_range)
+		
+		'breath':
+			cells = _compute_triangle(origin_cell, target_cell, spell.cast_range[1])
 		
 		_: # Remarkable and constant default behaviour
 			cells.append(grid[0][0]) 

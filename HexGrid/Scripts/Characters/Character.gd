@@ -32,7 +32,8 @@ var destination_cell
 
 ## Spells List ##
 var Spells = {'CannonBall' : "res://Scenes/Spells/RaySpell.tscn",
-				'Missile'  : "res://Scenes/Spells/BombSpell.tscn"}
+				'Missile'  : "res://Scenes/Spells/BombSpell.tscn",
+			'Flamethrower' : "res://Scenes/Spells/BreathSpell.tscn"}
 
 
 ## GENERAL SECTION ##
