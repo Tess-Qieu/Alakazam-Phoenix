@@ -81,3 +81,15 @@ class BombSpell(Spell):
 		self.cast_range   = [2,4]
 		self.impact_type  = 'zone'
 		self.impact_range = 2
+
+class BreathSpell(Spell):
+	'''
+	classdocs
+	'''
+	
+	def __init(self):
+		Spell.__init__(self)
+		self.damage_amount = [8,13]
+		self.cast_range = [2,4] #First value is cast range, second is triangle height
+		self.fov_type = 'hexa_points'
+		self.impact_type = 'breath'

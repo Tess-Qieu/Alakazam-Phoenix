@@ -1,6 +1,7 @@
 import random
 # from collections import namedtuple
 from Spell import Spell
+from builtins import False
 
 
 def distance_coord(q1, r1, q2, r2):
@@ -22,7 +23,9 @@ class Cell():
 		self.q = q
 		self.r = r
 		self.kind = kind
-
+	
+	def get_coord3(self):
+		return [self.q, self.r, -self.q-self.r]
 
 class Map():
 	'''Contains a representation of the map'''
@@ -241,6 +244,29 @@ class Map():
 			or ((target.q - origin.q) == (target.r - origin.r)):
 			
 			return self.has_vision_on(origin, target)
+	
+	def is_target_in_hexa_points_fov(self, origin : Cell, target : Cell, \
+									radius : int):
+		result = False
+		origin_coord = origin.get_coord3()
+		target_coord = target.get_coord3()
+		
+		if (radius % 2) == 0:	
+			result = ( target_coord == origin_coord +[-radius, radius/2, radius/2] ) \
+				  or ( target_coord == origin_coord -[-radius, radius/2, radius/2] ) \
+				  or ( target_coord == origin_coord +[radius/2, -radius, radius/2] ) \
+				  or ( target_coord == origin_coord -[radius/2, -radius, radius/2] ) \
+				  or ( target_coord == origin_coord +[radius/2, radius/2, -radius] ) \
+				  or ( target_coord == origin_coord -[radius/2, radius/2, -radius] )
+		else:
+			result = ( target_coord == origin_coord +[-radius, radius, 0] ) \
+				  or ( target_coord == origin_coord -[-radius, radius, 0] ) \
+				  or ( target_coord == origin_coord +[radius, 0, -radius] ) \
+				  or ( target_coord == origin_coord -[radius, 0, -radius] ) \
+				  or ( target_coord == origin_coord +[0, radius, -radius] ) \
+				  or ( target_coord == origin_coord -[0, radius, -radius] )
+		
+		return result
 
 	def is_target_in_fov(self, spell : Spell, caster_cell, target_cell):
 		''' Function managing if a character placed on a given cell 
@@ -256,6 +282,10 @@ class Map():
 													spell.cast_range[1])
 		elif spell.fov_type == 'fov': 
 			return self.has_vision_on(caster_cell, target_cell)
+		
+		elif spell.fov_type == 'hexa_points':
+			return self.is_target_in_hexapoint_fov()
+		
 		else:
 			return False
 	
@@ -275,4 +305,6 @@ class Map():
 			return [target_cell]
 		elif spell.impact_type == 'zone':
 			return self._compute_zone(target_cell, spell.impact_range)
+		elif spell.impact_type == 'breath'
+			return [] #TODO
 		return []
