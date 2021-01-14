@@ -328,13 +328,11 @@ func _compute_triangle(cell_top, cell_target, height, \
 			[cell_top.get_coords_string(), cell_target.get_coords_string()]))
 		return
 	
-	# Vectorial direction computation
-	var vect_dir : Vector3 = cell_target.get_coord_vect3() \
-								- cell_top.get_coord_vect3()
-	vect_dir = (vect_dir*2)/distance_cells(cell_target, cell_top)
+	# Resize of the direction vect
+	direction = (direction*2)/distance_cells(cell_target, cell_top)
 	
 	var triangle = [cell_top]
-	_compute_triangle_recursive(cell_top, cell_top, height, vect_dir, triangle, \
+	_compute_triangle_recursive(cell_top, cell_top, height, direction, triangle, \
 								block_filter, select_filter)
 	return triangle
 

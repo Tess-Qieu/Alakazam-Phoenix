@@ -1,12 +1,10 @@
 import random
 # from collections import namedtuple
 from Spell import Spell
-from builtins import False
 
 
-def distance_coord(q1, r1, q2, r2):
-	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
-
+# def distance_coord(q1, r1, q2, r2):
+# 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
 # Cell = namedtuple('Cell', ['q', 'r', 'kind'])
 
@@ -82,7 +80,7 @@ class Map():
 		
 		# Line calculation between two cells
 		line = []
-		N = int(distance_coord(start.q, start.r, end.q, end.r))
+		N = int(self.distance_coords(start.q, start.r, end.q, end.r))
 		
 		# Addition of starting cell
 		line.append(start)
@@ -145,7 +143,7 @@ class Map():
 			q = -self.RAY - r if r <= 0 else -self.RAY
 			# first part : random
 			for i in range(half):
-				if distance_coord(q, r, 0, 0) > self.RAY_ARENA:
+				if self.distance_coords(q, r, 0, 0) > self.RAY_ARENA:
 					kind = 'border'
 				else:
 					kind = _random_kind(self)
@@ -185,7 +183,31 @@ class Map():
 				return False
 			current_cell = cell
 		return True
-	
+
+	def neighbors(self, cell:Cell):
+		liste = []
+		
+		if self.grid[cell.q][cell.r+1] != None:
+			liste.append([cell.q][cell.r+1])
+			
+		if self.grid[cell.q][cell.r-1] != None:
+			liste.append([cell.q][cell.r-1])
+			
+		if self.grid[cell.q+1][cell.r] != None:
+			liste.append([cell.q+1][cell.r])
+			
+		if self.grid[cell.q-1][cell.r] != None:
+			liste.append([cell.q-1][cell.r])
+			
+		if self.grid[cell.q-1][cell.r+1] != None:
+			liste.append([cell.q-1][cell.r+1])
+			
+		if self.grid[cell.q+1][cell.r-1] != None:
+			liste.append([cell.q+1][cell.r-1])
+			
+		return liste
+		
+		
 	## VARIOUS SHAPES SECTION ##
 	def _compute_zone(self, center, radius, selection_filter = ['floor', \
 																'blocked']):
@@ -199,7 +221,49 @@ class Map():
 				if self.grid[q][r].kind in selection_filter:
 					zone.append(self.grid[q][r])
 		return zone
+	
+	def _compute_triangle_recursive(self, current_cell : Cell, cell_ref:Cell,
+								height, direction, triangle, select_filter, block_filter):
+		if self.distance_cells(current_cell, cell_ref) == height -1:
+			return
+		else:
+			target_cell = self.grid[current_cell.q + direction[0]][current_cell.r + direction[1]]
+			
+			for n in self.neighbors(current_cell):
+				if  not n in triangle \
+					and self.distance_cells(n, target_cell) == 1 \
+					and not n.kind in block_filter:
+					if n.kind in select_filter:
+						triangle.append(n)
+					
+					self._compute_triangle_recursive(n, cell_ref, height, direction, triangle, select_filter, block_filter)
 
+
+
+	def _compute_triangle(self, start : Cell, target : Cell, height, \
+						selection_filter = ['floor', 'blocked'], \
+						block_filter = ['border', 'full']):
+		''' TODO
+			
+			@author: Gauth
+		'''
+		direction = target.get_coord3() - start.get_coord3()
+		
+		if not ( ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
+				or ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
+				or ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
+				):
+			print("ERROR: cells are not aligned")
+			return []
+		
+		direction = (direction*2)/self.distance_cells(start, target)
+		
+		triangle = [start]
+		
+		# recursive construction
+		self._compute_triangle_recursive(start, start, height, direction, triangle, selection_filter, block_filter)
+		
+		return triangle
 	
 	## VISION SECTION ##
 	
@@ -247,6 +311,10 @@ class Map():
 	
 	def is_target_in_hexa_points_fov(self, origin : Cell, target : Cell, \
 									radius : int):
+		''' TODO
+			 
+			@author: Gauth
+		'''
 		result = False
 		origin_coord = origin.get_coord3()
 		target_coord = target.get_coord3()
@@ -306,5 +374,5 @@ class Map():
 		elif spell.impact_type == 'zone':
 			return self._compute_zone(target_cell, spell.impact_range)
 		elif spell.impact_type == 'breath'
-			return [] #TODO
+			return self._compute_triangle(caster_cell, target_cell, spell.cast_range[1])
 		return []
