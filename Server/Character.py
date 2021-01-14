@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from Spell import RaySpell, BombSpell
+from Spell import RaySpell, BombSpell, BreathSpell
 
 
 def distance_coord(q1, r1, q2, r2):
@@ -13,7 +13,8 @@ class Character():
 	# List of spells the character knows
 	#  At runtime, class references are converted to instances
 	Spells = {'CannonBall'	: RaySpell(),
-			 	'Missile'	: BombSpell() }
+			 	'Missile'	: BombSpell(),
+			 'Flamethrower'	: BreathSpell() }
 	
 # 	# Cell on the Map where the character is currently placed
 # 	current_cell : Cell

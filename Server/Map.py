@@ -2,11 +2,11 @@ import random
 # from collections import namedtuple
 from Spell import Spell
 
-
 # def distance_coord(q1, r1, q2, r2):
 # 	return (abs(q1 - q2) + abs(q1 + r1 - q2 - r2) + abs(r1 - r2)) / 2
 
 # Cell = namedtuple('Cell', ['q', 'r', 'kind'])
+
 
 class Cell():
 	''' Class representing a cell on the Map 
@@ -23,7 +23,8 @@ class Cell():
 		self.kind = kind
 	
 	def get_coord3(self):
-		return [self.q, self.r, -self.q-self.r]
+		return [self.q, self.r, -self.q - self.r]
+
 
 class Map():
 	'''Contains a representation of the map'''
@@ -187,36 +188,35 @@ class Map():
 	def neighbors(self, cell:Cell):
 		liste = []
 		
-		if self.grid[cell.q][cell.r+1] != None:
-			liste.append([cell.q][cell.r+1])
+		if self.grid[cell.q][cell.r + 1] != None:
+			liste.append([cell.q][cell.r + 1])
 			
-		if self.grid[cell.q][cell.r-1] != None:
-			liste.append([cell.q][cell.r-1])
+		if self.grid[cell.q][cell.r - 1] != None:
+			liste.append([cell.q][cell.r - 1])
 			
-		if self.grid[cell.q+1][cell.r] != None:
-			liste.append([cell.q+1][cell.r])
+		if self.grid[cell.q + 1][cell.r] != None:
+			liste.append([cell.q + 1][cell.r])
 			
-		if self.grid[cell.q-1][cell.r] != None:
-			liste.append([cell.q-1][cell.r])
+		if self.grid[cell.q - 1][cell.r] != None:
+			liste.append([cell.q - 1][cell.r])
 			
-		if self.grid[cell.q-1][cell.r+1] != None:
-			liste.append([cell.q-1][cell.r+1])
+		if self.grid[cell.q - 1][cell.r + 1] != None:
+			liste.append([cell.q - 1][cell.r + 1])
 			
-		if self.grid[cell.q+1][cell.r-1] != None:
-			liste.append([cell.q+1][cell.r-1])
+		if self.grid[cell.q + 1][cell.r - 1] != None:
+			liste.append([cell.q + 1][cell.r - 1])
 			
 		return liste
 		
-		
-	## VARIOUS SHAPES SECTION ##
-	def _compute_zone(self, center, radius, selection_filter = ['floor', \
+	# # VARIOUS SHAPES SECTION ##
+	def _compute_zone(self, center, radius, selection_filter=['floor', \
 																'blocked']):
 		zone = []
-		z = -center.q -center.r
+		z = -center.q - center.r
 		
-		for q in range(center.q-radius, center.q+radius+1):
-			for r in range( max(center.r-radius, -q-z-radius), \
-							min(center.r+radius, -q-z+radius) +1):
+		for q in range(center.q - radius, center.q + radius + 1):
+			for r in range(max(center.r - radius, -q - z - radius), \
+							min(center.r + radius, -q - z + radius) + 1):
 				
 				if self.grid[q][r].kind in selection_filter:
 					zone.append(self.grid[q][r])
@@ -224,7 +224,7 @@ class Map():
 	
 	def _compute_triangle_recursive(self, current_cell : Cell, cell_ref:Cell,
 								height, direction, triangle, select_filter, block_filter):
-		if self.distance_cells(current_cell, cell_ref) == height -1:
+		if self.distance_cells(current_cell, cell_ref) == height - 1:
 			return
 		else:
 			target_cell = self.grid[current_cell.q + direction[0]][current_cell.r + direction[1]]
@@ -238,25 +238,23 @@ class Map():
 					
 					self._compute_triangle_recursive(n, cell_ref, height, direction, triangle, select_filter, block_filter)
 
-
-
 	def _compute_triangle(self, start : Cell, target : Cell, height, \
-						selection_filter = ['floor', 'blocked'], \
-						block_filter = ['border', 'full']):
+						selection_filter=['floor', 'blocked'], \
+						block_filter=['border', 'full']):
 		''' TODO
 			
 			@author: Gauth
 		'''
 		direction = target.get_coord3() - start.get_coord3()
 		
-		if not ( ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
-				or ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
-				or ( direction[0] == -2*direction[1] and direction[0] = -2*direction[2] ) \
+		if not ((direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
+				or (direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
+				or (direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
 				):
 			print("ERROR: cells are not aligned")
 			return []
 		
-		direction = (direction*2)/self.distance_cells(start, target)
+		direction = (direction * 2) / self.distance_cells(start, target)
 		
 		triangle = [start]
 		
@@ -265,9 +263,9 @@ class Map():
 		
 		return triangle
 	
-	## VISION SECTION ##
+	# # VISION SECTION ##
 	
-	def has_vision_on(self, cell_from, cell_target, blocked_by = ['border', \
+	def has_vision_on(self, cell_from, cell_target, blocked_by=['border', \
 																  'full']):
 		''' Function computing a field of view (fov) from a cell
 			 and returning if an other cell is in this fov
@@ -320,19 +318,24 @@ class Map():
 		target_coord = target.get_coord3()
 		
 		if (radius % 2) == 0:	
-			result = ( target_coord == origin_coord +[-radius, radius/2, radius/2] ) \
-				  or ( target_coord == origin_coord -[-radius, radius/2, radius/2] ) \
-				  or ( target_coord == origin_coord +[radius/2, -radius, radius/2] ) \
-				  or ( target_coord == origin_coord -[radius/2, -radius, radius/2] ) \
-				  or ( target_coord == origin_coord +[radius/2, radius/2, -radius] ) \
-				  or ( target_coord == origin_coord -[radius/2, radius/2, -radius] )
+			result = (target_coord == origin_coord + [-radius, int(radius/2), int(radius/2)] ) \
+				  or (target_coord == origin_coord + -1*[-radius, int(radius/2), int(radius/2)] ) \
+				  or (target_coord == origin_coord + [int(radius/2), -radius, int(radius/2)] ) \
+				  or (target_coord == origin_coord + -1*[int(radius/2), -radius, int(radius/2)] ) \
+				  or (target_coord == origin_coord + [int(radius/2), int(radius/2), -radius] ) \
+				  or (target_coord == origin_coord + -1*[int(radius/2), int(radius/2), -radius] )
 		else:
-			result = ( target_coord == origin_coord +[-radius, radius, 0] ) \
-				  or ( target_coord == origin_coord -[-radius, radius, 0] ) \
-				  or ( target_coord == origin_coord +[radius, 0, -radius] ) \
-				  or ( target_coord == origin_coord -[radius, 0, -radius] ) \
-				  or ( target_coord == origin_coord +[0, radius, -radius] ) \
-				  or ( target_coord == origin_coord -[0, radius, -radius] )
+			result = (target_coord == origin_coord + [-radius, radius, 0]) \
+				  or (target_coord == origin_coord + -1*[-radius, radius, 0]) \
+				  or (target_coord == origin_coord + [radius, 0, -radius]) \
+				  or (target_coord == origin_coord + -1*[radius, 0, -radius]) \
+				  or (target_coord == origin_coord + [0, radius, -radius]) \
+				  or (target_coord == origin_coord + -1*[0, radius, -radius])
+		
+		if not result:
+			print("DEBUG: ########\n" + \
+				"origin:({},{}) and target:({},{}) ".format(origin.q, origin.r, target.q, target.r)+\
+				"are not aligned\n#############")
 		
 		return result
 
@@ -343,6 +346,9 @@ class Map():
 			 
 			@author: Gauth
 		'''
+# 		print("DEBUG: ########\n"+\
+# 				"fov type :"+ spell.fov_type\
+# 				+"\n#############")
 		if spell.fov_type == 'straight_lines':
 			return self.is_target_in_straight_line_fov(caster_cell, \
 													target_cell, \
@@ -352,7 +358,9 @@ class Map():
 			return self.has_vision_on(caster_cell, target_cell)
 		
 		elif spell.fov_type == 'hexa_points':
-			return self.is_target_in_hexapoint_fov()
+			return self.is_target_in_hexa_points_fov(caster_cell, \
+													target_cell,
+													spell.cast_range[0])
 		
 		else:
 			return False
@@ -373,6 +381,6 @@ class Map():
 			return [target_cell]
 		elif spell.impact_type == 'zone':
 			return self._compute_zone(target_cell, spell.impact_range)
-		elif spell.impact_type == 'breath'
+		elif spell.impact_type == 'breath':
 			return self._compute_triangle(caster_cell, target_cell, spell.cast_range[1])
 		return []

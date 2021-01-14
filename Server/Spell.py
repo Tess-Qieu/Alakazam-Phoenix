@@ -87,9 +87,10 @@ class BreathSpell(Spell):
 	classdocs
 	'''
 	
-	def __init(self):
+	def __init__(self):
 		Spell.__init__(self)
 		self.damage_amount = [8,13]
 		self.cast_range = [2,4] #First value is cast range, second is triangle height
 		self.fov_type = 'hexa_points'
 		self.impact_type = 'breath'
+		
