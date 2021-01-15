@@ -189,22 +189,22 @@ class Map():
 		liste = []
 		
 		if self.grid[cell.q][cell.r + 1] != None:
-			liste.append([cell.q][cell.r + 1])
+			liste.append(self.grid[cell.q][cell.r + 1])
 			
 		if self.grid[cell.q][cell.r - 1] != None:
-			liste.append([cell.q][cell.r - 1])
+			liste.append(self.grid[cell.q][cell.r - 1])
 			
 		if self.grid[cell.q + 1][cell.r] != None:
-			liste.append([cell.q + 1][cell.r])
+			liste.append(self.grid[cell.q + 1][cell.r])
 			
 		if self.grid[cell.q - 1][cell.r] != None:
-			liste.append([cell.q - 1][cell.r])
+			liste.append(self.grid[cell.q - 1][cell.r])
 			
 		if self.grid[cell.q - 1][cell.r + 1] != None:
-			liste.append([cell.q - 1][cell.r + 1])
+			liste.append(self.grid[cell.q - 1][cell.r + 1])
 			
 		if self.grid[cell.q + 1][cell.r - 1] != None:
-			liste.append([cell.q + 1][cell.r - 1])
+			liste.append(self.grid[cell.q + 1][cell.r - 1])
 			
 		return liste
 		
@@ -248,14 +248,19 @@ class Map():
 		direction = [target.q - start.q, target.r -start.r, (-target.q -target.r) - (-start.q -start.r)]
 		
 		if not ((direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
-				or (direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
-				or (direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
+			or ( direction[1] == -2 * direction[0] and direction[1] == -2 * direction[2]) \
+			or ( direction[2] == -2 * direction[0] and direction[2] == -2 * direction[1]) \
 				):
 			print("ERROR: cells are not aligned")
+# 			print("DEBUG:###########\n"+\
+# 				"start:({},{}), target:({},{}), direction:{}".format(\
+# 					start.q, start.r, target.q, target.r, direction) \
+# 				+"\n#################")
 			return []
 		
-		# TODO : Operation entre listes et flottant non possibles
-		direction = (direction * 2) / self.distance_cells(start, target)
+		# Resize of direction to obtain a 2-cells long "vector"
+		for index in range(len(direction)):
+			direction[index] = direction[index] * 2 / self.distance_cells(start, target)
 		
 		triangle = [start]
 		
