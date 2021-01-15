@@ -307,9 +307,9 @@ class Map():
 			max_dist < self.distance_cells(target, origin):
 			return False
 		
-		# Constant Q, Constant R or Delta_Q = Delta_R
+		# Constant Q, Constant R or Constant Z
 		if origin.q == target.q or origin.r == target.r \
-			or ((target.q - origin.q) == (target.r - origin.r)):
+			or ( (-origin.r -origin.q) == (-target.r -target.q) ):
 			
 			return self.has_vision_on(origin, target)
 	
