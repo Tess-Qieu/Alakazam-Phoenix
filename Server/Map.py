@@ -245,7 +245,7 @@ class Map():
 			
 			@author: Gauth
 		'''
-		direction = target.get_coord3() - start.get_coord3()
+		direction = [target.q - start.q, target.r -start.r, (-target.q -target.r) - (-start.q -start.r)]
 		
 		if not ((direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
 				or (direction[0] == -2 * direction[1] and direction[0] == -2 * direction[2]) \
@@ -254,6 +254,7 @@ class Map():
 			print("ERROR: cells are not aligned")
 			return []
 		
+		# TODO : Operation entre listes et flottant non possibles
 		direction = (direction * 2) / self.distance_cells(start, target)
 		
 		triangle = [start]
@@ -314,28 +315,72 @@ class Map():
 			@author: Gauth
 		'''
 		result = False
+		targets = []
 		origin_coord = origin.get_coord3()
 		target_coord = target.get_coord3()
+# 		print("DEBUG: ########\n" + \
+# 				"radius:{}".format(radius)+\
+# 				"\n#############")
 		
-		if (radius % 2) == 0:	
-			result = (target_coord == origin_coord + [-radius, int(radius/2), int(radius/2)] ) \
-				  or (target_coord == origin_coord + -1*[-radius, int(radius/2), int(radius/2)] ) \
-				  or (target_coord == origin_coord + [int(radius/2), -radius, int(radius/2)] ) \
-				  or (target_coord == origin_coord + -1*[int(radius/2), -radius, int(radius/2)] ) \
-				  or (target_coord == origin_coord + [int(radius/2), int(radius/2), -radius] ) \
-				  or (target_coord == origin_coord + -1*[int(radius/2), int(radius/2), -radius] )
+		if (radius % 2) == 0:
+			targets.append([origin_coord[0] -radius,\
+							origin_coord[1] +radius/2,\
+							origin_coord[2] +radius/2] )
+			
+			targets.append([origin_coord[0] +radius,\
+							origin_coord[1] -radius/2,\
+							origin_coord[2] -radius/2] ) 
+			
+			targets.append([origin_coord[0] +radius/2,\
+							origin_coord[1] -radius,\
+							origin_coord[2] +radius/2] ) 
+			
+			targets.append([origin_coord[0] -radius/2,\
+							origin_coord[1] +radius,\
+							origin_coord[2] -radius/2] )
+			
+			targets.append([origin_coord[0] +radius/2,\
+							origin_coord[1] +radius/2,\
+							origin_coord[2] -radius] ) 
+			
+			targets.append([origin_coord[0] -radius/2,\
+							origin_coord[1] -radius/2,\
+							origin_coord[2] +radius] ) 
+# 			print("DEBUG: ########\n" + \
+# 				"targets:\n")
+# 			for i in targets:
+# 				print("{}\n".format(i))
+# 			print("###############")
+			result = target_coord in targets
 		else:
-			result = (target_coord == origin_coord + [-radius, radius, 0]) \
-				  or (target_coord == origin_coord + -1*[-radius, radius, 0]) \
-				  or (target_coord == origin_coord + [radius, 0, -radius]) \
-				  or (target_coord == origin_coord + -1*[radius, 0, -radius]) \
-				  or (target_coord == origin_coord + [0, radius, -radius]) \
-				  or (target_coord == origin_coord + -1*[0, radius, -radius])
+			targets.append([origin_coord[0] -radius,\
+							origin_coord[1] +radius,\
+							origin_coord[2]	+0] )
+			
+			targets.append([origin_coord[0] +radius,\
+							origin_coord[1] -radius,\
+							origin_coord[2] -0] ) 
+			
+			targets.append([origin_coord[0] +radius,\
+							origin_coord[1] +0,\
+							origin_coord[2] -radius] ) 
+			
+			targets.append([origin_coord[0] -radius,\
+							origin_coord[1] +0,\
+							origin_coord[2] +radius] )
+			
+			targets.append([origin_coord[0] +radius,\
+							origin_coord[1] -radius,\
+							origin_coord[2] +0] ) 
+			
+			targets.append([origin_coord[0] -radius,\
+							origin_coord[1] +radius,\
+							origin_coord[2] +0] )
 		
-		if not result:
-			print("DEBUG: ########\n" + \
-				"origin:({},{}) and target:({},{}) ".format(origin.q, origin.r, target.q, target.r)+\
-				"are not aligned\n#############")
+# 		if not result:
+# 			print("DEBUG: ########\n" + \
+# 				"origin:({},{}) and target:({},{}) ".format(origin.q, origin.r, target.q, target.r)+\
+# 				"are not aligned\n#############")
 		
 		return result
 
