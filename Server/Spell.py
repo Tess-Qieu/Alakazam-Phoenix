@@ -66,7 +66,7 @@ class RaySpell(Spell) :
 	def __init__(self):
 		Spell.__init__(self)
 		self.damage_amount = [28,32]
-		self.cast_range = [0,10]
+		self.cast_range = [1,10]
 		self.fov_type = 'straight_lines'
 		
 	
