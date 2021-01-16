@@ -152,6 +152,7 @@ func _on_character_movement_finished(character, ending_cell):
 func _on_character_clicked(character):
 	if state == 'cast_spell' and character.current_cell in fov:
 		_ask_cast_spell(selected_character, current_spell, character.current_cell)
+		# TODO DESELECT SPELL
 	
 	elif _can_player_control_character(character):
 		fov = []
@@ -262,6 +263,9 @@ func display_fov():
 	if selected_character.Spells.has(current_spell):
 		fov = $Map.manage_fov(selected_character.Spells[current_spell], 
 							selected_character.current_cell, "skyblue")
+	else:
+		fov = []
+		clear_arena()
 
 func _color_fov_cells():
 	for cell in fov:
