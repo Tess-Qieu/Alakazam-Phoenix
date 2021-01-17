@@ -65,8 +65,10 @@ func add_character_info(character:Character, team:Team):
 	
 # warning-ignore:unused_argument
 func _process(delta):
+	if node_battle.state == 'moving':
+		toggle_spell_buttons(true)
 	# disable or enable spell button
-	if node_battle.memory_on_turn != null :
+	elif node_battle.memory_on_turn != null :
 		# we have to wait until it receives informations from the server to be set
 		if node_battle.selected_character \
 							in node_battle.memory_on_turn['cast spell'].keys():
