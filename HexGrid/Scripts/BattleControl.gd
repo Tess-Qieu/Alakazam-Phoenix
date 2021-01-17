@@ -17,8 +17,8 @@ func _on_SpellButton_toggled(button_pressed, spell_button ):
 	# Spell Activation
 	if button_pressed:
 		# Deselection of previous spell
-		if selected_button != null:
-			selected_button.pressed = false
+		deselect_spell()
+		
 		# new button memorization
 		selected_button = spell_button
 		
@@ -82,7 +82,8 @@ func update_spell_list(character : Character):
 	for child in $PanelRight/SpellListContainer.get_children():
 		$PanelRight/SpellListContainer.remove_child(child)
 		child.queue_free()
-	# if any button was selected, reset of memorization
+	# if any button was selected, de-selection and reset of memorization
+	deselect_spell()
 	selected_button = null
 	
 	# Addition of new spells
@@ -104,3 +105,8 @@ func toggle_spell_buttons(disabled : bool):
 	# If all buttons must be disabled, then the previous selection is reset
 	if disabled:
 		selected_button = null
+
+func deselect_spell():
+	# Function used to deselect a spell button 
+	if selected_button != null:
+		selected_button.pressed = false
