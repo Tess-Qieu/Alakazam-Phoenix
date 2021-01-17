@@ -9,8 +9,7 @@ var selected_button : Button
 
 func _ready():
 	node_battle = get_parent()
-
-
+	$Debug_Button.connect("toggled", self, "_on_Debug_Button_toggled")
 
 ## BUTTON EVENT MANAGEMENT
 func _on_SpellButton_toggled(button_pressed, spell_button ):
@@ -42,6 +41,11 @@ func _on_ButtonEndTurn_pressed():
 	
 	# New turn
 	node_battle.ask_end_turn()
+
+func _on_Debug_Button_toggled(button_pressed):
+	for q in node_battle.get_node("Map").grid:
+		for r in node_battle.get_node("Map").grid[q]:
+			node_battle.get_node("Map").grid[q][r].show_coordinates(button_pressed)
 
 
 ## USEFULL FUNCTIONS ##

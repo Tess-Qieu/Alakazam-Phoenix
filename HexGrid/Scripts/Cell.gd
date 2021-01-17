@@ -35,6 +35,14 @@ func init(_q, _r, _kind, battle_scene):
 		# warning-ignore:return_value_discarded
 		connect("cell_clicked", battle_scene, "_on_cell_clicked", [self])
 
+func show_coordinates(showing):
+	if kind in ["floor","blocked"]:
+		if showing:
+			$Label3D/Viewport/Control/Panel/Label.text = get_coords_string()
+			$Label3D.show()
+		else:
+			$Label3D.hide()
+
 func change_material(material_key):
 	if material_key == 'blocked':
 		material_key = 'floor'

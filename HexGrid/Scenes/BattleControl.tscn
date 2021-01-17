@@ -89,4 +89,14 @@ percent_visible = false
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="Debug_Button" type="CheckButton" parent="."]
+anchor_left = 0.56
+anchor_top = 1.0
+anchor_right = 0.56
+anchor_bottom = 1.0
+grow_vertical = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 [connection signal="pressed" from="EndTurn_Widget/ButtonEndTurn" to="." method="_on_ButtonEndTurn_pressed"]
