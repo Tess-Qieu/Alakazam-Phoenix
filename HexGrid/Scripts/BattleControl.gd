@@ -76,6 +76,21 @@ func _process(delta):
 			toggle_spell_buttons(node_battle.memory_on_turn['cast spell']\
 											[node_battle.selected_character])
 
+func _input(event):
+	if event.is_action_pressed("ui_cancel"):
+		if node_battle.state == 'cast_spell':
+			deselect_spell()
+			
+			# battle management
+			node_battle.state = "normal"
+			node_battle.current_spell = ""
+			
+			# reset of Map enlightment 
+			node_battle.display_fov()
+
+
+
+
 func update_spell_list(character : Character):
 	# When selecting a new character, the spell list must be cleaned and the
 	#  new spells must be added
