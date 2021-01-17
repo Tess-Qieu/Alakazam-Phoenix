@@ -331,7 +331,8 @@ func _compute_triangle(cell_top, cell_target, height, \
 	# Resize of the direction vect
 	direction = (direction*2)/distance_cells(cell_target, cell_top)
 	
-	var triangle = [cell_top]
+	# the start of the triangle is not included : avoid casting on caster's cell
+	var triangle = []
 	_compute_triangle_recursive(cell_top, cell_top, height, direction, triangle, \
 								block_filter, select_filter)
 	return triangle

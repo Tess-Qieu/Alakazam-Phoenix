@@ -262,7 +262,7 @@ class Map():
 		for index in range(len(direction)):
 			direction[index] = direction[index] * 2 / self.distance_cells(start, target)
 		
-		triangle = [start]
+		triangle = []
 		
 		# recursive construction
 		self._compute_triangle_recursive(start, start, height, direction, triangle, selection_filter, block_filter)
