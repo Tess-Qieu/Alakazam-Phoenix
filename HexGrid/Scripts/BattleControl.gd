@@ -42,6 +42,12 @@ func _on_ButtonEndTurn_pressed():
 	# New turn
 	node_battle.ask_end_turn()
 
+
+func _on_StartButton_pressed():
+	# Temporary behaviour
+	$NewTurn_Widget.hide()
+	#TODO: This button shall call the Battle to start the turn (not implemented yet)
+
 func _on_Debug_Button_toggled(button_pressed):
 	for q in node_battle.get_node("Map").grid:
 		for r in node_battle.get_node("Map").grid[q]:

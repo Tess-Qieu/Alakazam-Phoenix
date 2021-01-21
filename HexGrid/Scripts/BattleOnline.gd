@@ -46,7 +46,7 @@ func _on_message(data):
 		if 'directive' in data.keys():
 			# directive from the server
 			if data['directive'] == 'new turn':
-				new_turn(data['details'])
+				next_turn(data['details'])
 	
 	elif data['action'] == 'game over':
 		game_over(data['details'])
@@ -90,19 +90,20 @@ func ask_cast_spell(thrower, spell_name, target):
 				}
 	send_data(data)
 
+
+
+## BEHAVIOUR WHEN THE SERVER VALID AN ACTION ##
+#func new_turn(data):
+#func next_turn(data=null):
+#
+#	var is_my_turn = data['user id'] == Global.user_id
+#	print('My turn : {0}'.format([is_my_turn]))
+#	$BattleControl/EndTurn_Widget.reset(is_my_turn, data['turn time'])
+
 func choose_next_current_team(data=null):
 	for team in teams.values():
 		if team.user_id == data['user id']:
 			current_team = team
-
-
-
-## BEHAVIOUR WHEN THE SERVER VALID AN ACTION ##
-func new_turn(data):
-	next_turn(data)
-	var is_my_turn = data['user id'] == Global.user_id
-	print('My turn : {0}'.format([is_my_turn]))
-	$BattleControl/EndTurn_Widget.reset(is_my_turn, data['turn time'])
 
 func move_valid(data):
 	var character = get_character_by_id(data['id character'])

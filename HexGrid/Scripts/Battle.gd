@@ -50,6 +50,8 @@ func next_turn(data=null):
 	choose_next_selected_character()
 	_reset_memory_on_turn()
 	clear_arena()
+	
+	$BattleControl/NewTurn_Widget.configure(current_team)
 
 
 ## CHARACTER CREATION/UPDATE ##
