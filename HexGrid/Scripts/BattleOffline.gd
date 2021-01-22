@@ -23,7 +23,13 @@ func _ready():
 			$Map.grid[character['q']][character['r']] = 'blocked'
 	
 	init_battle($Map.grid, teams_infos)
-	next_turn(null)
+	
+	# Default turn informations
+	var data = { 'user id': Global.user_id,
+				 'turn time': 30,
+				 'memory on turn': memory_on_turn
+				}
+	next_turn(data)
 
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
