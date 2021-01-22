@@ -23,13 +23,17 @@ func _ready():
 			$Map.grid[character['q']][character['r']] = 'blocked'
 	
 	init_battle($Map.grid, teams_infos)
-	next_turn()
+	next_turn(null)
 
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
 func ask_end_turn(): 
 	print('Turn end, new turn.')
-	next_turn()
+	var data = { 'user id': Global.user_id,
+				 'turn time': 30,
+				 'memory on turn': memory_on_turn
+				}
+	next_turn(data)
 
 
 func ask_cast_spell(character, spell_name, target_cell):

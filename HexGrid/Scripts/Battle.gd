@@ -43,7 +43,7 @@ func choose_next_selected_character():
 			if team.user_id == Global.user_id:
 				_select_character(team.get_member(0))
 
-func next_turn(data=null):
+func next_turn(data):
 	# Select the next current_team and selected_character on the next turn
 	# Then reset memory on turn
 	choose_next_current_team(data)
@@ -51,7 +51,9 @@ func next_turn(data=null):
 	_reset_memory_on_turn()
 	clear_arena()
 	
-	$BattleControl/NewTurn_Widget.configure(current_team)
+	if data != null:
+		$BattleControl/NewTurn_Widget.configure(current_team, is_player_turn(data['user id']))
+		$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
 
 
 ## CHARACTER CREATION/UPDATE ##
@@ -271,7 +273,6 @@ func choose_next_current_team(data=null):
 
 
 
-
 ## DISPLAY FUNCTIONS ##
 func display_fov():
 	if selected_character.Spells.has(current_spell):
@@ -295,8 +296,6 @@ func clear_arena():
 		_color_selected_character_cell()
 	
 	_color_fov_cells()
-
-
 
 
 
@@ -351,6 +350,12 @@ func _has_not_already_done_action(character, action):
 	
 func _is_character_turn(character):
 	return current_team.has_member(character)
-	
+
+func is_player_turn(user_id):
+	if user_id == null:
+		return true
+	else:
+		return user_id == Global.user_id
+
 func _can_player_control_character(character):
 	return character.user_id == Global.user_id and character.is_alive()
