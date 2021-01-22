@@ -34,7 +34,9 @@ func _ready():
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
 func ask_end_turn(): 
-	print('Turn end, new turn.')
+#	print('Turn end, new turn.')
+	# When playing Offline, the server behaviour is simulated by sending default
+	# information throught the same methods
 	var data = { 'user id': Global.user_id,
 				 'turn time': 30,
 				 'memory on turn': memory_on_turn
