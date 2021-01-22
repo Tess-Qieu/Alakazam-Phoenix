@@ -52,8 +52,10 @@ func next_turn(data):
 	clear_arena()
 	
 	if data != null:
-		$BattleControl/NewTurn_Widget.configure(current_team, is_player_turn(data['user id']))
-		$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
+		if data.has('user id'):
+			$BattleControl/NewTurn_Widget.configure(current_team, is_player_turn(data['user id']))
+			if data.has('turn time'):
+				$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
 
 
 ## CHARACTER CREATION/UPDATE ##

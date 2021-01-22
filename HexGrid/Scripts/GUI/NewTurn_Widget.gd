@@ -13,5 +13,5 @@ func _ready():
 func configure(team:Team, is_player_turn):
 	$Control/TeamTurn_Label.text = team.name
 	# TODO: Start button shall be deactivated if the playing team is not the player's team
-	$Control/StartButton.visible = is_player_turn
+#	$Control/StartButton.visible = is_player_turn
 	show()
