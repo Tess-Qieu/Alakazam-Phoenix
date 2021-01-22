@@ -43,6 +43,9 @@ func ask_end_turn():
 				}
 	next_turn(data)
 
+func ask_begin_turn():
+	
+	begin_turn(null)
 
 func ask_cast_spell(character, spell_name, target_cell):
 	# Turn and action already verified

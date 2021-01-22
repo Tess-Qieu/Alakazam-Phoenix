@@ -51,12 +51,17 @@ func next_turn(data):
 	_reset_memory_on_turn()
 	clear_arena()
 	
+	# Display of the new_turn widget
 	if data != null:
 		if data.has('user id'):
 			$BattleControl/NewTurn_Widget.configure(current_team, is_player_turn(data['user id']))
 			if data.has('turn time'):
 				$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
 
+func begin_turn(data):
+	# Starts the timer and hides the new_turn widget
+	$BattleControl/NewTurn_Widget.hide()
+	$BattleControl/EndTurn_Widget.set_physics_process(true)
 
 ## CHARACTER CREATION/UPDATE ##
 func _create_team(team_name, data):
@@ -249,9 +254,8 @@ func _ask_move(character, path):
 		ask_move(character, path)
 
 
-
-
 ## INHERITABLED FUNCTIONS ##
+# warning-ignore:unused_argument
 # warning-ignore:unused_argument
 # warning-ignore:unused_argument
 func ask_cast_spell(character, spell_name, cell):
@@ -269,7 +273,8 @@ func ask_end_turn():
 func choose_next_current_team(data=null):
 	pass
 
-
+func _ask_begin_turn():
+	pass
 
 
 

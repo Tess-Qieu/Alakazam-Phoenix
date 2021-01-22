@@ -39,14 +39,18 @@ func _on_ButtonEndTurn_pressed():
 	# Memoriazation reset before ending turn
 	selected_button = null
 	
+	# Ticking stopped
+	$EndTurn_Widget.set_physics_process(false)
+	
 	# New turn
 	node_battle.ask_end_turn()
 
 
 func _on_StartButton_pressed():
 	# Temporary behaviour
-	$NewTurn_Widget.hide()
+#	$NewTurn_Widget.hide()
 	#TODO: This button shall call the Battle to start the turn (not implemented yet)
+	node_battle.ask_begin_turn()
 
 func _on_Debug_Button_toggled(button_pressed):
 	for q in node_battle.get_node("Map").grid:
