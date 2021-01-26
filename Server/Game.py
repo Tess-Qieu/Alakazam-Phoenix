@@ -97,6 +97,9 @@ class Game(Lobby):
 				self.timer.cancel()
 				await self.new_turn()
 				
+			elif data['ask'] == 'begin turn':
+				await self.begin_turn()
+				
 			# after a player ask a play, check if the game is over
 			if self.is_game_over():
 				await self.notify_game_over()
@@ -151,11 +154,20 @@ class Game(Lobby):
 				'directive': 'new turn',
 				'details' : {'user id': self.player_on_turn.user_id,
 							 'turn time': TIME_TURN,
-							 'memory on turn': self.serialize_memory_on_turn()}}
-		self.timer = Timer(TIME_TURN, self.new_turn)
+							 'memory on turn': self.serialize_memory_on_turn()}}		
 		await self.notify_all(data)
 
-
+	async def begin_turn(self):
+		data = {'action'	: 'game',
+				'directive'	: 'begin turn',
+				'details'	: {}
+				}
+		# Timer reinitialization
+		self.timer = Timer(TIME_TURN, self.new_turn)
+		
+		# Data communication
+		await self.notify_all(data)
+		
 
 	async def notify_ask_not_valid(self, data):
 		user = self.get_player_by_id(data['user id'])

@@ -273,7 +273,7 @@ func ask_end_turn():
 func choose_next_current_team(data=null):
 	pass
 
-func _ask_begin_turn():
+func ask_begin_turn():
 	pass
 
 

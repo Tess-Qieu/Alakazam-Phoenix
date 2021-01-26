@@ -47,6 +47,9 @@ func _on_message(data):
 			# directive from the server
 			if data['directive'] == 'new turn':
 				next_turn(data['details'])
+			
+			elif data['directive'] == 'begin turn':
+				begin_turn(data)
 	
 	elif data['action'] == 'game over':
 		game_over(data['details'])
@@ -68,6 +71,12 @@ func ask_end_turn():
 				'ask': 'end turn',
 				'details': {}}
 
+	send_data(data)
+
+func ask_begin_turn():
+	var data = {'action' : 'game',
+				'ask'	 : 'begin turn',
+				'details': {}}
 	send_data(data)
 
 func ask_move(character, path):

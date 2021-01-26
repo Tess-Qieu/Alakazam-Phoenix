@@ -13,4 +13,4 @@ func reset(is_my_turn, turn_time):
 	$ButtonEndTurn.disabled = not is_my_turn
 	$TimerBar.max_value = turn_time
 	$TimerBar.value = 0
-#	set_physics_process(true)
+	set_physics_process(false)
