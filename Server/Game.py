@@ -154,7 +154,14 @@ class Game(Lobby):
 				'directive': 'new turn',
 				'details' : {'user id': self.player_on_turn.user_id,
 							 'turn time': TIME_TURN,
-							 'memory on turn': self.serialize_memory_on_turn()}}		
+							 'memory on turn': self.serialize_memory_on_turn()
+							 }
+				}
+		
+		# Spread the new_turn to the new current team
+# 		current_team = self.get_team_by_player(self.player_on_turn)
+# 		data = current_team.new_turn(data)
+
 		await self.notify_all(data)
 
 	async def begin_turn(self):

@@ -53,3 +53,17 @@ class Character():
 	def get_current_cell(self):
 		return self.current_cell
 	
+	def new_turn(self):
+		''' Method called at the beginning of every new turn for the 
+			character
+		'''
+		# Creation of a dictionary with the following structure :
+		# { Spell_1 : cooldown, 
+		#	Spell_2 : cooldown }
+		cooldowns = {}
+		
+		# Spread of the new_turn info to each spell
+		for s in self.Spells:
+			cooldowns[s] = s.new_turn()
+			
+		return cooldowns

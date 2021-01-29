@@ -58,6 +58,18 @@ class Spell(object):
 			data += [data_one_target]
 
 		return data
+	
+	def new_turn(self):
+		''' Method called at the beginning of every new turn for the spell
+		'''
+		# Each turn the cooldown decreases
+		if self.current_cooldown > 0:
+			self.current_cooldown -= 1
+			
+		elif self.current_cooldown < 0: # Correction if invalid value
+			self.current_cooldown = 0
+		
+		return self.current_cooldown
 
 class RaySpell(Spell) :
 	'''

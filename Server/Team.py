@@ -37,3 +37,21 @@ class Team():
 	def serialize(self):
 		return {'user id': self.user.user_id, 'color': self.team_color,
 				'characters': [character.serialize() for character in self.characters]}
+	
+	def new_turn(self, data):
+		''' Method called at the beginning of every new turn for the team
+		'''
+		# Creation of a dictionary with the following structure :
+		# { character 1 : { Spell_1 : cooldown, 
+		#					Spell_2 : cooldown },
+		#	character 2 : { Spell_1 : cooldown,
+		#					Spell_2 : cooldown } }
+		cooldowns = {}
+		
+		# Spread of the new_turn to each character of the team
+		for c in self.characters:
+			cooldowns[c] = c.new_turn()
+		
+		# Cooldowns additions to the data
+		data['details']['cooldowns'] = cooldowns
+		return data
