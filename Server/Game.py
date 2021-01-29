@@ -381,7 +381,7 @@ class Game(Lobby):
 
 	def get_team_by_player(self, user):
 		for team in self.teams:
-			if team.user == self.player_on_turn:
+			if team.user == user:
 				return team
 
 	def next_player(self):
