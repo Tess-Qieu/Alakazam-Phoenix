@@ -56,6 +56,11 @@ class Server():
         pseudo = data['details']['pseudo']
 
         new_id = self.users_manager_id.get_new_id()
+        
+        # Addition of a pseudo if no one is given
+        if pseudo == '':
+            pseudo = 'fool_{}'.format(new_id)
+        
         self.add_user(websocket, path, pseudo, new_id)
 
         response = {'action' : 'connection', 'details' : {'user id' : new_id}}
