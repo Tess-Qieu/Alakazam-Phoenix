@@ -50,7 +50,7 @@ class Team():
 		
 		# Spread of the new_turn to each character of the team
 		for c in self.characters:
-			cooldowns[c] = c.new_turn()
+			cooldowns[c.id_character] = c.new_turn()
 		
 		# Cooldowns additions to the data
 		data['details']['cooldowns'] = cooldowns
