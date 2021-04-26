@@ -161,8 +161,8 @@ class Game(Lobby):
 				}
 		
 		# Spread the new_turn to the new current team
-# 		current_team = self.get_team_by_player(self.player_on_turn)
-# 		data = current_team.new_turn(data)
+		current_team = self.get_team_by_player(self.player_on_turn)
+		data = current_team.new_turn(data)
 
 		await self.notify_all(data)
 

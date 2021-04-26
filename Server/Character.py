@@ -63,7 +63,7 @@ class Character():
 		cooldowns = {}
 		
 		# Spread of the new_turn info to each spell
-		for s in self.Spells:
-			cooldowns[s.__class__.__name__] = s.new_turn()
+		for s in self.Spells.keys():
+			cooldowns[s] = self.Spells[s].new_turn()
 			
 		return cooldowns
