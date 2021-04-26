@@ -10,15 +10,6 @@ def distance_coord(q1, r1, q2, r2):
 class Character():
 	''' Represents a character in the game '''
 	
-	# List of spells the character knows
-	#  At runtime, class references are converted to instances
-	Spells = {'CannonBall'	: RaySpell(),
-			 	'Missile'	: BombSpell(),
-			 'Flamethrower'	: BreathSpell() }
-	
-# 	# Cell on the Map where the character is currently placed
-# 	current_cell : Cell
-	
 	def __init__(self, team_color, user, id_character):
 		
 		self.team_color = team_color
@@ -30,6 +21,11 @@ class Character():
 		self.alive = True
 		
 		self.current_cell : Cell = None
+		
+		# List of spells the character knows
+		self.spells = {'CannonBall'	: RaySpell(),
+			 			'Missile'	: BombSpell(),
+			 		'Flamethrower'	: BreathSpell() }
 
 	def die(self):
 		# Make the character die, /!\ MAYBE NEED TO RAISE SOMETHING FOR GAME
@@ -63,7 +59,7 @@ class Character():
 		cooldowns = {}
 		
 		# Spread of the new_turn info to each spell
-		for s in self.Spells.keys():
-			cooldowns[s] = self.Spells[s].new_turn()
+		for s in self.spells.keys():
+			cooldowns[s] = self.spells[s].new_turn()
 			
 		return cooldowns

@@ -17,7 +17,7 @@ class Spell(object):
 		'''
 		self.cast_range = [1,3]
 		self.start_cooldown = 10
-		self.current_cooldown = self.start_cooldown
+		self.current_cooldown = 0
 		self.fov_type = 'fov'
 		self.impact_type = 'cell'
 		self.damage_amount = [-1,-1]
@@ -80,6 +80,7 @@ class RaySpell(Spell) :
 		self.damage_amount = [28,32]
 		self.cast_range = [1,10]
 		self.fov_type = 'straight_lines'
+		self.current_cooldown = 3 #Not available at first turn
 		
 	
 class BombSpell(Spell):
@@ -93,6 +94,7 @@ class BombSpell(Spell):
 		self.cast_range   = [2,4]
 		self.impact_type  = 'zone'
 		self.impact_range = 2
+		self.start_cooldown = 4
 
 class BreathSpell(Spell):
 	'''
@@ -105,4 +107,5 @@ class BreathSpell(Spell):
 		self.cast_range = [2,4] #First value is cast range, second is triangle height
 		self.fov_type = 'hexa_points'
 		self.impact_type = 'breath'
+		self.start_cooldown = 3
 		
