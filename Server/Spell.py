@@ -57,6 +57,9 @@ class Spell(object):
 
 			data += [data_one_target]
 
+		# Cooldown setting
+		self.current_cooldown = self.start_cooldown
+		
 		return data
 	
 	def new_turn(self):

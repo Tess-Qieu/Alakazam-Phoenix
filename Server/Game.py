@@ -200,9 +200,14 @@ class Game(Lobby):
 		return result
 
 	def is_correct_character_user(self, character):
+		# Verify if the given character is controlled by the active user
 		return character.user.user_id == self.player_on_turn.user_id
 
 	def is_correct_ask(self, character, data):
+		# Verify if an action can be done with the given character
+		# > Character controlled by active user
+		# > Character alive
+		
 		character_user = self.is_correct_character_user(character)
 		if not character_user:
 			data['reason'] = ['character not controlled by player on turn']
@@ -215,19 +220,31 @@ class Game(Lobby):
 				and character.alive
 
 	def is_correct_ask_cast_spell(self, data):
-		# Verify if the ask spell is correct and that the character has not cast a spell yet this turn
+		# Verify if the spell can be casted :
+		# > Character available
+		# > Character has not casted a spell yet
+		# > Spell is available
+		
 		character = self.get_character_by_id(data['thrower']['id character'])
 		
 		casting_done = self.memory_on_turn['cast spell'][character]
 		if casting_done:
 			data['reason'] = ['character already casted a spell']
 		
-		return self.is_correct_ask(character, data) and not casting_done
+		cooldown = character.spells[data['spell name']].current_cooldown
+		cooldown_ok = (cooldown == 0)
+		if not cooldown_ok:
+			data['reason'] = ['Spell not cooled down. '
+							+ f'Remaining {cooldown} turns']
+		
+		return self.is_correct_ask(character, data) and not casting_done \
+			and cooldown_ok
 
 	def is_correct_ask_move(self, data):
 		# Verify the ask is correct and that the character has not move yet this turn
 		character = self.get_character_by_id(data['id character'])
-		return self.is_correct_ask(character, data) and not self.memory_on_turn['move'][character]
+		return self.is_correct_ask(character, data) and \
+					not self.memory_on_turn['move'][character]
 
 
 
@@ -297,7 +314,7 @@ class Game(Lobby):
 		cell_thrower = character_thrower.current_cell
 		cell_target = self.map.get_cell(coord_target[0], coord_target[1])
 		
-		spell = character_thrower.Spells[spell_name]
+		spell = character_thrower.spells[spell_name]
 
 		
 		#is_valid = self.map.is_target_in_field_of_view(cell_thrower, cell_target)
@@ -309,7 +326,7 @@ class Game(Lobby):
 														cell_thrower,\
 													 	cell_target)
 			# Give impacted cell to Spell to compute damage info
-			data_spell_applied = character_thrower.Spells[spell_name] \
+			data_spell_applied = character_thrower.spells[spell_name] \
 				.compute_damages_on(cell_target, \
 									touched_cells, \
 									self.teams, \
