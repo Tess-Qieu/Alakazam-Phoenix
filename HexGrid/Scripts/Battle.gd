@@ -2,27 +2,23 @@ extends Spatial
 
 var RobotCharacter = preload("res://Scenes/Characters/Robot_character.tscn")
 
-
+## SELECTION VARIABLES ##
 var selected_character: Character
-
 var current_spell = 'none'
-
-var teams = {}
 var current_team: Team
-
-var state = 'normal' # ['normal', 'cast_spell', 'movement']
-
-# memory of what action have been made by which character this turn
-var memory_on_turn = {'move': {}, 'cast spell': {}} 
-
-var character_moving
-
-
 var fov = []
+
+## MOVEMENT VARIABLES ##
+var character_moving
 var path_instanced = []
 var path_serialized = []
 
-var test_path = []
+## GAME VARIABLES ##
+var teams = {}
+var state = 'normal' # ['normal', 'cast_spell', 'movement']
+# memory of what action have been made by which character this turn
+var memory_on_turn = {'move': {}, 'cast spell': {}} 
+
 
 
 
@@ -32,6 +28,9 @@ func init_battle(grid, teams_infos):
 	$Map.instance_map(grid)
 	for name in teams_infos.keys():
 		_create_team(name, teams_infos[name])
+	
+	# Instanciation ended, sending ready status to server
+	ask_ready()
 
 func choose_next_selected_character():
 	# if the current_team belongs to the client then we choose the first character from its team
@@ -58,6 +57,7 @@ func next_turn(data):
 			if data.has('turn time'):
 				$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
 
+# warning-ignore:unused_argument
 func begin_turn(data):
 	# Starts the timer and hides the new_turn widget
 	$BattleControl/NewTurn_Widget.hide()
@@ -188,10 +188,6 @@ func _on_cell_clicked(cell):
 			fov = []
 			state = 'normal'
 			clear_arena()
-	
-#	elif state == 'test':
-#		#test_path = [cell]
-#		clear_arena()
 
 
 
@@ -276,6 +272,8 @@ func choose_next_current_team(data=null):
 func ask_begin_turn():
 	pass
 
+func ask_ready():
+	pass
 
 
 

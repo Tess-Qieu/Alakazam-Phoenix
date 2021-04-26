@@ -48,10 +48,6 @@ class Game(Lobby):
 		self.turns = self.players.copy()
 		random.shuffle(self.turns)
 
-	def begin(self):
-		# could be the time while players can place character
-		self.timer = Timer(1, self.new_turn) 
-
 	def init_teams(self):
 		# Create the team's characters
 		
@@ -83,6 +79,10 @@ class Game(Lobby):
 			# players send they are ready
 			if data['details']['ready'] == True:
 				self.set_player_ready(user)
+			
+			# If the game is started, the game begins
+			if self.started:
+				await self.new_turn()
 
 		elif data['action'] == 'game':
 			# game is running
@@ -98,6 +98,8 @@ class Game(Lobby):
 				await self.new_turn()
 				
 			elif data['ask'] == 'begin turn':
+				print(f'Turn of player {self.players[data["details"]["user id"]].pseudo} begins !')
+		
 				await self.begin_turn()
 				
 			# after a player ask a play, check if the game is over
@@ -169,6 +171,7 @@ class Game(Lobby):
 				'directive'	: 'begin turn',
 				'details'	: {}
 				}
+		
 		# Timer reinitialization
 		self.timer = Timer(TIME_TURN, self.new_turn)
 		
@@ -345,8 +348,6 @@ class Game(Lobby):
 		# else start the game
 		print(f'The game in the lobby {self.id_lobby} starts !')
 		self.started = True
-		self.begin()
-
 
 
 

@@ -2,11 +2,6 @@ extends 'res://Scripts/Battle.gd'
 
 func _ready():
 	Network.set_server_receiver_node(self)
-	ask_ready() # TEMPORARY SOLUTION TO SAY READY, LATER THERE WILL BE A BUTTON
-
-func init_battle(grid, teams_infos):
-	.init_battle(grid, teams_infos)
-	next_turn({'user id': Global.user_id})
 
 ## COMMUCATION WITH SERVER
 func send_data(data):
@@ -102,13 +97,6 @@ func ask_cast_spell(thrower, spell_name, target):
 
 
 ## BEHAVIOUR WHEN THE SERVER VALID AN ACTION ##
-#func new_turn(data):
-#func next_turn(data=null):
-#
-#	var is_my_turn = data['user id'] == Global.user_id
-#	print('My turn : {0}'.format([is_my_turn]))
-#	$BattleControl/EndTurn_Widget.reset(is_my_turn, data['turn time'])
-
 func choose_next_current_team(data=null):
 	for team in teams.values():
 		if team.user_id == data['user id']:
