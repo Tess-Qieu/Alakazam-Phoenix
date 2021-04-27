@@ -12,7 +12,7 @@ signal character_movement_finished
 
 # Movement margin used to discriminate if the character has arrived on a cell
 const MVT_MARGIN = 0.02 
-var speed = 0
+const speed = 3.35
 
 ## ID informations ##
 var id_character
@@ -159,17 +159,8 @@ func _process_movement_one_cell(delta):
 		to_look.y = translation.y
 		look_at(to_look, Vector3(0,1,0))
 		
-		# Character velocity direction calculation
-		var velocity = destination_cell.translation - translation
-		velocity.y = 0
-		velocity = velocity.normalized()
-		
-		# Velocity value calculation
-		velocity = velocity * speed * delta
-		
-		# Movement action
-		# warning-ignore:return_value_discarded
-		move_and_slide(velocity)
+		var new_pos = translation + dist.normalized() * delta * speed
+		translation = new_pos
 		
 	else: # If the character has reached the cell (within a margin)
 		# The character is teleported to the exact cell location
