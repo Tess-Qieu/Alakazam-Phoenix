@@ -14,3 +14,4 @@ func _init():
 	damage_amount = [10,15]
 	cast_range = [2,4]
 	impact_type = 'zone'
+	start_cooldown = 4

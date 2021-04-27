@@ -87,6 +87,10 @@ func select():
 func is_alive():
 	return current_health > 0
 
+func next_turn(data : Dictionary):
+	# On each new turn, spells are updated with the provided data
+	for spell_id in data.keys():
+		Spells[spell_id].next_turn(data[spell_id])
 
 
 

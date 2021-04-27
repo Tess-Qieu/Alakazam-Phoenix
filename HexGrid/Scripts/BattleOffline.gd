@@ -25,22 +25,40 @@ func _ready():
 	init_battle($Map.grid, teams_infos)
 	
 	# Default turn informations
-	var data = { 'user id': Global.user_id,
-				 'turn time': 30,
-				 'memory on turn': memory_on_turn
-				}
-	next_turn(data)
+	ask_end_turn()
 
 
 ## BEHAVIOUR FOR ASK ACTIONS ##
-func ask_end_turn(): 
-#	print('Turn end, new turn.')
-	# When playing Offline, the server behaviour is simulated by sending default
+func ask_end_turn():
+	# When playing Offline, the server behaviour is simulated by sending
 	# information throught the same methods
 	var data = { 'user id': Global.user_id,
 				 'turn time': 30,
-				 'memory on turn': memory_on_turn
+				 'memory on turn': memory_on_turn,
+				 'cooldowns' : {}
 				}
+	
+	## Cooldowns computation ##
+	var cooldown
+	# Creation of a dictionary with the following structure :
+	# { cooldowns : { character 1 id : { Spell_1 : cooldown, 
+	#									 Spell_2 : cooldown },
+	#				  character 2 id : { Spell_1 : cooldown,
+	#									 Spell_2 : cooldown } }
+	
+	# Computation of each character in the team playing next turn
+	for character in get_next_team().get_all_members():
+		# Character dictionary initialization
+		data['cooldowns'][character.id_character] = {}
+		# Computation of each spell of the character
+		for spell_id in character.Spells.keys():
+			if character.Spells[spell_id].current_cooldown > 0:
+				cooldown = character.Spells[spell_id].current_cooldown -1
+			else:
+				cooldown = 0
+			
+			data['cooldowns'][character.id_character][spell_id] = cooldown
+	
 	next_turn(data)
 
 func ask_begin_turn():
@@ -77,14 +95,19 @@ func ask_move(character, path):
 
 # warning-ignore:unused_argument
 func choose_next_current_team(data=null):
+	# Function allowing to change the current team to the next in line
+	current_team = get_next_team()
+
+func get_next_team():
+	# Function allowing to access the next playing team without changing the 
+	#  current one
 	var list_keys = teams.keys()
 	var next_index = -1
 	if current_team != null:
 		next_index = (list_keys.find(current_team.name) + 1) % len(list_keys)
 	else:
 		next_index = 0
-	current_team = teams[list_keys[next_index]]
-
+	return teams[list_keys[next_index]]
 
 # ------------------
 

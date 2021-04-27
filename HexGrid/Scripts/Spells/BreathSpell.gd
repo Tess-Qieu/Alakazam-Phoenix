@@ -12,3 +12,4 @@ func _init():
 	cast_range = [2,4] #First value is cast range, second is triangle height
 	fov_type = 'hexa_points'
 	impact_type = 'breath'
+	start_cooldown = 3

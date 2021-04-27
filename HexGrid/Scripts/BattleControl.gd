@@ -47,9 +47,6 @@ func _on_ButtonEndTurn_pressed():
 
 
 func _on_StartButton_pressed():
-	# Temporary behaviour
-#	$NewTurn_Widget.hide()
-	#TODO: This button shall call the Battle to start the turn (not implemented yet)
 	node_battle.ask_begin_turn()
 
 func _on_Debug_Button_toggled(button_pressed):
@@ -125,13 +122,20 @@ func update_spell_list(character : Character):
 		$PanelRight/SpellListContainer.add_child(spell_bt)
 		
 		# Signal connections
-		spell_bt.initialize(spell_key, character.Spells[spell_key].miniature)
+		spell_bt.initialize(spell_key, character.Spells[spell_key])
 		spell_bt.connect("toggled", self, "_on_SpellButton_toggled", [spell_bt])
 
 func toggle_spell_buttons(disabled : bool):
-	# Function allowing to able/disabl every spell button for a given character
+	# Function allowing to able/disable every spell button for a given character
+	# If all are disabled, no verification is done
+	# but, at setting buttons to able, cooldowns are checked
+	
 	for node in $PanelRight/SpellListContainer.get_children():
-		node.disabled = disabled
+		if disabled:
+			node.disabled = disabled
+		else:
+			if node.get_node('Cooldown_label').text == '0':
+				node.disabled = disabled
 	
 	# If all buttons must be disabled, then the previous selection is reset
 	if disabled:

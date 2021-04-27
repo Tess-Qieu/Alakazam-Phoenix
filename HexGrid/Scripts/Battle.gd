@@ -53,9 +53,15 @@ func next_turn(data):
 	# Display of the new_turn widget
 	if data != null:
 		if data.has('user id'):
-			$BattleControl/NewTurn_Widget.configure(current_team, is_player_turn(data['user id']))
+			$BattleControl/NewTurn_Widget.configure(current_team, 
+											is_player_turn(data['user id']))
 			if data.has('turn time'):
-				$BattleControl/EndTurn_Widget.reset(is_player_turn(data['user id']), data['turn time'])
+				$BattleControl/EndTurn_Widget.reset(\
+				is_player_turn(data['user id']), data['turn time'])
+			
+			# if cooldowns are provided, update of the current team
+			if data.has('cooldowns'):
+				current_team.next_turn(data['cooldowns'])
 
 # warning-ignore:unused_argument
 func begin_turn(data):
@@ -137,6 +143,8 @@ func make_character_cast_spell(character, cell, spell_name, damages_infos):
 	clear_arena()
 	state = 'normal'
 	_update_memory_on_turn('cast spell', character)
+	# Update spell list
+	$BattleControl.update_spell_list(character)
 
 
 

@@ -10,3 +10,4 @@ func _init():
 	cast_range = [1, 10]
 	damage_amount = [28,32]
 	fov_type = 'straight_lines'
+	current_cooldown = 3

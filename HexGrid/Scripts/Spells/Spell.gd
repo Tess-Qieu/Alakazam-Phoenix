@@ -18,7 +18,7 @@ var damages_info_memory
 
 var cast_range = [1,3]
 var start_cooldown = 10
-var current_cooldown
+var current_cooldown = 0
 var miniature = preload("res://icon.png")
 var fov_type = 'fov'
 var impact_type = 'cell'
@@ -101,6 +101,9 @@ func cast(thrower, target, damages_infos):
 	# Activate animation
 	cell_targeted = target
 	is_casting = true
+	
+	# setting the cooldown after casting
+	current_cooldown = start_cooldown
 
 
 func get_damage_amount(damages_infos):
@@ -117,6 +120,9 @@ func is_information_target_die(damages_infos):
 	return false
 	
 	
+func next_turn(data):
+	# Update of cooldown with provided data
+	current_cooldown = data
 	
 func _physics_process(delta):
 	if is_casting:

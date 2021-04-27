@@ -11,9 +11,18 @@ func _ready():
 	connect("mouse_entered", self, "_on_SpellButton_mouse_entered")
 	connect("mouse_exited", self, "_on_SpellButton_mouse_exited")
 
-func initialize(spell_key, spell_icon):
-	icon = spell_icon
+func initialize(spell_key, spell : Spell):
+	icon = spell.miniature
 	name = spell_key
+	
+	# Cooldown memorization
+	$Cooldown_label.text = String(spell.current_cooldown)
+	if spell.current_cooldown != 0:
+		disabled = true
+		$Cooldown_label.show()
+	else:
+		$Cooldown_label.hide()
+		disabled = false
 
 func _process(delta):
 	# Pop-up Management

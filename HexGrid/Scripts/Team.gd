@@ -29,8 +29,20 @@ func get_member(index : int):
 	if index >= 0 and index < get_child_count():
 		return get_child(index)
 
+func get_member_by_id(id):
+	for elt in get_children():
+		if elt.id_character == id:
+			return elt
+			
+	return null # default return if no one is found
+
 func get_all_members():
 	return get_children()
+
+func next_turn(data:Dictionary):
+	# Update of character info with the provided data
+	for character_id in data.keys():
+		get_member_by_id(character_id).next_turn(data[character_id])
 
 func is_team_dead():
 	return false #HEROES NEVER DIE!
