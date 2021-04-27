@@ -62,6 +62,9 @@ func next_turn(data):
 			# if cooldowns are provided, update of the current team
 			if data.has('cooldowns'):
 				current_team.next_turn(data['cooldowns'])
+	
+	# Update spell list
+	$BattleControl.update_spell_list(selected_character)
 
 # warning-ignore:unused_argument
 func begin_turn(data):
