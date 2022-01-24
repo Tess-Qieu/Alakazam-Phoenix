@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/Cells/CellSize1.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/GUI/Menu/MainMenu.gd" type="Script" id=2]
 [ext_resource path="res://Prefabs/GUI/default_theme.tres" type="Theme" id=3]
-[ext_resource path="res://Prefabs/GUI/default_flat_box.tres" type="StyleBox" id=4]
 [ext_resource path="res://Prefabs/GUI/Mediumfont.tres" type="DynamicFont" id=5]
 
 [sub_resource type="Animation" id=1]
@@ -22,22 +21,6 @@ tracks/0/keys = {
 "update": 0,
 "values": [ Vector3( 0, 0, 0 ), Vector3( 0, 360, 0 ) ]
 }
-
-[sub_resource type="StyleBoxFlat" id=2]
-content_margin_left = 2.0
-content_margin_right = 2.0
-content_margin_top = 1.0
-content_margin_bottom = 5.0
-bg_color = Color( 0.223529, 0.215686, 0.25098, 1 )
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color( 0.54902, 0.0745098, 0.941176, 1 )
-corner_radius_top_left = 1
-corner_radius_top_right = 1
-corner_radius_bottom_right = 1
-corner_radius_bottom_left = 1
 
 [node name="MainMenu" type="Control"]
 anchor_right = 1.0
@@ -90,6 +73,7 @@ omni_range = 5.05243
 [node name="Visual_components" type="VBoxContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+theme = ExtResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -102,33 +86,15 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="PanelContainer" type="PanelContainer" parent="Visual_components/Title_Container"]
-margin_left = 687.0
-margin_top = 129.0
-margin_right = 1233.0
-margin_bottom = 227.0
-
-[node name="MarginContainer" type="MarginContainer" parent="Visual_components/Title_Container/PanelContainer"]
-margin_left = 7.0
-margin_top = 7.0
-margin_right = 539.0
-margin_bottom = 91.0
-custom_constants/margin_right = 15
-custom_constants/margin_top = 15
-custom_constants/margin_left = 15
-custom_constants/margin_bottom = 15
-
-[node name="Title" type="Label" parent="Visual_components/Title_Container/PanelContainer/MarginContainer"]
-margin_left = 15.0
-margin_top = 15.0
-margin_right = 517.0
-margin_bottom = 69.0
+[node name="Title" type="Label" parent="Visual_components/Title_Container"]
+margin_left = 694.0
+margin_top = 136.0
+margin_right = 1226.0
+margin_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme = ExtResource( 3 )
-custom_styles/normal = ExtResource( 4 )
 text = "Alakazham - Phoenix"
 align = 1
 valign = 1
@@ -138,9 +104,9 @@ __meta__ = {
 }
 
 [node name="Name_Container" type="VBoxContainer" parent="Visual_components"]
-margin_left = 763.0
+margin_left = 759.0
 margin_top = 361.0
-margin_right = 1156.0
+margin_right = 1160.0
 margin_bottom = 718.0
 grow_horizontal = 2
 size_flags_horizontal = 6
@@ -149,33 +115,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PanelContainer" type="PanelContainer" parent="Visual_components/Name_Container"]
-margin_top = 114.0
-margin_right = 393.0
+[node name="Label" type="Label" parent="Visual_components/Name_Container"]
+margin_top = 108.0
+margin_right = 401.0
 margin_bottom = 176.0
 size_flags_horizontal = 4
 size_flags_vertical = 10
-
-[node name="MarginContainer" type="MarginContainer" parent="Visual_components/Name_Container/PanelContainer"]
-margin_left = 7.0
-margin_top = 7.0
-margin_right = 386.0
-margin_bottom = 55.0
-size_flags_vertical = 8
-custom_constants/margin_right = 5
-custom_constants/margin_top = 5
-custom_constants/margin_left = 5
-custom_constants/margin_bottom = 5
-
-[node name="Label" type="Label" parent="Visual_components/Name_Container/PanelContainer/MarginContainer"]
-margin_left = 5.0
-margin_top = 5.0
-margin_right = 374.0
-margin_bottom = 43.0
-size_flags_horizontal = 4
-size_flags_vertical = 10
-theme = ExtResource( 3 )
-custom_styles/normal = SubResource( 2 )
 custom_fonts/font = ExtResource( 5 )
 text = "Enter your player name:"
 align = 1
@@ -183,8 +128,8 @@ valign = 1
 
 [node name="Name_Selector" type="LineEdit" parent="Visual_components/Name_Container"]
 margin_top = 180.0
-margin_right = 393.0
-margin_bottom = 222.0
+margin_right = 401.0
+margin_bottom = 236.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 3
@@ -206,31 +151,29 @@ size_flags_vertical = 3
 alignment = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Visual_components/VBoxContainer2"]
-margin_top = 108.0
+margin_top = 78.0
 margin_right = 1920.0
 margin_bottom = 162.0
 alignment = 1
 
 [node name="Local_Button" type="Button" parent="Visual_components/VBoxContainer2/HBoxContainer"]
-margin_left = 691.0
+margin_left = 643.0
 margin_right = 943.0
-margin_bottom = 54.0
+margin_bottom = 84.0
 size_flags_horizontal = 10
-theme = ExtResource( 3 )
 text = "LocalGame"
 
 [node name="Filler" type="MarginContainer" parent="Visual_components/VBoxContainer2/HBoxContainer"]
 margin_left = 947.0
 margin_right = 972.0
-margin_bottom = 54.0
+margin_bottom = 84.0
 custom_constants/margin_left = 25
 
 [node name="Online_Button" type="Button" parent="Visual_components/VBoxContainer2/HBoxContainer"]
 margin_left = 976.0
-margin_right = 1244.0
-margin_bottom = 54.0
+margin_right = 1292.0
+margin_bottom = 84.0
 size_flags_horizontal = 2
-theme = ExtResource( 3 )
 text = "OnlineGame"
 
 [node name="Filler2" type="MarginContainer" parent="Visual_components/VBoxContainer2"]
@@ -240,10 +183,9 @@ margin_bottom = 191.0
 custom_constants/margin_top = 25
 
 [node name="Sandbox_Button" type="Button" parent="Visual_components/VBoxContainer2"]
-margin_left = 861.0
+margin_left = 837.0
 margin_top = 195.0
-margin_right = 1059.0
-margin_bottom = 249.0
+margin_right = 1083.0
+margin_bottom = 279.0
 size_flags_horizontal = 6
-theme = ExtResource( 3 )
 text = "Sandbox"
