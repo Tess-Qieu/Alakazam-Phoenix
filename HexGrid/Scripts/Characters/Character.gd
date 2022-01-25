@@ -11,7 +11,7 @@ signal character_selected
 signal character_movement_finished
 
 # Movement margin used to discriminate if the character has arrived on a cell
-const MVT_MARGIN = 0.02 
+const MVT_MARGIN = 0.035
 var speed = 0
 
 ## ID informations ##
@@ -145,7 +145,7 @@ func move_to(cell):
 func _process_movement_one_cell(delta):
 	# First, the distance between the destination cell and the character 
 	#  position is calculated
-	var dist = destination_cell.translation - translation
+	var dist = (destination_cell.translation - translation)/scale
 	dist.y = 0 # Distance is only considered in (x,z) plan
 	
 	# if the character has not reached the destination cell
