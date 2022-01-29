@@ -1,8 +1,6 @@
 extends 'res://Scripts/Characters/Character.gd'
 
 func _ready():
-	speed = 150
-	
 	# Miniature update
 	miniature = load("res://Prefabs/Character/Robot_miniature.png")
 
