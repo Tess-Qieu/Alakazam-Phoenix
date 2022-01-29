@@ -4,8 +4,6 @@ var color1 = 'fab45a' #yellow
 var color2 = '646464'   #grey
 
 func _ready():
-	speed = 150
-	
 	# Miniature update
 	miniature = load("res://Prefabs/Character/Robot_miniature.png")
 	
