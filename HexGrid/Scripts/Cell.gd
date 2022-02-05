@@ -70,5 +70,5 @@ func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape
 			elif event.button_index == BUTTON_RIGHT:
 				pass
 				
-			elif event.button_index == BUTTON_MIDDLE:
-				print("({0},{1})".format([q, r]))
+		if event.button_index == BUTTON_MIDDLE:
+			print("({0},{1}) - {2}".format([q, r, kind]))

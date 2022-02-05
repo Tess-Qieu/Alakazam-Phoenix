@@ -56,7 +56,9 @@ func _generate_one_gridline(line_size, r):
 			_add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
 		q += 1
 
-func generate_grid():
+func generate_grid(random = false):
+	if random:
+		rng.randomize()
 	var nb_cell = RAY + 1
 	for r in range(-RAY, 0) :
 		_generate_one_gridline(nb_cell, r)
