@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Prefabs/GUI/MenuBar_theme.tres" type="Theme" id=1]
+[ext_resource path="res://Prefabs/GUI/Sandbox_Theme.tres" type="Theme" id=1]
+[ext_resource path="res://Scenes/Map.tscn" type="PackedScene" id=2]
 
 [node name="Sandbox" type="PanelContainer"]
 anchor_right = 1.0
@@ -30,16 +31,6 @@ margin_right = 1905.0
 margin_bottom = 25.0
 size_flags_horizontal = 3
 
-[node name="New_Bt" type="Button" parent="VBoxContainer/MenuBar_Background/MenuBar"]
-visible = false
-margin_left = 39.0
-margin_right = 79.0
-margin_bottom = 19.0
-text = "New"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
 [node name="MenuButton" type="MenuButton" parent="VBoxContainer/MenuBar_Background/MenuBar"]
 margin_right = 50.0
 margin_bottom = 20.0
@@ -47,18 +38,28 @@ rect_min_size = Vector2( 50, 20 )
 text = "File"
 items = [ "New", null, 0, false, false, 0, 0, null, "", false, "", null, 0, false, true, 1, 0, null, "", true, "Save", null, 0, false, false, 2, 0, null, "", false, "Save as", null, 0, false, false, 4, 0, null, "", false, "Load", null, 0, false, false, 4, 0, null, "", false, "", null, 0, false, true, 5, 0, null, "", true ]
 
+[node name="New_Bt" type="Button" parent="VBoxContainer/MenuBar_Background/MenuBar"]
+visible = false
+margin_left = 54.0
+margin_right = 94.0
+margin_bottom = 20.0
+text = "New"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="Save_Bt" type="Button" parent="VBoxContainer/MenuBar_Background/MenuBar"]
 visible = false
-margin_left = 39.0
-margin_right = 80.0
-margin_bottom = 19.0
+margin_left = 98.0
+margin_right = 139.0
+margin_bottom = 20.0
 text = "Save"
 
 [node name="Load_Bt" type="Button" parent="VBoxContainer/MenuBar_Background/MenuBar"]
 visible = false
-margin_left = 39.0
-margin_right = 81.0
-margin_bottom = 19.0
+margin_left = 143.0
+margin_right = 185.0
+margin_bottom = 20.0
 disabled = true
 text = "Load"
 
@@ -67,56 +68,48 @@ margin_left = 54.0
 margin_right = 58.0
 margin_bottom = 20.0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
-visible = false
-margin_top = 33.0
+[node name="HBoxContainer" type="HSplitContainer" parent="VBoxContainer"]
+margin_top = 34.0
 margin_right = 1910.0
 margin_bottom = 1070.0
 size_flags_vertical = 3
+split_offset = 1200
 
-[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
-margin_right = 265.0
-margin_bottom = 1037.0
-custom_constants/margin_right = 250
+[node name="Viewport_Container" type="ViewportContainer" parent="VBoxContainer/HBoxContainer"]
+margin_right = 1600.0
+margin_bottom = 1036.0
+rect_min_size = Vector2( 400, 100 )
+stretch = true
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer/HBoxContainer"]
-margin_left = 269.0
-margin_right = 1641.0
-margin_bottom = 1037.0
-size_flags_horizontal = 3
+[node name="Viewport" type="Viewport" parent="VBoxContainer/HBoxContainer/Viewport_Container"]
+size = Vector2( 1600, 1036 )
+handle_input_locally = false
+render_target_update_mode = 3
+
+[node name="Map" parent="VBoxContainer/HBoxContainer/Viewport_Container/Viewport" instance=ExtResource( 2 )]
+
+[node name="ToolsMenu" type="TabContainer" parent="VBoxContainer/HBoxContainer"]
+margin_left = 1612.0
+margin_right = 1910.0
+margin_bottom = 1036.0
+size_flags_horizontal = 9
 tab_align = 0
 
-[node name="Tabs" type="ViewportContainer" parent="VBoxContainer/HBoxContainer/TabContainer"]
+[node name="MapTools" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/ToolsMenu"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 35.0
-margin_right = -4.0
-margin_bottom = -4.0
-stretch = true
+margin_left = 5.0
+margin_top = 32.0
+margin_right = -5.0
+margin_bottom = -5.0
 
-[node name="Viewport" type="Viewport" parent="VBoxContainer/HBoxContainer/TabContainer/Tabs"]
-size = Vector2( 1364, 998 )
-handle_input_locally = false
-render_target_update_mode = 0
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_right = 288.0
+margin_bottom = 53.0
+text = "Generic tools"
 
-[node name="Tabs2" type="ViewportContainer" parent="VBoxContainer/HBoxContainer/TabContainer"]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 35.0
-margin_right = -4.0
-margin_bottom = -4.0
-stretch = true
-
-[node name="Viewport" type="Viewport" parent="VBoxContainer/HBoxContainer/TabContainer/Tabs2"]
-size = Vector2( 1364, 998 )
-handle_input_locally = false
-render_target_update_mode = 0
-
-[node name="MarginContainer2" type="MarginContainer" parent="VBoxContainer/HBoxContainer"]
-margin_left = 1645.0
-margin_right = 1910.0
-margin_bottom = 1037.0
-custom_constants/margin_right = 250
+[node name="Resize_Map_Bt" type="Button" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 57.0
+margin_right = 288.0
+margin_bottom = 76.0
+text = "Resize Map"
