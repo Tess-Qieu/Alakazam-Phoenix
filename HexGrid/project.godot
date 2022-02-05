@@ -52,7 +52,7 @@ _global_script_class_icons={
 
 config/name="HexGrid"
 run/main_scene="res://Scenes/Menu/MainMenu.tscn"
-config/icon="res://icon.png"
+config/icon="res://Prefabs/Character/Robot_miniature.png"
 
 [autoload]
 
