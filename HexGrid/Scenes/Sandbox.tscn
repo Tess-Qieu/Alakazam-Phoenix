@@ -106,12 +106,37 @@ margin_right = -5.0
 margin_bottom = -5.0
 
 [node name="Label" type="Label" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+visible = false
 margin_right = 288.0
 margin_bottom = 53.0
 text = "Generic tools"
 
 [node name="Resize_Map_Bt" type="Button" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 57.0
+visible = false
 margin_right = 288.0
-margin_bottom = 76.0
+margin_bottom = 19.0
 text = "Resize Map"
+
+[node name="HSeparator" type="HSeparator" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+visible = false
+margin_right = 288.0
+margin_bottom = 4.0
+
+[node name="PathWidget" type="VBoxContainer" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_right = 288.0
+margin_bottom = 55.0
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget"]
+margin_right = 288.0
+margin_bottom = 19.0
+toggle_mode = true
+text = "Draw Path"
+
+[node name="HSlider" type="HSlider" parent="VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget"]
+margin_top = 23.0
+margin_right = 288.0
+margin_bottom = 55.0
+max_value = 10.0
+value = 5.0
+tick_count = 11
