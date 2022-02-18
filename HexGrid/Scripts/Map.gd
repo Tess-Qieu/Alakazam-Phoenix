@@ -1,4 +1,5 @@
 extends Spatial
+class_name HexMap
 
 var Cell = preload("res://Scripts/Cell.gd")
 var CellSize1 = preload("res://Scenes/Cells/CellSize1.tscn")
@@ -507,11 +508,15 @@ func _compute_path(start, end, distance_max):
 	
 	return _path
 
-func display_path(start, end, distance_max):
+func display_path(start, end, distance_max, as_object = false):
 	var path = _compute_path(start, end, distance_max)
 	for elt in path:
 		elt.change_material('green')
-	return _serialize_path(path)
+	
+	if as_object:
+		return path
+	else:
+		return _serialize_path(path)
 
 
 func _compute_displacement_range(start, distance_max):
