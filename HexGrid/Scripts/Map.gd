@@ -74,29 +74,33 @@ func _add_instance_to_grid(instance, q, r):
 		grid[q] = {}
 	grid[q][r] = instance
 	
-func _instance_cell(cell_type, q, r, kind):
+func _instance_cell(cell_type, q, r, kind, handler_node = null):
+	# Protection in case of null handler
+	if handler_node == null:
+		handler_node = get_parent()
+	
 	var cell = cell_type.instance()
-	cell.init(q, r, kind, get_parent())
+	cell.init(q, r, kind, handler_node)
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
 	if kind in SELECTABLE_CELLS:
 		cells_floor += [cell]
 
-func instance_map(new_grid):
+func instance_map(new_grid, handler_node = null):
 	grid = new_grid
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
 			if kind == 'hole':
-				_instance_cell(CellSize1, q, r, kind)
+				_instance_cell(CellSize1, q, r, kind, handler_node)
 			elif kind == 'floor' or kind == 'blocked': 
-				_instance_cell(CellSize2, q, r, kind)
+				_instance_cell(CellSize2, q, r, kind, handler_node)
 			elif kind == 'full':
-				_instance_cell(CellSize3, q, r, kind)
+				_instance_cell(CellSize3, q, r, kind, handler_node)
 			elif kind == 'border':
 				var height = rng.randi() % 3
 				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
-				_instance_cell(choices[height], q, r, kind)
+				_instance_cell(choices[height], q, r, kind, handler_node)
 
 
 

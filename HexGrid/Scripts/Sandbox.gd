@@ -59,7 +59,14 @@ func newWorld():
 	# Initialize new map
 	# Generate map
 	myMap.generate_grid(true)
-	myMap.instance_map(myMap.grid)
+	myMap.instance_map(myMap.grid, self)
 	# Add map
 	myWorldRoot.add_child(myMap)
 	print("Map ok!")
+
+func _on_cell_hovered(cell):
+	myMap.clear()
+	myMap.display_path(cell, cell, 10)
+
+func _on_cell_clicked(cell):
+	pass
