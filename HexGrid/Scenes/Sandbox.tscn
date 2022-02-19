@@ -94,6 +94,7 @@ physics_object_picking = true
 margin_left = 1612.0
 margin_right = 1910.0
 margin_bottom = 1036.0
+rect_min_size = Vector2( 200, 0 )
 size_flags_horizontal = 9
 tab_align = 0
 
