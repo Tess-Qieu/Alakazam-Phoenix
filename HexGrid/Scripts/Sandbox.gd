@@ -1,19 +1,20 @@
-extends PanelContainer
+extends Control
 
 enum actions {None, MapTool_DrawPath}
 
 # Node variables
-onready var MenuBt = $VBoxContainer/MenuBar_Background/MenuBar/MenuButton
+onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
 onready var MenuPopup : PopupMenu
-onready var Pathbutton = $VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
-onready var PathSlider = $VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
-onready var ToolsMenu : TabContainer = $VBoxContainer/HBoxContainer/ToolsMenu
+onready var PathWidget = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget
+onready var Pathbutton = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
+onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
+onready var ToolsMenu : TabContainer = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
 # Children references
-onready var viewportContainer = $VBoxContainer/HBoxContainer/Viewport_Container
-onready var myWorldRoot = $VBoxContainer/HBoxContainer/Viewport_Container/myWorldRoot
+onready var viewportContainer = $PanelContainer/VBoxContainer/HBoxContainer/Viewport_Container
+onready var myWorldRoot = $PanelContainer/VBoxContainer/HBoxContainer/Viewport_Container/myWorldRoot
 var myMap : HexMap = null
 
 # Dictionary containing every data to compute the world (Map, Characters...)
@@ -40,6 +41,8 @@ func _ready():
 	for child_index in range(ToolsMenu.get_child_count()):
 		ToolsMenu.set_tab_disabled(child_index, true)
 		ToolsMenu.visible = false
+	
+	PathWidget.popUp = $DrawPathPanel
 
 
 func _on_itemPressed_MenuBt(index: int):
