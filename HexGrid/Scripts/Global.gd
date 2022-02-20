@@ -1,8 +1,9 @@
 extends Node
 
-var BattleOnline = preload('res://Scenes/BattleOnline.tscn')
+var BattleOnline  = preload('res://Scenes/BattleOnline.tscn')
 var BattleOffline = preload("res://Scenes/BattleOffline.tscn")
-var WaitingLobby = preload("res://Scenes/WaitingLobby.tscn")
+var WaitingLobby  = preload("res://Scenes/WaitingLobby.tscn")
+var Sandbox       = preload("res://Scenes/Sandbox.tscn")
 
 var materials = {'hole': 'ae8257', 
 				'floor': "e6cab8", 
