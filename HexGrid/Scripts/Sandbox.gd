@@ -111,20 +111,21 @@ func _on_cell_hovered(cell):
 	match current_action:
 		actions.MapTool_DrawPath:
 			# Behaviour to draw path
-			if cells_set.empty():
-				# If no cell is selected, only the hovered cell is highlighted
-				myMap.clear()
-				myMap.display_path(cell, cell, 10)
-			elif cells_set.size() == 1:
-				# Draw a path from selected cell to hovered cell
-				myMap.clear()
-				cells_set[0].change_material("darkgreen")
-				myMap.display_path(cells_set[0], cell, PathSlider.value)
+			if myMap.is_cell_selectible(cell):
+				if cells_set.empty():
+					# If no cell is selected, only the hovered cell is highlighted
+					myMap.clear()
+					myMap.display_path(cell, cell, 10)
+				elif cells_set.size() == 1:
+					# Draw a path from selected cell to hovered cell
+					myMap.clear()
+					cells_set[0].change_material("darkgreen")
+					myMap.display_path(cells_set[0], cell, PathSlider.value)
 		
 		actions.MapTool_CellKindChange:
-			if cells_set.empty():
-				myMap.clear()
-				cell.change_material("darkgreen")
+			if cells_set.empty() and cell.kind != "border":
+				myMap.clear_all()
+				cell.change_material("grey")
 
 func _on_cell_clicked(cell):
 	match current_action:
@@ -183,7 +184,7 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 
 func _on_cellKindChange_requested(kind):
 	if cells_set.size() == 1:
-		myMap.change_cell_kind(cells_set[0], kind)
+		myMap.change_cell_kind(cells_set[0], kind, self)
 		CellKindPopup.hide()
 		# Clear cell selection
 		cells_set.clear()

@@ -18,7 +18,7 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
-const SELECTABLE_CELLS = ['floor', 'blocked']
+const SELECTIBLE_CELLS = ['floor', 'blocked']
 const BLOCKING_VIEW = ['full', 'border']
 
 const PROBA_CELL_FULL = 0.1
@@ -89,7 +89,7 @@ func _instance_cell(cell_scene, q, r, kind, handler_node = null):
 	cell.init(q, r, kind, handler_node)
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
-	if kind in SELECTABLE_CELLS:
+	if kind in SELECTIBLE_CELLS:
 		cells_floor += [cell]
 
 func instance_map(new_grid, handler_node = null):
@@ -188,7 +188,7 @@ func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
 
 func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0, \
 									block_filter = BLOCKING_VIEW, \
-									select_filter = SELECTABLE_CELLS ):
+									select_filter = SELECTIBLE_CELLS ):
 	## Computes a field of view composed of 6 straight lines
 	# from a given cell and within a range of distance
 	var paths = {}
@@ -283,7 +283,7 @@ func _compute_zone(center, radius):
 		for r in range( \
 				max(center.r-radius, -q-z-radius), \
 				min(center.r+radius, -q-z+radius) +1):
-			if grid[q][r].kind in SELECTABLE_CELLS:
+			if grid[q][r].kind in SELECTIBLE_CELLS:
 				zone.append(grid[q][r])
 	return zone
 
@@ -314,7 +314,7 @@ func _compute_triangle_recursive(current_cell, cell_ref, height, direction, \
 
 func _compute_triangle(cell_top, cell_target, height, \
 									block_filter = BLOCKING_VIEW, \
-									select_filter = SELECTABLE_CELLS):
+									select_filter = SELECTIBLE_CELLS):
 	# Computes a triangle from a given cell to a target cell
 	
 	var direction = cell_target.get_coord_vect3() - cell_top.get_coord_vect3()
@@ -354,7 +354,7 @@ func display_triangle(cell_top, cell_target, height, color_key):
 
 
 func _compute_hexa_points(cell_origin, radius, isEvenRangePointy = true, \
-							 select_filter = SELECTABLE_CELLS):
+							 select_filter = SELECTIBLE_CELLS):
 	# Computes the 6 corners of an hexagon, based on a given cell and a radius
 	# By default, even and odd radius are not managed the same way :
 	# For an odd range, the returned cells have a side parallel to the origin cell
@@ -597,6 +597,11 @@ func clear():
 	for c in cells_floor:
 		c.change_material('floor')
 
+func clear_all():
+	for r in grid.keys():
+		for q in grid[r].keys():
+			grid[r][q].change_material(grid[r][q].kind)
+
 func manage_fov(spell : Spell, origin_cell, color_key):
 	var fov = []
 	match spell.fov_type:
@@ -655,3 +660,10 @@ func change_cell_kind(cell, kind:String, handler = null):
 			remove_child(cell)
 			# Instantiating a new cell from previous one
 			_instance_cell(kind_to_scene[kind], cell.q, cell.r, kind, handler)
+
+func is_cell_selectible(cell):
+	if "kind" in cell:
+		if cell.kind in SELECTIBLE_CELLS:
+			return true
+	
+	return false

@@ -29,7 +29,7 @@ func init(_q, _r, _kind, battle_scene):
 	translation.z = r * TRANS_DOWNRIGHT.y
 	change_material(kind)
 	
-	if battle_scene != null and kind == 'floor':
+	if battle_scene != null :#and kind == 'floor':
 		# warning-ignore:return_value_discarded
 		$Circle/Area.connect("mouse_entered", battle_scene, "_on_cell_hovered", [self])
 		# warning-ignore:return_value_discarded
@@ -38,7 +38,10 @@ func init(_q, _r, _kind, battle_scene):
 func change_material(material_key):
 	if material_key == 'blocked':
 		material_key = 'floor'
-	$Circle.set_surface_material(0, Global.materials[material_key])
+	if material_key in Global.materials.keys():
+		$Circle.set_surface_material(0, Global.materials[material_key])
+	else:
+		print("Color {0} does not exists".format([material_key]))
 
 func set_character(new_character):
 	character_on = new_character
@@ -62,13 +65,8 @@ func get_coords_string():
 func _on_Area_input_event(_camera, event, _click_position, _click_normal, _shape_idx):
 	# If the event is a mouse click
 	if event is InputEventMouseButton and event.pressed:
-		if kind == "floor" :
-			# A different material is applied on each button
-			if event.button_index == BUTTON_LEFT :
+		match event.button_index:
+			BUTTON_LEFT:
 				emit_signal('cell_clicked')
-				
-			elif event.button_index == BUTTON_RIGHT:
-				pass
-				
-		if event.button_index == BUTTON_MIDDLE:
-			print("({0},{1}) - {2}".format([q, r, kind]))
+			BUTTON_MIDDLE:
+				print("({0},{1}) - {2}".format([q, r, kind]))
