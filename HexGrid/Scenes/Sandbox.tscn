@@ -129,6 +129,17 @@ margin_top = 59.0
 margin_right = 288.0
 margin_bottom = 63.0
 
+[node name="CellKindWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 67.0
+margin_right = 288.0
+margin_bottom = 86.0
+
+[node name="CellKind_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget"]
+margin_right = 288.0
+margin_bottom = 19.0
+toggle_mode = true
+text = "Cange cell type"
+
 [node name="DrawPathPanel" type="PopupPanel" parent="."]
 margin_right = 321.0
 margin_bottom = 101.0
@@ -148,6 +159,64 @@ Activate path drawing by clicking the button
 Select path length with slider. "
 align = 1
 valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CellKindPopup" type="PopupPanel" parent="."]
+visible = true
+margin_right = 250.0
+margin_bottom = 100.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CellKindPopup"]
+margin_left = 4.0
+margin_top = 4.0
+margin_right = 246.0
+margin_bottom = 96.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="CellKindPopup/VBoxContainer"]
+margin_right = 242.0
+margin_bottom = 53.0
+size_flags_horizontal = 3
+text = "Select new cell kind"
+align = 1
+valign = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CellKindPopup/VBoxContainer"]
+margin_top = 57.0
+margin_right = 242.0
+margin_bottom = 92.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="KindBt_Floor" type="Button" parent="CellKindPopup/VBoxContainer/HBoxContainer"]
+margin_right = 78.0
+margin_bottom = 35.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Floor"
+
+[node name="KindBt_Hole" type="Button" parent="CellKindPopup/VBoxContainer/HBoxContainer"]
+margin_left = 82.0
+margin_right = 160.0
+margin_bottom = 35.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Hole"
+
+[node name="KindBt_Wall" type="Button" parent="CellKindPopup/VBoxContainer/HBoxContainer"]
+margin_left = 164.0
+margin_right = 242.0
+margin_bottom = 35.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Wall"
 __meta__ = {
 "_edit_use_anchors_": false
 }

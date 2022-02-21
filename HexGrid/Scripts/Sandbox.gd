@@ -1,6 +1,6 @@
 extends Control
 
-enum actions {None, MapTool_DrawPath}
+enum actions {None, MapTool_DrawPath, MapTool_CellKindChange}
 
 # Node variables
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -8,14 +8,16 @@ onready var MenuPopup : PopupMenu
 onready var PathWidget = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget
 onready var Pathbutton = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
 onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
-onready var ToolsMenu : TabContainer = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
+onready var ToolsMenu  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
+onready var CellKindBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget/CellKind_Bt
+onready var CellKindPopup = $CellKindPopup
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
 # Children references
-onready var viewportContainer = $PanelContainer/VBoxContainer/HBoxContainer/Viewport_Container
 onready var myWorldRoot = $PanelContainer/VBoxContainer/HBoxContainer/Viewport_Container/myWorldRoot
 var myMap : HexMap = null
+var current_bt : Button = null
 
 # Dictionary containing every data to compute the world (Map, Characters...)
 var world : Dictionary = {}
@@ -37,12 +39,21 @@ func _ready():
 	MenuPopup = MenuBt.get_popup()
 	# warning-ignore:return_value_discarded
 	MenuPopup.connect("index_pressed", self, "_on_itemPressed_MenuBt")
-	Pathbutton.connect("toggled", self, "_on_PathButton_toggled")
+	
+	## Path widget connections ##
+	# Button action
+	Pathbutton.connect("toggled", self, "_on_Button_Toggled", [Pathbutton])
+	# Popup link
+	PathWidget.popUp = $DrawPathPanel
+	
+	## Cell Kind Widget connections ##
+	# Button action
+	CellKindBt.connect("toggled", self, "_on_Button_Toggled", [CellKindBt])
+	
+	# At openning the sandbox, no world exists. So all tabs are deactivated
 	for child_index in range(ToolsMenu.get_child_count()):
 		ToolsMenu.set_tab_disabled(child_index, true)
 		ToolsMenu.visible = false
-	
-	PathWidget.popUp = $DrawPathPanel
 
 
 func _on_itemPressed_MenuBt(index: int):
@@ -89,36 +100,72 @@ func newWorld():
 	ToolsMenu.set_tab_disabled(index, false)
 
 func _on_cell_hovered(cell):
-	# Behaviour to draw path
-	if current_action == actions.MapTool_DrawPath:
-		if cells_set.empty():
-			# If no cell is selected, only the hovered cell is highlighted
+	match current_action:
+		actions.MapTool_DrawPath:
+			# Behaviour to draw path
+			if cells_set.empty():
+				# If no cell is selected, only the hovered cell is highlighted
+				myMap.clear()
+				myMap.display_path(cell, cell, 10)
+			elif cells_set.size() == 1:
+				# Draw a path from selected cell to hovered cell
+				myMap.clear()
+				cells_set[0].change_material("darkgreen")
+				myMap.display_path(cells_set[0], cell, PathSlider.value)
+		
+		actions.MapTool_CellKindChange:
 			myMap.clear()
-			myMap.display_path(cell, cell, 10)
-		elif cells_set.size() == 1:
-			# Draw a path from selected cell to hovered cell
-			myMap.clear()
-			cells_set[0].change_material("darkgreen")
-			myMap.display_path(cells_set[0], cell, PathSlider.value)
-			
+			cell.change_material("darkgreen")
+
 func _on_cell_clicked(cell):
-	# Behaviour to draw path
-	if current_action == actions.MapTool_DrawPath:
-		if cells_set.size() != 1:
-			# If no cell is selected, save the clicked cell as path beginning
-			cells_set = [cell]
-			myMap.clear()
-			cells_set[0].change_material("darkgreen")
-		else:
-			# Saves the path from initial cell to clicked cell
-			cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
+	match current_action:
+		actions.MapTool_DrawPath:
+			# Behaviour to draw path
+			if cells_set.size() != 1:
+				# If no cell is selected, save the clicked cell as path beginning
+				cells_set = [cell]
+				myMap.clear()
+				cells_set[0].change_material("darkgreen")
+			else:
+				# Saves the path from initial cell to clicked cell
+				cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
+		
+		actions.MapTool_CellKindChange:
+			# Behaviour to change cell kind
+			CellKindPopup.rect_position = get_global_mouse_position() \
+						+ Vector2(-CellKindPopup.rect_size[0], 0)
+			CellKindPopup.show()
 
-
-func _on_PathButton_toggled(button_pressed:bool):
+func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
+	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
+	
 	if button_pressed:
-		current_action = actions.MapTool_DrawPath
-	else:
+		# Select action given the pressed button
+		match changed_bt:
+			Pathbutton:
+				current_action = actions.MapTool_DrawPath
+			CellKindBt:
+				current_action = actions.MapTool_CellKindChange
+		
+		# If a button was already pressed, it is unpressed. The currently active
+		# button is now the clicked button
+		var previous_bt : Button = current_bt
+		current_bt = changed_bt
+		if previous_bt != null:
+			#print("Button unselected: {0}".format([previous_bt.name]))
+			previous_bt.pressed = false
+	
+	elif current_bt == changed_bt:
+		# If a button is unpressed and the currently active button is himself
+		# then no specific behaviour or action must be active
+		match current_action:
+			actions.MapTool_CellKindChange:
+				CellKindPopup.hide()
+		
 		current_action = actions.None
+		current_bt = null
+	
+	#print("Current action: {0}".format([current_action]))
 	# Clear cell selection
 	cells_set.clear()
 	myMap.clear()
@@ -130,3 +177,5 @@ func _input(event):
 			match current_action:
 				actions.MapTool_DrawPath:
 					Pathbutton.pressed = false
+				actions.MapTool_CellKindChange:
+					CellKindBt.pressed = false
