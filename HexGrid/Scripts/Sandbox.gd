@@ -11,6 +11,9 @@ onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/M
 onready var ToolsMenu  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
 onready var CellKindBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget/CellKind_Bt
 onready var CellKindPopup = $CellKindPopup
+onready var kindHoleBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
+onready var kindFloorBt = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
+onready var kindWallBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -49,6 +52,11 @@ func _ready():
 	## Cell Kind Widget connections ##
 	# Button action
 	CellKindBt.connect("toggled", self, "_on_Button_Toggled", [CellKindBt])
+	# Cell kind popup buttons
+	kindFloorBt.connect("pressed", self, "_on_cellKindChange_requested", ['floor'])
+	kindHoleBt.connect("pressed", self, "_on_cellKindChange_requested", ['hole'])
+	kindWallBt.connect("pressed", self, "_on_cellKindChange_requested", ['full'])
+	
 	
 	# At openning the sandbox, no world exists. So all tabs are deactivated
 	for child_index in range(ToolsMenu.get_child_count()):
@@ -114,8 +122,9 @@ func _on_cell_hovered(cell):
 				myMap.display_path(cells_set[0], cell, PathSlider.value)
 		
 		actions.MapTool_CellKindChange:
-			myMap.clear()
-			cell.change_material("darkgreen")
+			if cells_set.empty():
+				myMap.clear()
+				cell.change_material("darkgreen")
 
 func _on_cell_clicked(cell):
 	match current_action:
@@ -131,10 +140,12 @@ func _on_cell_clicked(cell):
 				cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
 		
 		actions.MapTool_CellKindChange:
-			# Behaviour to change cell kind
-			CellKindPopup.rect_position = get_global_mouse_position() \
-						+ Vector2(-CellKindPopup.rect_size[0], 0)
-			CellKindPopup.show()
+			if cells_set.empty():
+				# Behaviour to change cell kind
+				CellKindPopup.rect_position = get_global_mouse_position() \
+							+ Vector2(-CellKindPopup.rect_size[0], 0)
+				CellKindPopup.show()
+				cells_set = [cell]
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
@@ -169,6 +180,14 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	# Clear cell selection
 	cells_set.clear()
 	myMap.clear()
+
+func _on_cellKindChange_requested(kind):
+	if cells_set.size() == 1:
+		myMap.change_cell_kind(cells_set[0], kind)
+		CellKindPopup.hide()
+		# Clear cell selection
+		cells_set.clear()
+		myMap.clear()
 
 func _input(event):
 	if event is InputEventKey:

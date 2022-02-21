@@ -7,6 +7,11 @@ var CellSize2 = preload("res://Scenes/Cells/CellSize2.tscn")
 var CellSize3 = preload("res://Scenes/Cells/CellSize3.tscn")
 var CellSize4 = preload("res://Scenes/Cells/CellSize4.tscn")
 var CellSize5 = preload("res://Scenes/Cells/CellSize5.tscn")
+var kind_to_scene = {'hole'  : CellSize1,
+					'floor'  : CellSize2,
+					'blocked': CellSize2,
+					'full'   : CellSize3,
+					'border' : [CellSize3, CellSize4, CellSize5] }
 
 var rng = RandomNumberGenerator.new()
 var grid = {}
@@ -75,12 +80,12 @@ func _add_instance_to_grid(instance, q, r):
 		grid[q] = {}
 	grid[q][r] = instance
 	
-func _instance_cell(cell_type, q, r, kind, handler_node = null):
+func _instance_cell(cell_scene, q, r, kind, handler_node = null):
 	# Protection in case of null handler
 	if handler_node == null:
 		handler_node = get_parent()
 	
-	var cell = cell_type.instance()
+	var cell = cell_scene.instance()
 	cell.init(q, r, kind, handler_node)
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
@@ -92,16 +97,11 @@ func instance_map(new_grid, handler_node = null):
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
-			if kind == 'hole':
-				_instance_cell(CellSize1, q, r, kind, handler_node)
-			elif kind == 'floor' or kind == 'blocked': 
-				_instance_cell(CellSize2, q, r, kind, handler_node)
-			elif kind == 'full':
-				_instance_cell(CellSize3, q, r, kind, handler_node)
+			if kind in ['hole', "blocked", "floor", 'full']:
+				_instance_cell(kind_to_scene[kind], q, r, kind, handler_node)
 			elif kind == 'border':
 				var height = rng.randi() % 3
-				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
-				_instance_cell(choices[height], q, r, kind, handler_node)
+				_instance_cell(kind_to_scene[kind][height], q, r, kind, handler_node)
 
 
 
@@ -635,3 +635,23 @@ func get_impact(spell : Spell, origin_cell, target_cell):
 			cells.append(grid[0][0]) 
 		
 	return cells
+
+func change_cell_color(cell, new_color):
+	if cell.has_method("change_material"):
+		cell.change_material(new_color)
+	elif cell is Array:
+		grid[cell[0]][cell[1]].change_material(new_color)
+
+func change_cell_kind(cell, kind:String, handler = null):
+	if handler == null:
+		handler = cell.get_parent()
+	
+	if cell is Array:
+		cell = grid[cell[0]][cell[1]]
+	
+	if "kind" in cell:
+		if cell.kind != kind and kind != "blocked" and cell.kind != "blocked":
+			# Removing cell from map
+			remove_child(cell)
+			# Instantiating a new cell from previous one
+			_instance_cell(kind_to_scene[kind], cell.q, cell.r, kind, handler)
