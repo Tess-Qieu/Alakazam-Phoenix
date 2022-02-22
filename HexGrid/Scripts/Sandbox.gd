@@ -166,10 +166,14 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 		if previous_bt != null:
 			#print("Button unselected: {0}".format([previous_bt.name]))
 			previous_bt.pressed = false
+			match previous_bt:
+				CellKindBt:
+					CellKindPopup.hide()
 	
 	elif current_bt == changed_bt:
 		# If a button is unpressed and the currently active button is himself
 		# then no specific behaviour or action must be active
+#		print("Button: {0}\nAction: {1}".format([changed_bt.name, actions.keys()[current_action]]))
 		match current_action:
 			actions.MapTool_CellKindChange:
 				CellKindPopup.hide()

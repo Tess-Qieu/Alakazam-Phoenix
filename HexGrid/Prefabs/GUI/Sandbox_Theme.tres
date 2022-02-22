@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=23 format=2]
+[gd_resource type="Theme" load_steps=24 format=2]
 
 [ext_resource path="res://Prefabs/GUI/Fonts/DroidSans.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://Prefabs/GUI/Icons/grabber_highlighted.png" type="Texture" id=2]
@@ -12,9 +12,9 @@ content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
 draw_center = false
-border_width_left = 1
+border_width_left = 2
 border_width_top = 2
-border_width_right = 1
+border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.682353, 0.156863, 0.14902, 1 )
 corner_radius_top_left = 20
@@ -29,9 +29,9 @@ content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
 draw_center = false
-border_width_left = 1
+border_width_left = 2
 border_width_top = 2
-border_width_right = 1
+border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.94902, 0.894118, 0.905882, 0.482353 )
 corner_radius_top_left = 22
@@ -49,9 +49,9 @@ content_margin_right = 6.0
 content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
-border_width_left = 1
+border_width_left = 2
 border_width_top = 2
-border_width_right = 1
+border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.0627451, 0.85098, 0.788235, 1 )
 corner_radius_top_left = 20
@@ -65,9 +65,9 @@ content_margin_right = 6.0
 content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
-border_width_left = 1
+border_width_left = 2
 border_width_top = 2
-border_width_right = 1
+border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.521569, 0.501961, 0.827451, 1 )
 corner_radius_top_left = 20
@@ -81,9 +81,9 @@ content_margin_right = 6.0
 content_margin_top = 1.0
 content_margin_bottom = 1.0
 bg_color = Color( 0.0588235, 0.109804, 0.109804, 1 )
-border_width_left = 1
+border_width_left = 2
 border_width_top = 2
-border_width_right = 1
+border_width_right = 2
 border_width_bottom = 2
 border_color = Color( 0.0627451, 0.85098, 0.788235, 1 )
 corner_radius_top_left = 20
@@ -135,16 +135,16 @@ corner_radius_top_right = 50
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 50
 
-[sub_resource type="StyleBoxFlat" id=2]
-content_margin_left = 18.0
-content_margin_right = 18.0
-content_margin_top = 18.0
-content_margin_bottom = 18.0
+[sub_resource type="StyleBoxFlat" id=21]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 10.0
+content_margin_bottom = 10.0
 bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
-border_width_left = 6
-border_width_top = 6
-border_width_right = 6
-border_width_bottom = 6
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color( 0.521569, 0.501961, 0.827451, 1 )
 corner_radius_top_right = 24
 corner_radius_bottom_left = 24
@@ -210,6 +210,22 @@ corner_radius_top_right = 50
 corner_radius_bottom_right = 20
 corner_radius_bottom_left = 50
 
+[sub_resource type="StyleBoxFlat" id=20]
+content_margin_left = 5.0
+content_margin_right = 5.0
+content_margin_top = 5.0
+content_margin_bottom = 5.0
+bg_color = Color( 0.0313726, 0.0588235, 0.0588235, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.521569, 0.501961, 0.827451, 1 )
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
 [sub_resource type="StyleBoxFlat" id=15]
 content_margin_left = 15.0
 content_margin_right = 15.0
@@ -265,7 +281,7 @@ HSlider/icons/grabber_highlight = ExtResource( 2 )
 HSlider/styles/grabber_area = SubResource( 17 )
 HSlider/styles/grabber_area_highlight = SubResource( 18 )
 HSlider/styles/slider = SubResource( 19 )
-Label/styles/normal = SubResource( 2 )
+Label/styles/normal = SubResource( 21 )
 LineEdit/styles/focus = SubResource( 9 )
 LineEdit/styles/normal = SubResource( 3 )
 LineEdit/styles/read_only = SubResource( 10 )
@@ -276,6 +292,7 @@ MarginContainer/constants/margin_top = 15
 PanelContainer/styles/panel = SubResource( 11 )
 PopupMenu/styles/hover = SubResource( 13 )
 PopupMenu/styles/panel = SubResource( 11 )
+PopupPanel/styles/panel = SubResource( 20 )
 TabContainer/styles/panel = SubResource( 11 )
 TabContainer/styles/tab_bg = SubResource( 15 )
 TabContainer/styles/tab_disabled = SubResource( 14 )
