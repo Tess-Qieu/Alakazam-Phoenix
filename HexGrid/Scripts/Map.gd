@@ -667,3 +667,14 @@ func is_cell_selectible(cell):
 			return true
 	
 	return false
+
+func get_cell(q, r):
+	return grid[q][r]
+
+func save():
+	var grid_serialized : Dictionary = {}
+	for q in grid.keys():
+		grid_serialized[q] = {}
+		for r in grid[q].keys():
+			grid_serialized[q][r] = get_cell(q, r).kind
+	return grid_serialized

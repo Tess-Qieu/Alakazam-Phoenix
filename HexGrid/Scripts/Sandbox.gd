@@ -14,6 +14,7 @@ onready var CellKindPopup = $CellKindPopup
 onready var kindHoleBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
 onready var kindFloorBt = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
 onready var kindWallBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
+onready var myFileDialog = $FileDialog
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -58,6 +59,9 @@ func _ready():
 	kindWallBt.connect("pressed", self, "_on_cellKindChange_requested", ['full'])
 	
 	
+	myFileDialog.connect("file_selected", self, "_on_file_selected")
+	
+	
 	# At openning the sandbox, no world exists. So all tabs are deactivated
 	for child_index in range(ToolsMenu.get_child_count()):
 		ToolsMenu.set_tab_disabled(child_index, true)
@@ -72,7 +76,7 @@ func _on_itemPressed_MenuBt(index: int):
 		"Save":
 			saveMap()
 		"Save as":
-			print("Where's the dialog window to save as ?")
+			saveMapAs()
 		"Load":
 			print("Nothing to load")
 		_:
@@ -81,8 +85,20 @@ func _on_itemPressed_MenuBt(index: int):
 func saveMap():
 	if myWorldRoot.get_child_count() == 0:
 		print("No world to save")
+	elif worldSave == null:
+		saveMapAs()
 	else:
-		print("Can you save me ?")
+		print("Saving in {0}\n".format([worldSave.get_path()]))
+		var data_to_save = {}
+		data_to_save["myMap"] = myMap.save()
+		worldSave.store_line(to_json(data_to_save))
+		worldSave.close()
+
+func saveMapAs():
+	if myWorldRoot.get_child_count() == 0:
+		print("No world to save")
+	else :
+		myFileDialog.show()
 
 func newWorld():
 #	print("New world!")
@@ -203,3 +219,9 @@ func _input(event):
 					Pathbutton.pressed = false
 				actions.MapTool_CellKindChange:
 					CellKindBt.pressed = false
+
+func _on_file_selected(file_selected: String):
+	worldSave = File.new()
+	worldSave.open(file_selected, File.WRITE_READ)
+	saveMap()
+	myFileDialog.hide()
