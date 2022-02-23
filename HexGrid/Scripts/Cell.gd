@@ -20,8 +20,8 @@ func _ready():
 	pass
 
 func init(_q, _r, _kind, battle_scene):
-	q = _q
-	r = _r
+	q = int(_q)
+	r = int(_r)
 	kind = _kind
 	character_on = null
 	

@@ -27,7 +27,7 @@ var current_bt : Button = null
 var world : Dictionary = {}
 
 # Path to world file
-var worldSave : File = null
+var myWorldSave = ""
 
 # Set of cells to be memorized
 var cells_set = []
@@ -74,45 +74,69 @@ func _on_itemPressed_MenuBt(index: int):
 		"New":
 			newWorld()
 		"Save":
-			saveMap()
+			saveWorld()
 		"Save as":
-			saveMapAs()
+			saveWorldAs()
 		"Load":
-			print("Nothing to load")
+			myFileDialog.mode = FileDialog.MODE_OPEN_FILE
+			myFileDialog.show()
 		_:
 			print("Action '{0}' not handled".format([MenuPopup.get_item_text(index)]))
 
-func saveMap():
+func saveWorld():
 	if myWorldRoot.get_child_count() == 0:
 		print("No world to save")
-	elif worldSave == null:
-		saveMapAs()
+	elif myWorldSave.empty():
+		saveWorldAs()
 	else:
-		print("Saving in {0}\n".format([worldSave.get_path()]))
+		var saveFile = File.new()
+		saveFile.open(myWorldSave, File.WRITE)
+		print("Saving in {0}\n".format([saveFile.get_path()]))
 		var data_to_save = {}
 		data_to_save["myMap"] = myMap.save()
-		worldSave.store_line(to_json(data_to_save))
-		worldSave.close()
+		saveFile.store_line(to_json(data_to_save))
+		saveFile.close()
 
-func saveMapAs():
+func saveWorldAs():
 	if myWorldRoot.get_child_count() == 0:
 		print("No world to save")
 	else :
+		myFileDialog.mode = FileDialog.MODE_SAVE_FILE
 		myFileDialog.show()
 
-func newWorld():
-#	print("New world!")
-	# Destroy previous world
+func loadWorld():
+	if myWorldSave.empty():
+		print("No file to load")
+	else:
+		var loadFile = File.new()
+		loadFile.open(myWorldSave, File.READ)
+		print("Loading world from {0}".format([loadFile.get_path()]))
+		var world_data = parse_json(loadFile.get_line())
+		if world_data is Dictionary and world_data.has("myMap"):
+				newWorld(world_data["myMap"])
+		else:
+			print("Error loading map in data: {0}".format((world_data)))
+		loadFile.close()
+
+func _destroyPreviousWorld():
+	# Remove and destroy all childs of 
 	for child in myWorldRoot.get_children():
-		myWorldRoot.remove_child(child)
-		child.queue_free()
+			myWorldRoot.remove_child(child)
+			child.queue_free()
+
+func newWorld(grid = null):
+#	print("New world!")
+	_destroyPreviousWorld()
 	
 	## Create a new map ##
 	# Instanciate new map
 	myMap = MapClass.instance()
 	# Initialize new map
 	# Generate map
-	myMap.generate_grid(true)
+	if (grid == null):
+		myMap.generate_grid(true)
+	else:
+		myMap.grid = grid
 	myMap.instance_map(myMap.grid, self)
 	# Add map
 	myWorldRoot.add_child(myMap)
@@ -200,7 +224,7 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Current action: {0}".format([current_action]))
 	# Clear cell selection
 	cells_set.clear()
-	myMap.clear()
+	myMap.clear_all()
 
 func _on_cellKindChange_requested(kind):
 	if cells_set.size() == 1:
@@ -221,7 +245,12 @@ func _input(event):
 					CellKindBt.pressed = false
 
 func _on_file_selected(file_selected: String):
-	worldSave = File.new()
-	worldSave.open(file_selected, File.WRITE_READ)
-	saveMap()
+	myWorldSave = file_selected
+	match myFileDialog.mode:
+		FileDialog.MODE_SAVE_FILE:
+			# When the dialog is openned to save the world
+			saveWorld()
+		FileDialog.MODE_OPEN_FILE:
+			# When the dialog is oppened to load a saved world
+			loadWorld()
 	myFileDialog.hide()
