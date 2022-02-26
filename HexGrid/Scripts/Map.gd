@@ -18,8 +18,27 @@ var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
+const ALL_KINDS = ['floor', 'blocked', 'full', 'hole', 'border']
 const SELECTIBLE_CELLS = ['floor', 'blocked']
 const BLOCKING_VIEW = ['full', 'border']
+
+# In the map, cells are handled with axial coordinates as coord = (q,r) with a
+# placement as shown :
+#     /   \   /   \
+#   _| 0,-1| |+1,-1|_
+# /   \   /   \   /   \
+#|-1,0 | | Q,R | |+1,0 |
+# \ _ /   \   /   \ _ /
+#    |-1,+1| | 0,+1|
+#     \ _ /   \ _ /
+# Direction vectors, used to compute a circle. 
+# This order, combined with neighbors listing order simplifies the algorithm
+const DIRECTIONS = {'UpRight'  : Vector2(+1,-1),
+					'UpLeft'   : Vector2( 0,-1),
+					'Left'     : Vector2(-1, 0),
+					'DownLeft' : Vector2(-1,+1),
+					'DownRight': Vector2( 0,+1),
+					'Right'    : Vector2(+1, 0)}
 
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
@@ -29,7 +48,6 @@ const RAY = LENGTH_BORDER + RAY_ARENA
 
 # Littlest step the camera can do on the Zoom 3D Curve, on unit_offset
 export var camera_sensibility = 0.05
-
 
 func _ready():
 	rng.randomize()
@@ -422,11 +440,48 @@ func display_hexa_points(cell_origin, radius, color_key):
 	
 	return points
 
-
+func display_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = ""):
+	if color.empty():
+		color = 'green'
+	
+	return _compute_circle(center, radius, filter_select, color)
+	
+func _compute_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = ""):
+	# Initialize output array
+	var circle = []
+	
+	if radius == 0:
+		circle.append(center)
+	elif radius > 0:
+		# Select initial cell :
+		var q_init = center.q + int(radius*DIRECTIONS['Left'].x)
+		var r_init = center.r + int(radius*DIRECTIONS['Left'].y)
+		var cell = grid[q_init][r_init]
+		# A circle has the particularity of having a number of cell equal to
+		# its radius on each side.
+		for side in range(6):
+			for step in range(radius):
+				# Handle current cell
+				if cell.kind in filter_select:
+					circle.append(cell)
+					if not color.empty():
+						change_cell_color(cell, color)
+				# Select next cell
+				cell = _neighbors(cell)[side]
+	
+	return circle
 
 ## HANDLE PATH FINDING ##
 func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
+	# Cells are returned in this order :
+	#   / \ / \ 
+	#  | 3 | 2 |
+	# / \ / \ / \
+	#| 4 |   | 1 |
+	# \ / \ / \ / 
+	#  | 5 | 0 |
+	#   \ / \ / 
 	var list = []
 	
 	if grid[cell.q][cell.r +1] != null:
