@@ -95,17 +95,6 @@ margin_right = 288.0
 margin_bottom = 37.0
 text = "Generic tools"
 
-[node name="Resize_Map_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-visible = false
-margin_right = 288.0
-margin_bottom = 19.0
-text = "Resize Map"
-
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-visible = false
-margin_right = 288.0
-margin_bottom = 4.0
-
 [node name="PathWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
 margin_right = 288.0
 margin_bottom = 55.0
@@ -169,6 +158,31 @@ text = "Draw Circle"
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 162.0
+margin_right = 288.0
+margin_bottom = 166.0
+
+[node name="ArenaSizeWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 170.0
+margin_right = 288.0
+margin_bottom = 225.0
+
+[node name="ResizeArena_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget"]
+margin_right = 288.0
+margin_bottom = 19.0
+toggle_mode = true
+text = "Resize Arena"
+
+[node name="ArenaSize_Slider" type="HSlider" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget"]
+margin_top = 23.0
+margin_right = 288.0
+margin_bottom = 55.0
+min_value = 2.0
+max_value = 12.0
+value = 8.0
+tick_count = 11
 
 [node name="DrawPathPanel" type="PopupPanel" parent="."]
 visible = true

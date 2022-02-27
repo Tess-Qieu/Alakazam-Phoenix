@@ -1,6 +1,7 @@
 extends Control
 
-enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, MapTool_DrawCircle}
+enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, 
+					MapTool_DrawCircle, MapTool_ResizeArena}
 
 # Node variables
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -16,6 +17,8 @@ onready var kindFloorBt = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floo
 onready var kindWallBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
 onready var myFileDialog = $FileDialog
 onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
+onready var ArenaSizeBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
+onready var ArenaSizeSl = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -59,7 +62,12 @@ func _ready():
 	kindHoleBt.connect("pressed", self, "_on_cellKindChange_requested", ['hole'])
 	kindWallBt.connect("pressed", self, "_on_cellKindChange_requested", ['full'])
 	
+	## Shapes drawing widget  connections ##
 	circleBt.connect("toggled", self, "_on_Button_Toggled", [circleBt])
+	
+	## Arena Size widget ##
+#	ArenaSizeBt.connect("pressed", self, "ask_map_resize")
+	ArenaSizeBt.connect("toggled", self, "_on_Button_Toggled", [ArenaSizeBt])
 	
 	
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
@@ -184,15 +192,16 @@ func _on_cell_hovered(cell):
 func _on_cell_clicked(cell):
 	match current_action:
 		actions.MapTool_DrawPath:
-			# Behaviour to draw path
-			if cells_set.size() != 1:
-				# If no cell is selected, save the clicked cell as path beginning
-				cells_set = [cell]
-				myMap.clear()
-				myMap.change_cell_color(cells_set[0],"darkgreen")
-			else:
-				# Saves the path from initial cell to clicked cell
-				cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
+			if myMap.is_cell_selectible(cell):
+				# Behaviour to draw path
+				if cells_set.size() != 1:
+					# If no cell is selected, save the clicked cell as path beginning
+					cells_set = [cell]
+					myMap.clear()
+					myMap.change_cell_color(cells_set[0],"darkgreen")
+				else:
+					# Saves the path from initial cell to clicked cell
+					cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
 		
 		actions.MapTool_CellKindChange:
 			if cells_set.empty():
@@ -203,16 +212,17 @@ func _on_cell_clicked(cell):
 				cells_set = [cell]
 		
 		actions.MapTool_DrawCircle:
-			# Behaviour to draw path
-			if cells_set.size() != 1:
-				# If no cell is selected, save the clicked cell as path beginning
-				cells_set = [cell]
-				myMap.clear()
-				myMap.change_cell_color(cells_set[0],"darkgreen")
-			else:
-				# Saves the path from initial cell to clicked cell
-				var radius = myMap.distance_cells(cell, cells_set[0])
-				cells_set = myMap.display_circle(cells_set[0], radius)
+			if myMap.is_cell_selectible(cell):
+				# Behaviour to draw path
+				if cells_set.size() != 1:
+					# If no cell is selected, save the clicked cell as path beginning
+					cells_set = [cell]
+					myMap.clear()
+					myMap.change_cell_color(cells_set[0],"darkgreen")
+				else:
+					# Saves the path from initial cell to clicked cell
+					var radius = myMap.distance_cells(cell, cells_set[0])
+					cells_set = myMap.display_circle(cells_set[0], radius)
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
@@ -226,6 +236,10 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				current_action = actions.MapTool_CellKindChange
 			circleBt:
 				current_action = actions.MapTool_DrawCircle
+			ArenaSizeBt:
+				current_action = actions.MapTool_ResizeArena
+				myMap.change_arena_size(ArenaSizeSl.value, self)
+				ArenaSizeBt.pressed = false
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button

@@ -40,11 +40,14 @@ const DIRECTIONS = {'UpRight'  : Vector2(+1,-1),
 					'DownRight': Vector2( 0,+1),
 					'Right'    : Vector2(+1, 0)}
 
+# Cell types probability
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
-const LENGTH_BORDER = 8
-const RAY_ARENA = 8
-const RAY = LENGTH_BORDER + RAY_ARENA
+
+# Map size variables
+var Border_Width = 8
+var Arena_Radius = 8
+var Map_Radius = Border_Width + Arena_Radius
 
 # Littlest step the camera can do on the Zoom 3D Curve, on unit_offset
 export var camera_sensibility = 0.05
@@ -68,10 +71,10 @@ func _random_kind():
 func _generate_one_gridline(line_size, r):
 	var kind = ''
 	var half = line_size / 2  if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
-	var q = -RAY -r if r <= 0 else -RAY
+	var q = -Map_Radius -r if r <= 0 else -Map_Radius
 	# first part : random
 	for i in range(half):
-		if distance_coord(q, r, 0, 0) > RAY_ARENA:
+		if distance_coord(q, r, 0, 0) > Arena_Radius:
 			kind = 'border'
 		else:
 			kind = _random_kind()
@@ -83,11 +86,11 @@ func _generate_one_gridline(line_size, r):
 func generate_grid(random = false):
 	if random:
 		rng.randomize()
-	var nb_cell = RAY + 1
-	for r in range(-RAY, 0) :
+	var nb_cell = Map_Radius + 1
+	for r in range(-Map_Radius, 0) :
 		_generate_one_gridline(nb_cell, r)
 		nb_cell += 1
-	for r in range(RAY + 1) :
+	for r in range(Map_Radius + 1) :
 		_generate_one_gridline(nb_cell, r)
 		nb_cell -= 1
 
@@ -702,20 +705,6 @@ func change_cell_color(cell, new_color):
 	elif cell is Array:
 		grid[cell[0]][cell[1]].change_material(new_color)
 
-func change_cell_kind(cell, kind:String, handler = null):
-	if handler == null:
-		handler = cell.get_parent()
-	
-	if cell is Array:
-		cell = grid[cell[0]][cell[1]]
-	
-	if "kind" in cell:
-		if cell.kind != kind and kind != "blocked" and cell.kind != "blocked":
-			# Removing cell from map
-			remove_child(cell)
-			# Instantiating a new cell from previous one
-			_instance_cell(kind_to_scene[kind], cell.q, cell.r, kind, handler)
-
 func is_cell_selectible(cell):
 	if "kind" in cell:
 		if cell.kind in SELECTIBLE_CELLS:
@@ -733,3 +722,59 @@ func save():
 		for r in grid[q].keys():
 			grid_serialized[q][r] = get_cell(q, r).kind
 	return grid_serialized
+
+
+## HANDLING MAP TRANSFORMATION ##
+
+func change_cell_kind(cell, new_kind:String, handler = null):
+	if handler == null:
+		handler = cell.get_parent()
+	
+	if cell is Array:
+		cell = grid[cell[0]][cell[1]]
+	
+	if "kind" in cell:
+		if cell.kind != new_kind and new_kind != "blocked" and cell.kind != "blocked":
+			# Removing cell from map
+			if cell.kind == "floor":
+				cells_floor.erase(cell)
+			remove_child(cell)
+			# Instantiating a new cell from previous one
+			if new_kind == "border":
+				# border kind in chosen randomly in various sizes
+				var height = rng.randi() % 3
+				_instance_cell(kind_to_scene[new_kind][height], cell.q, cell.r, new_kind, handler)
+			else :
+				_instance_cell(kind_to_scene[new_kind], cell.q, cell.r, new_kind, handler)
+
+func change_arena_size(new_size, handler = null):
+	### Method allowing to change the arena size, within the map size.
+	# If size increases, new cells are set as floor, if size decreases, new cells
+	# are set as border
+	
+	var new_kind
+	var cells_to_change = []
+	
+	if new_size == 0 or new_size == null or new_size >= Map_Radius:
+		# Data integrity protection
+		print("Invalid size {0}".format(['null' if new_size == null else new_size]))
+		return
+	elif new_size == Arena_Radius:
+		# Nothing to do if sized not changed
+		return
+	elif new_size < Arena_Radius:
+		new_kind = "border"
+		for i in range(new_size, Arena_Radius+1):
+			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
+	else:
+		new_kind = "floor"
+		for i in range(Arena_Radius, new_size+1):
+			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
+	
+	# Size info change
+	Arena_Radius = new_size
+	Border_Width = Map_Radius - Arena_Radius
+	
+	# Change each map within modified ranges
+	for cell in cells_to_change:
+		change_cell_kind(cell, new_kind, handler)
