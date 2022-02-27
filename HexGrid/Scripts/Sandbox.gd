@@ -1,6 +1,6 @@
 extends Control
 
-enum actions {None, MapTool_DrawPath, MapTool_CellKindChange}
+enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, MapTool_DrawCircle}
 
 # Node variables
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -15,6 +15,7 @@ onready var kindHoleBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
 onready var kindFloorBt = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
 onready var kindWallBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
 onready var myFileDialog = $FileDialog
+onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -57,6 +58,8 @@ func _ready():
 	kindFloorBt.connect("pressed", self, "_on_cellKindChange_requested", ['floor'])
 	kindHoleBt.connect("pressed", self, "_on_cellKindChange_requested", ['hole'])
 	kindWallBt.connect("pressed", self, "_on_cellKindChange_requested", ['full'])
+	
+	circleBt.connect("toggled", self, "_on_Button_Toggled", [circleBt])
 	
 	
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
@@ -155,17 +158,28 @@ func _on_cell_hovered(cell):
 				if cells_set.empty():
 					# If no cell is selected, only the hovered cell is highlighted
 					myMap.clear()
-					myMap.display_path(cell, cell, 10)
+					myMap.change_cell_color(cell, 'green')
 				elif cells_set.size() == 1:
 					# Draw a path from selected cell to hovered cell
 					myMap.clear()
-					cells_set[0].change_material("darkgreen")
+					myMap.change_cell_color(cells_set[0], 'darkgreen')
 					myMap.display_path(cells_set[0], cell, PathSlider.value)
 		
 		actions.MapTool_CellKindChange:
 			if cells_set.empty() and cell.kind != "border":
 				myMap.clear_all()
-				cell.change_material("grey")
+				myMap.change_cell_color(cell, 'grey')
+		
+		actions.MapTool_DrawCircle:
+			if cells_set.empty() and myMap.is_cell_selectible(cell):
+				# If no cell is selected, only the hovered cell is highlighted
+				myMap.clear()
+				myMap.change_cell_color(cell, 'green')
+			elif cells_set.size() == 1:
+				var radius = myMap.distance_cells(cell, cells_set[0])
+				myMap.clear()
+				myMap.change_cell_color(cells_set[0], 'darkgreen')
+				myMap.display_circle(cells_set[0], radius)
 
 func _on_cell_clicked(cell):
 	match current_action:
@@ -175,7 +189,7 @@ func _on_cell_clicked(cell):
 				# If no cell is selected, save the clicked cell as path beginning
 				cells_set = [cell]
 				myMap.clear()
-				cells_set[0].change_material("darkgreen")
+				myMap.change_cell_color(cells_set[0],"darkgreen")
 			else:
 				# Saves the path from initial cell to clicked cell
 				cells_set = myMap.display_path(cells_set[0], cell, PathSlider.value, true)
@@ -187,6 +201,18 @@ func _on_cell_clicked(cell):
 							+ Vector2(-CellKindPopup.rect_size[0], 0)
 				CellKindPopup.show()
 				cells_set = [cell]
+		
+		actions.MapTool_DrawCircle:
+			# Behaviour to draw path
+			if cells_set.size() != 1:
+				# If no cell is selected, save the clicked cell as path beginning
+				cells_set = [cell]
+				myMap.clear()
+				myMap.change_cell_color(cells_set[0],"darkgreen")
+			else:
+				# Saves the path from initial cell to clicked cell
+				var radius = myMap.distance_cells(cell, cells_set[0])
+				cells_set = myMap.display_circle(cells_set[0], radius)
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
@@ -198,6 +224,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				current_action = actions.MapTool_DrawPath
 			CellKindBt:
 				current_action = actions.MapTool_CellKindChange
+			circleBt:
+				current_action = actions.MapTool_DrawCircle
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button
@@ -220,8 +248,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 		
 		current_action = actions.None
 		current_bt = null
-	
-	#print("Current action: {0}".format([current_action]))
+
+	# print("Current action: {0}".format([actions.keys()[current_action]]))
 	# Clear cell selection
 	cells_set.clear()
 	myMap.clear_all()
@@ -243,6 +271,8 @@ func _input(event):
 					Pathbutton.pressed = false
 				actions.MapTool_CellKindChange:
 					CellKindBt.pressed = false
+				actions.MapTool_DrawCircle:
+					circleBt.pressed = false
 
 func _on_file_selected(file_selected: String):
 	myWorldSave = file_selected

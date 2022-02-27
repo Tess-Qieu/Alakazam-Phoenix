@@ -143,6 +143,33 @@ margin_bottom = 19.0
 toggle_mode = true
 text = "Cange cell type"
 
+[node name="HSeparator3" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 90.0
+margin_right = 288.0
+margin_bottom = 94.0
+
+[node name="ShapeDrawingWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 98.0
+margin_right = 288.0
+margin_bottom = 158.0
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget"]
+margin_right = 288.0
+margin_bottom = 37.0
+text = "Shapes drawing"
+align = 1
+valign = 1
+
+[node name="CircleButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget"]
+margin_top = 41.0
+margin_right = 288.0
+margin_bottom = 60.0
+toggle_mode = true
+text = "Draw Circle"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="DrawPathPanel" type="PopupPanel" parent="."]
 visible = true
 margin_top = 64.0
