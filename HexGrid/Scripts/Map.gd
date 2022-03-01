@@ -44,7 +44,9 @@ const DIRECTIONS = {'UpRight'  : Vector2(+1,-1),
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
 
-# Map size variables
+# Map size variables.
+# Arena  coordinates in [0; Arena_Radius]
+# Border coordinates in [Arena_Radius +1; Arena_Radius +Map_Radius]
 var Border_Width = 8
 var Arena_Radius = 8
 var Map_Radius = Border_Width + Arena_Radius
@@ -123,6 +125,11 @@ func instance_map(new_grid, handler_node = null):
 			elif kind == 'border':
 				var height = rng.randi() % 3
 				_instance_cell(kind_to_scene[kind][height], q, r, kind, handler_node)
+	
+	# Update arena size
+	Arena_Radius = _compute_arena_radius()
+	Border_Width = Map_Radius - Arena_Radius
+	print("Arena Radius: {0}, Map Radius: {1}".format([Arena_Radius, Map_Radius]))
 
 
 
@@ -474,6 +481,22 @@ func _compute_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = "
 	
 	return circle
 
+func _compute_arena_radius():
+	# Returns the size of the arena.
+	# Considering X as (0;0) and B cells as border, the functions travels along
+	#  each cell of a line until stumble upon a border cell
+	#    
+	# / \ / \ / \ / \ / \ / \ / \ / \
+	#| X | 1 | 2 | 3 | 4 | 5 | B | B |
+	# \ / \ / \ / \ / \ / \ / \ / \ /
+	var radius = _compute_line(grid[0][0], grid[Map_Radius][0])
+	var cell_index = 0
+	while radius[cell_index].kind != 'border' and cell_index in grid.keys():
+		cell_index = cell_index +1
+	return cell_index -1
+
+
+
 ## HANDLE PATH FINDING ##
 func _neighbors (cell):
 	# Function returning every neighbor of a cell, of any kind	
@@ -755,7 +778,7 @@ func change_arena_size(new_size, handler = null):
 	var new_kind
 	var cells_to_change = []
 	
-	if new_size == 0 or new_size == null or new_size >= Map_Radius:
+	if new_size < 0 or new_size == null or new_size >= Map_Radius:
 		# Data integrity protection
 		print("Invalid size {0}".format(['null' if new_size == null else new_size]))
 		return
@@ -764,11 +787,13 @@ func change_arena_size(new_size, handler = null):
 		return
 	elif new_size < Arena_Radius:
 		new_kind = "border"
-		for i in range(new_size, Arena_Radius+1):
+		for i in range(new_size+1, Arena_Radius+1):
+#			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
 			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
 	else:
 		new_kind = "floor"
-		for i in range(Arena_Radius, new_size+1):
+		for i in range(Arena_Radius+1, new_size+1):
+#			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
 			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
 	
 	# Size info change
