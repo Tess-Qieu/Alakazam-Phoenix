@@ -1,7 +1,8 @@
 extends Control
 
 enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, 
-					MapTool_DrawCircle, MapTool_ResizeArena}
+					MapTool_DrawCircle, MapTool_ResizeArena,
+					MapTool_SelectKind}
 
 # Node variables
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -19,6 +20,7 @@ onready var myFileDialog = $FileDialog
 onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
 onready var ArenaSizeBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
 onready var ArenaSizeSl = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
+onready var KindSelBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget/KindSelectBt
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -66,10 +68,12 @@ func _ready():
 	circleBt.connect("toggled", self, "_on_Button_Toggled", [circleBt])
 	
 	## Arena Size widget ##
-#	ArenaSizeBt.connect("pressed", self, "ask_map_resize")
 	ArenaSizeBt.connect("toggled", self, "_on_Button_Toggled", [ArenaSizeBt])
 	
+	## Kind Selector widget ##
+	KindSelBt.connect("item_selected", self, "_on_kind_selected")
 	
+	## PopUps
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
 	
 	
@@ -240,6 +244,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				current_action = actions.MapTool_ResizeArena
 				myMap.change_arena_size(ArenaSizeSl.value, self)
 				ArenaSizeBt.pressed = false
+			KindSelBt:
+				current_action = actions.MapTool_SelectKind
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button
@@ -251,6 +257,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 			match previous_bt:
 				CellKindBt:
 					CellKindPopup.hide()
+				KindSelBt:
+					KindSelBt.select(0)
 	
 	elif current_bt == changed_bt:
 		# If a button is unpressed and the currently active button is himself
@@ -259,6 +267,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 		match current_action:
 			actions.MapTool_CellKindChange:
 				CellKindPopup.hide()
+			actions.MapTool_SelectKind:
+				KindSelBt.select(0)
 		
 		current_action = actions.None
 		current_bt = null
@@ -267,6 +277,14 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	# Clear cell selection
 	cells_set.clear()
 	myMap.clear_all()
+
+func _on_kind_selected(index : int):
+	var str_out = ""
+	str_out = KindSelBt.get_item_text(index)
+	print(str_out.to_lower())
+	
+	_on_Button_Toggled(index != 0, KindSelBt)
+
 
 func _on_cellKindChange_requested(kind):
 	if cells_set.size() == 1:
