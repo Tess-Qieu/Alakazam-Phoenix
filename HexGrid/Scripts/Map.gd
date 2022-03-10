@@ -738,6 +738,14 @@ func is_cell_selectible(cell):
 func get_cell(q, r):
 	return grid[q][r]
 
+func get_all_cells(kind = 'floor'):
+	var list = []
+	for q in grid.keys():
+		for r in grid[q].keys():
+			if grid[q][r].kind == kind:
+				list.append(grid[q][r])
+	return list
+
 func save():
 	var grid_serialized : Dictionary = {}
 	for q in grid.keys():

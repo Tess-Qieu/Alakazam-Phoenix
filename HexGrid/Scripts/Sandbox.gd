@@ -258,7 +258,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				CellKindBt:
 					CellKindPopup.hide()
 				KindSelBt:
-					KindSelBt.select(0)
+					if changed_bt != KindSelBt:
+						KindSelBt.select(0)
 	
 	elif current_bt == changed_bt:
 		# If a button is unpressed and the currently active button is himself
@@ -279,11 +280,24 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	myMap.clear_all()
 
 func _on_kind_selected(index : int):
+	# When selecting a kind in the option button, the option text is saved
+	# Button toggling function is called to ensure a coherent behaviour between
+	#  all buttons.
+	# Special case: if the selected option is "None" (index 0), the button
+	#  behaviour is similar to untoggled button
 	var str_out = ""
-	str_out = KindSelBt.get_item_text(index)
-	print(str_out.to_lower())
+	str_out = KindSelBt.get_item_text(index).to_lower()
+	# print(str_out.to_lower())
 	
+	# Ensure coherent button behaviour
 	_on_Button_Toggled(index != 0, KindSelBt)
+	
+	# If a kind is specified (not None), all cells from the given kind are 
+	#  are selected and highlighted
+	if index != 0:
+		cells_set = myMap.get_all_cells(str_out)
+		for cell in cells_set:
+			myMap.change_cell_color(cell, 'green')
 
 
 func _on_cellKindChange_requested(kind):
