@@ -32,13 +32,21 @@ const BLOCKING_VIEW = ['full', 'border']
 #    |-1,+1| | 0,+1|
 #     \ _ /   \ _ /
 # Direction vectors, used to compute a circle. 
-# This order, combined with neighbors listing order simplifies the algorithm
-const DIRECTIONS = {'UpRight'  : Vector2(+1,-1),
-					'UpLeft'   : Vector2( 0,-1),
-					'Left'     : Vector2(-1, 0),
-					'DownLeft' : Vector2(-1,+1),
-					'DownRight': Vector2( 0,+1),
-					'Right'    : Vector2(+1, 0)}
+# This order allows to travel in a circle, starting from the DownRight position
+#  and going anti-clockwise, as shown below
+#   / \ / \ 
+#  | 4 | 3 |
+# / \ / \ / \ 
+#| 5 |   | 2 |
+# \ / \ / \ / 
+#  | 6 | 1 |
+#   \ / \ / 
+const DIRECTIONS = {'UpRight'  : {'q':+1, 'r':-1},
+					'UpLeft'   : {'q': 0, 'r':-1},
+					'Left'     : {'q':-1, 'r': 0},
+					'DownLeft' : {'q':-1, 'r':+1},
+					'DownRight': {'q': 0, 'r':+1},
+					'Right'    : {'q':+1, 'r': 0} }
 
 # Cell types probability
 const PROBA_CELL_FULL = 0.1
@@ -464,8 +472,8 @@ func _compute_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = "
 		circle.append(center)
 	elif radius > 0:
 		# Select initial cell :
-		var q_init = center.q + int(radius*DIRECTIONS['Left'].x)
-		var r_init = center.r + int(radius*DIRECTIONS['Left'].y)
+		var q_init = center.q + radius*DIRECTIONS['Left']['q']
+		var r_init = center.r + radius*DIRECTIONS['Left']['r']
 		var cell = grid[q_init][r_init]
 		# A circle has the particularity of having a number of cell equal to
 		# its radius on each side.
@@ -510,25 +518,37 @@ func _neighbors (cell):
 	#   \ / \ / 
 	var list = []
 	
-	if grid[cell.q][cell.r +1] != null:
-		list.append(grid[cell.q][cell.r+1])
+	for d in ['DownRight', 'Right', 'UpRight', 'UpLeft', 'Left', 'DownLeft']:
+		var neighbor_q = cell.q + DIRECTIONS[d]['q']
+		var neighbor_r = cell.r + DIRECTIONS[d]['r']
+		if neighbor_q in grid.keys() and neighbor_r in grid[neighbor_q].keys():
+			list.append(grid[neighbor_q][neighbor_r])
 	
-	if grid[cell.q +1][cell.r] != null:
-		list.append(grid[cell.q +1][cell.r])
-	
-	if grid[cell.q +1][cell.r -1] != null:
-		list.append(grid[cell.q +1][cell.r -1])
-	
-	if grid[cell.q][cell.r -1] != null:
-		list.append(grid[cell.q][cell.r -1])
-	
-	if grid[cell.q -1][cell.r] != null:
-		list.append(grid[cell.q -1][cell.r])
-	
-	if grid[cell.q -1][cell.r +1] != null:
-		list.append(grid[cell.q -1][cell.r +1])
-	
+	var str_debug = ""
+	for c in list:
+		str_debug += c.get_coords_string()
+	print("Neighbors of {0} are : [{1}]".format([cell.get_coords_string(), str_debug]))
 	return list
+	
+#	if grid[cell.q][cell.r +1] != null:
+#		list.append(grid[cell.q][cell.r+1])
+#
+#	if grid[cell.q +1][cell.r] != null:
+#		list.append(grid[cell.q +1][cell.r])
+#
+#	if grid[cell.q +1][cell.r -1] != null:
+#		list.append(grid[cell.q +1][cell.r -1])
+#
+#	if grid[cell.q][cell.r -1] != null:
+#		list.append(grid[cell.q][cell.r -1])
+#
+#	if grid[cell.q -1][cell.r] != null:
+#		list.append(grid[cell.q -1][cell.r])
+#
+#	if grid[cell.q -1][cell.r +1] != null:
+#		list.append(grid[cell.q -1][cell.r +1])
+#
+#	return list
 	
 func _serialize_path(path):
 	var path_serialized = []
