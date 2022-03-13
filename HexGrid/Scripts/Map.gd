@@ -32,13 +32,21 @@ const BLOCKING_VIEW = ['full', 'border']
 #    |-1,+1| | 0,+1|
 #     \ _ /   \ _ /
 # Direction vectors, used to compute a circle. 
-# This order, combined with neighbors listing order simplifies the algorithm
-const DIRECTIONS = {'UpRight'  : Vector2(+1,-1),
-					'UpLeft'   : Vector2( 0,-1),
-					'Left'     : Vector2(-1, 0),
-					'DownLeft' : Vector2(-1,+1),
-					'DownRight': Vector2( 0,+1),
-					'Right'    : Vector2(+1, 0)}
+# This order allows to travel in a circle, starting from the DownRight position
+#  and going anti-clockwise, as shown below
+#   / \ / \ 
+#  | 4 | 3 |
+# / \ / \ / \ 
+#| 5 |   | 2 |
+# \ / \ / \ / 
+#  | 6 | 1 |
+#   \ / \ / 
+const DIRECTIONS = {'UpRight'  : {'q':+1, 'r':-1},
+					'UpLeft'   : {'q': 0, 'r':-1},
+					'Left'     : {'q':-1, 'r': 0},
+					'DownLeft' : {'q':-1, 'r':+1},
+					'DownRight': {'q': 0, 'r':+1},
+					'Right'    : {'q':+1, 'r': 0} }
 
 # Cell types probability
 const PROBA_CELL_FULL = 0.1
@@ -463,21 +471,31 @@ func _compute_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = "
 	if radius == 0:
 		circle.append(center)
 	elif radius > 0:
-		# Select initial cell :
-		var q_init = center.q + int(radius*DIRECTIONS['Left'].x)
-		var r_init = center.r + int(radius*DIRECTIONS['Left'].y)
-		var cell = grid[q_init][r_init]
+		# Select initial cell at down right corner from the center
+		var q_init = center.q + radius*DIRECTIONS['DownRight']['q']
+		var r_init = center.r + radius*DIRECTIONS['DownRight']['r']
+		
+		# store the initial cell coordinates
+		var coords = {'q':q_init, 'r':r_init}
+		
 		# A circle has the particularity of having a number of cell equal to
 		# its radius on each side.
-		for side in range(6):
-			for step in range(radius):
-				# Handle current cell
-				if cell.kind in filter_select:
-					circle.append(cell)
-					if not color.empty():
-						change_cell_color(cell, color)
-				# Select next cell
-				cell = _neighbors(cell)[side]
+		#
+		# Starting from the downright corner of the circle, loop on each circle
+		#  side a number of time equal to radius. For each coordinate tests if
+		#  the cell exists. If so, the cell is added and its color changed
+		for side in DIRECTIONS:
+			for _step in range(radius):
+				coords['q'] = coords['q']+DIRECTIONS[side]['q']
+				coords['r'] = coords['r']+DIRECTIONS[side]['r']
+				
+				if has_cell(coords['q'], coords['r']):
+					var cell = grid[coords['q']][coords['r']] 
+					if cell.kind in filter_select:
+						if not cell in circle:
+							circle.append(cell)
+						if not color.empty():
+							change_cell_color(cell, color)
 	
 	return circle
 
@@ -498,7 +516,7 @@ func _compute_arena_radius():
 
 
 ## HANDLE PATH FINDING ##
-func _neighbors (cell):
+func _neighbors(cell):
 	# Function returning every neighbor of a cell, of any kind	
 	# Cells are returned in this order :
 	#   / \ / \ 
@@ -510,25 +528,16 @@ func _neighbors (cell):
 	#   \ / \ / 
 	var list = []
 	
-	if grid[cell.q][cell.r +1] != null:
-		list.append(grid[cell.q][cell.r+1])
-	
-	if grid[cell.q +1][cell.r] != null:
-		list.append(grid[cell.q +1][cell.r])
-	
-	if grid[cell.q +1][cell.r -1] != null:
-		list.append(grid[cell.q +1][cell.r -1])
-	
-	if grid[cell.q][cell.r -1] != null:
-		list.append(grid[cell.q][cell.r -1])
-	
-	if grid[cell.q -1][cell.r] != null:
-		list.append(grid[cell.q -1][cell.r])
-	
-	if grid[cell.q -1][cell.r +1] != null:
-		list.append(grid[cell.q -1][cell.r +1])
+	for d in DIRECTIONS:
+		var neighbor_q = cell.q + DIRECTIONS[d]['q']
+		var neighbor_r = cell.r + DIRECTIONS[d]['r']
+		if has_cell(neighbor_q, neighbor_r):
+			list.append(grid[neighbor_q][neighbor_r])
 	
 	return list
+
+func has_cell(cell_q, cell_r):
+	return cell_q in grid.keys() and cell_r in grid[cell_q].keys()
 	
 func _serialize_path(path):
 	var path_serialized = []
