@@ -245,6 +245,7 @@ func _on_cell_clicked(cell):
 				myMap.clear()
 				myMap.change_cell_color(cell, "blue")
 				print("ANIMATION !!!")
+				myMap.animate_cirles(cell)
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))

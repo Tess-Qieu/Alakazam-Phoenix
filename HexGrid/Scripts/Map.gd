@@ -820,3 +820,44 @@ func change_arena_size(new_size, handler = null):
 	# Change each map within modified ranges
 	for cell in cells_to_change:
 		change_cell_kind(cell, new_kind, handler)
+
+
+## ANIMATION SECTION ##
+
+func animate_cirles(center_cell, radius = 3, mode = 0):
+	# Animation modes : 
+	#  00: expanding smooth, inside --> outise
+	#  01: expanding step by step
+	#  10: attracting smooth, outside -->inside
+	#  11: attracting step by step
+	#  20: both smooth, inside --> outside --> inside
+	#  21: both step by step
+	
+	if radius <= 1:
+		# Nothing to animate
+		return
+	
+	if center_cell is Array:
+		# conversion from coordinates to object
+		center_cell = get_cell(center_cell[0], center_cell[1])
+	
+	for step in range(1, radius+1):
+		# For each cell in the circle
+		for cell in _compute_circle(center_cell, step):
+			# Connect a timer for time duration of colored status
+			var duration_t = Timer.new()
+			duration_t.connect("timeout", self, "change_cell_color", [cell, cell.kind])
+			duration_t.one_shot = true
+			duration_t.autostart = false
+			duration_t.wait_time = 0.5
+			
+			# Connect a timer for the delay before the cell changes status
+			var delay_t = Timer.new()
+			delay_t.connect("timeout", duration_t, "start", [duration_t.wait_time])
+			delay_t.connect("timeout", self, "change_cell_color", [cell, 'skyblue'])
+			delay_t.one_shot = true
+			delay_t.autostart = true
+			delay_t.wait_time = 0.5*step
+			
+			add_child(duration_t)
+			add_child(delay_t)
