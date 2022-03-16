@@ -2,25 +2,28 @@ extends Control
 
 enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, 
 					MapTool_DrawCircle, MapTool_ResizeArena,
-					MapTool_SelectKind}
+					MapTool_SelectKind, MapTool_CircleAnim}
 
 # Node variables
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
 onready var MenuPopup : PopupMenu
-onready var PathWidget = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget
-onready var Pathbutton = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
-onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
-onready var ToolsMenu  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
-onready var CellKindBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget/CellKind_Bt
+
+onready var PathWidget    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget
+onready var Pathbutton    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
+onready var PathSlider    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
+onready var ToolsMenu     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
+onready var CellKindBt    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget/CellKind_Bt
 onready var CellKindPopup = $CellKindPopup
-onready var kindHoleBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
-onready var kindFloorBt = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
-onready var kindWallBt  = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
-onready var myFileDialog = $FileDialog
-onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
-onready var ArenaSizeBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
-onready var ArenaSizeSl = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
-onready var KindSelBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget/KindSelectBt
+onready var kindHoleBt    = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
+onready var kindFloorBt   = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
+onready var kindWallBt    = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
+onready var myFileDialog  = $FileDialog
+onready var circleBt      = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
+onready var ArenaSizeBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
+onready var ArenaSizeSl   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
+onready var KindSelBt     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget/KindSelectBt
+onready var CirclesAnimBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesAnimBt
+
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -72,6 +75,9 @@ func _ready():
 	
 	## Kind Selector widget ##
 	KindSelBt.connect("item_selected", self, "_on_kind_selected")
+	
+	## Animation Widget ##
+	CirclesAnimBt.connect("toggled", self, "_on_Button_Toggled", [CirclesAnimBt])
 	
 	## PopUps
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
@@ -192,6 +198,12 @@ func _on_cell_hovered(cell):
 				myMap.clear()
 				myMap.change_cell_color(cells_set[0], 'darkgreen')
 				myMap.display_circle(cells_set[0], radius)
+		
+		actions.MapTool_CircleAnim:
+			if cells_set.empty() and myMap.is_cell_selectible(cell):
+				# If no cell is selected, only the hovered cell is highlighted
+				myMap.clear()
+				myMap.change_cell_color(cell, 'skyblue')
 
 func _on_cell_clicked(cell):
 	match current_action:
@@ -227,6 +239,12 @@ func _on_cell_clicked(cell):
 					# Saves the path from initial cell to clicked cell
 					var radius = myMap.distance_cells(cell, cells_set[0])
 					cells_set = myMap.display_circle(cells_set[0], radius)
+		
+		actions.MapTool_CircleAnim:
+			if myMap.is_cell_selectible(cell):
+				myMap.clear()
+				myMap.change_cell_color(cell, "blue")
+				print("ANIMATION !!!")
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
@@ -246,6 +264,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				ArenaSizeBt.pressed = false
 			KindSelBt:
 				current_action = actions.MapTool_SelectKind
+			CirclesAnimBt:
+				current_action = actions.MapTool_CircleAnim
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button

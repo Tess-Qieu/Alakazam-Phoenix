@@ -195,6 +195,22 @@ align = 1
 items = [ "None", null, false, 0, null, "Floor", null, false, 1, null, "Full", null, false, 2, null, "Hole", null, false, 3, null, "Blocked", null, false, 4, null ]
 selected = 0
 
+[node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 277.0
+margin_right = 288.0
+margin_bottom = 281.0
+
+[node name="AnimationWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 285.0
+margin_right = 288.0
+margin_bottom = 304.0
+
+[node name="CirclesAnimBt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget"]
+margin_right = 288.0
+margin_bottom = 19.0
+toggle_mode = true
+text = "Circles Animation"
+
 [node name="DrawPathPanel" type="PopupPanel" parent="."]
 visible = true
 margin_top = 64.0
