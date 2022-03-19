@@ -244,7 +244,6 @@ func _on_cell_clicked(cell):
 			if myMap.is_cell_selectible(cell):
 				myMap.clear()
 				myMap.change_cell_color(cell, "blue")
-				print("ANIMATION !!!")
 				myMap.animate_cirles(cell)
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):

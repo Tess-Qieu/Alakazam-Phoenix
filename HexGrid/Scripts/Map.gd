@@ -137,7 +137,7 @@ func instance_map(new_grid, handler_node = null):
 	# Update arena size
 	Arena_Radius = _compute_arena_radius()
 	Border_Width = Map_Radius - Arena_Radius
-	print("Arena Radius: {0}, Map Radius: {1}".format([Arena_Radius, Map_Radius]))
+#	print("Arena Radius: {0}, Map Radius: {1}".format([Arena_Radius, Map_Radius]))
 
 
 
@@ -824,10 +824,11 @@ func change_arena_size(new_size, handler = null):
 
 ## ANIMATION SECTION ##
 
-func animate_cirles(center_cell, radius = 3, mode = 0):
+func animate_cirles(center_cell, radius = 5, animation_mode = 0, color = "skyblue"):
 	# Animation modes : 
-	#  00: expanding smooth, inside --> outise
-	#  01: expanding step by step
+	#  00: expanding step, inside --> outise
+	#  01: expanding pulse (3 rows)
+	#  02: expanding full, full width before changing
 	#  10: attracting smooth, outside -->inside
 	#  11: attracting step by step
 	#  20: both smooth, inside --> outside --> inside
@@ -846,18 +847,41 @@ func animate_cirles(center_cell, radius = 3, mode = 0):
 		for cell in _compute_circle(center_cell, step):
 			# Connect a timer for time duration of colored status
 			var duration_t = Timer.new()
-			duration_t.connect("timeout", self, "change_cell_color", [cell, cell.kind])
 			duration_t.one_shot = true
-			duration_t.autostart = false
-			duration_t.wait_time = 0.5
+			duration_t.autostart = false # started by following Timer
+			# Change back to default color at time out
+			duration_t.connect("timeout", self, "change_cell_color", [cell, cell.kind])
 			
 			# Connect a timer for the delay before the cell changes status
 			var delay_t = Timer.new()
-			delay_t.connect("timeout", duration_t, "start", [duration_t.wait_time])
-			delay_t.connect("timeout", self, "change_cell_color", [cell, 'skyblue'])
 			delay_t.one_shot = true
 			delay_t.autostart = true
-			delay_t.wait_time = 0.5*step
+			# Change color at the end of the first timer and start the other 
+			delay_t.connect("timeout", duration_t, "start", [duration_t.wait_time])
+			delay_t.connect("timeout", self, "change_cell_color", [cell, color])
 			
+			var delta = 0.5
+			var tau   = 0.5
+			# Compute durations
+			match animation_mode:
+				2:
+					duration_t.wait_time = radius*tau
+					delay_t.wait_time = delta*(step-1)
+				1:
+					duration_t.wait_time = 3*tau
+					delay_t.wait_time = delta*(step-1)
+				0:
+					# Default mode
+					duration_t.wait_time = tau
+					delay_t.wait_time = delta*(step-1)
+					
+			print("step: {3}, mode: {0}, delta: {1}, tau:{2}".format(
+				[animation_mode, delay_t.wait_time, duration_t.wait_time, step]))
+			
+			# Remove timers at last timeout
+			duration_t.connect("timeout", duration_t, "queue_free")
+			duration_t.connect("timeout", delay_t, "queue_free")
+			
+			# Timers addition to tree
 			add_child(duration_t)
 			add_child(delay_t)
