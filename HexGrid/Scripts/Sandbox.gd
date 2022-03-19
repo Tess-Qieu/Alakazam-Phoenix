@@ -241,10 +241,15 @@ func _on_cell_clicked(cell):
 					cells_set = myMap.display_circle(cells_set[0], radius)
 		
 		actions.MapTool_CircleAnim:
-			if myMap.is_cell_selectible(cell):
+			if myMap.is_cell_selectible(cell) and cells_set.empty():
 				myMap.clear()
 				myMap.change_cell_color(cell, "blue")
-				myMap.animate_cirles(cell)
+				# Unselect button at animation ending. 
+				# Animation is started only if the connection did go well
+				if myMap.connect("animation_ended", CirclesAnimBt, "set_pressed", [false]) == OK:
+					myMap.animate_cirles(cell)
+					cells_set = [cell]
+
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 	#print("Button {0} set to {1}".format([changed_bt.name, button_pressed]))
@@ -290,6 +295,10 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				CellKindPopup.hide()
 			actions.MapTool_SelectKind:
 				KindSelBt.select(0)
+			actions.MapTool_CircleAnim:
+				# Disconnect the callback when animation has ended to avoid
+				#  conflicts between various animations
+				myMap.disconnect("animation_ended", CirclesAnimBt, "set_pressed")
 		
 		current_action = actions.None
 		current_bt = null

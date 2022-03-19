@@ -823,8 +823,9 @@ func change_arena_size(new_size, handler = null):
 
 
 ## ANIMATION SECTION ##
+signal animation_ended
 
-func animate_cirles(center_cell, radius = 5, animation_mode = 0, color = "skyblue"):
+func animate_cirles(center_cell, radius = 5, animation_mode = 10, color = "skyblue"):
 	# Animation modes : 
 	#  00: expanding step, inside --> outise
 	#  01: expanding pulse (3 rows)
@@ -843,45 +844,66 @@ func animate_cirles(center_cell, radius = 5, animation_mode = 0, color = "skyblu
 		center_cell = get_cell(center_cell[0], center_cell[1])
 	
 	for step in range(1, radius+1):
-		# For each cell in the circle
+		# Animation constant
+		# Delta : base delay before coloring a cell
+		# Tau   : base time during which the cell is colored
+		var delta = 0.2
+		var tau   = delta
+		
+		# Each circle is timed the same way: two timers are created for each
+		
+		# Timer for the colored duration
+		var duration_t = Timer.new()
+		duration_t.one_shot = true
+		duration_t.autostart = false # started by the delay Timer
+		
+		# Timer for the delay before coloring the cell
+		var delay_t = Timer.new()
+		delay_t.one_shot = true
+		delay_t.autostart = true
+		# Timers chaining
+		delay_t.connect("timeout", duration_t, "start")
+		
+		# Compute durations, given the animation mode
+		match animation_mode:
+			10:
+				delay_t.wait_time = delta*(radius +1 -step)
+				duration_t.wait_time = tau
+				if step == 1:
+					# End of animation on first circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+			2:
+				delay_t.wait_time = delta*step
+				duration_t.wait_time = radius*tau
+				if step == radius+1:
+					# End of animation on last circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+			1:
+				delay_t.wait_time = delta*step
+				duration_t.wait_time = 3*tau
+				if step == radius+1:
+					# End of animation on last circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+			_, 0:
+				# Default mode
+				delay_t.wait_time = delta*step
+				duration_t.wait_time = tau
+				if step == radius+1:
+					# End of animation on last circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+		
+		# Connect all cells in the circle to the timers
 		for cell in _compute_circle(center_cell, step):
-			# Connect a timer for time duration of colored status
-			var duration_t = Timer.new()
-			duration_t.one_shot = true
-			duration_t.autostart = false # started by following Timer
-			# Change back to default color at time out
-			duration_t.connect("timeout", self, "change_cell_color", [cell, cell.kind])
+			# Change the color after the first delay
+			delay_t.connect("timeout", cell, "change_material", [color])
 			
-			# Connect a timer for the delay before the cell changes status
-			var delay_t = Timer.new()
-			delay_t.one_shot = true
-			delay_t.autostart = true
-			# Change color at the end of the first timer and start the other 
-			delay_t.connect("timeout", duration_t, "start", [duration_t.wait_time])
-			delay_t.connect("timeout", self, "change_cell_color", [cell, color])
-			
-			var delta = 0.5
-			var tau   = 0.5
-			# Compute durations
-			match animation_mode:
-				2:
-					duration_t.wait_time = radius*tau
-					delay_t.wait_time = delta*(step-1)
-				1:
-					duration_t.wait_time = 3*tau
-					delay_t.wait_time = delta*(step-1)
-				0:
-					# Default mode
-					duration_t.wait_time = tau
-					delay_t.wait_time = delta*(step-1)
-					
-			print("step: {3}, mode: {0}, delta: {1}, tau:{2}".format(
-				[animation_mode, delay_t.wait_time, duration_t.wait_time, step]))
-			
-			# Remove timers at last timeout
-			duration_t.connect("timeout", duration_t, "queue_free")
-			duration_t.connect("timeout", delay_t, "queue_free")
-			
-			# Timers addition to tree
-			add_child(duration_t)
-			add_child(delay_t)
+			# Change back to default color after the second timer
+			duration_t.connect("timeout", cell, "change_material", [cell.kind])
+		
+		# Remove timers at last timeout
+		duration_t.connect("timeout", duration_t, "queue_free")
+		duration_t.connect("timeout", delay_t, "queue_free")
+		
+		# Timers addition to tree. Delay_t will start directly
+		add_child(duration_t)
+		add_child(delay_t)
