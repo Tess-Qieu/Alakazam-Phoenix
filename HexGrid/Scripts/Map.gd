@@ -829,31 +829,29 @@ enum anim_mode {IN_OUT, OUT_IN, BOTH}
 
 func animate_cirles(center_cell, radius = 5, 
 					animation_mode = anim_mode.IN_OUT, wave_width = 1, 
-					color = "skyblue"):
+					color = "skyblue", selection_filter = ALL_KINDS):
 	# Animation modes : 
-	#  00: expanding step, inside --> outise
-	#  01: expanding pulse (3 rows)
-	#  02: expanding full, full width before changing
-	#  10: attracting smooth, outside -->inside
-	#  11: attracting step by step
-	#  20: both smooth, inside --> outside --> inside
-	#  21: both step by step
+	#  IN_OUT: Circles are colored with increasing radius
+	#  OUT_IN: Circles are colored with decreasing radius
+	#  BOTH  : Circles are colored from the center to the outside, then going 
+	#          then going back to their original color from the outside to the
+	#          indisde
 	
-	if radius <= 1:
+	if radius < 1:
 		# Nothing to animate
 		return
 	
 	if center_cell is Array:
 		# conversion from coordinates to object
 		center_cell = get_cell(center_cell[0], center_cell[1])
+		
+	# Animation constant
+	# Delta : base delay before coloring a cell
+	# Tau   : base time during which the cell is colored
+	var delta = 0.2
+	var tau   = delta
 	
 	for step in range(1, radius+1):
-		# Animation constant
-		# Delta : base delay before coloring a cell
-		# Tau   : base time during which the cell is colored
-		var delta = 0.2
-		var tau   = delta
-		
 		# Each circle is timed the same way: two timers are created for each
 		
 		# Timer for the colored duration
@@ -896,7 +894,7 @@ func animate_cirles(center_cell, radius = 5,
 		
 		
 		# Connect all cells in the circle to the timers
-		for cell in _compute_circle(center_cell, step):
+		for cell in _compute_circle(center_cell, step, selection_filter):
 			# Change the color after the first delay
 			delay_t.connect("timeout", cell, "change_material", [color])
 			
@@ -910,3 +908,79 @@ func animate_cirles(center_cell, radius = 5,
 		# Timers addition to tree. Delay_t will start directly
 		add_child(duration_t)
 		add_child(delay_t)
+
+func animate_spiral(center_cell, radius = 5, 
+					animation_mode = anim_mode.IN_OUT, wave_width = 6, 
+					color = "skyblue", selection_filter = ALL_KINDS):
+	if radius < 1:
+		# Nothing to animate
+		return
+	
+	if center_cell is Array:
+		# conversion from coordinates to object
+		center_cell = get_cell(center_cell[0], center_cell[1])
+	
+	# Animation constant
+	# Delta : base delay before coloring a cell
+	# Tau   : base time during which the cell is colored
+	var delta = 0.07
+	var tau   = delta
+	# Number of neighbors in a spiral of a given radius: 6i neighbors on each circle
+	var neighbors_sum = radius*(radius+1)*3
+	# Count of the current cell on the total number of cells in the spiral
+	var total_index = 0
+	
+	# Compute the full spiral
+	for step in range(1, radius+1):
+		var cells = _compute_circle(center_cell, step, ALL_KINDS)
+		
+		for c in cells:
+			# Increment to total index
+			total_index += 1
+			
+			# Timer for the colored duration
+			var duration_t = Timer.new()
+			duration_t.one_shot = true
+			duration_t.autostart = false # started by the delay Timer
+			
+			# Timer for the delay before coloring the cell
+			var delay_t = Timer.new()
+			delay_t.one_shot = true
+			delay_t.autostart = true
+			# Timers chaining
+			delay_t.connect("timeout", duration_t, "start")
+			
+			# Compute durations, given the animation mode
+			duration_t.wait_time = wave_width*tau
+			
+			match animation_mode:
+				
+				anim_mode.OUT_IN:
+					delay_t.wait_time = delta*(neighbors_sum +1 - total_index)
+					if step == 1 and cells[0] == c:
+						# End of animation on first cell of first circle timeout
+						duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+					
+				_, anim_mode.IN_OUT:
+					# Default mode
+					delay_t.wait_time = delta*total_index
+					if step == radius and c == cells[-1]:
+						# End of animation on last cell of last circle timeout
+						duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+			
+			if c.kind in selection_filter:
+				# Change the color after the first delay
+				delay_t.connect("timeout", c, "change_material", [color])
+				
+				# Change back to default color after the second timer
+				duration_t.connect("timeout", c, "change_material", [c.kind])
+				
+			# Remove timers at last timeout
+			duration_t.connect("timeout", duration_t, "queue_free")
+			duration_t.connect("timeout", delay_t, "queue_free")
+			
+			# Timers addition to tree. Delay_t will start directly
+			add_child(duration_t)
+			add_child(delay_t)
+			
+#			print("For cell {0}, index: {1}, delay:{2}".format([c.get_coords_string(), total_index, delay_t.wait_time]))

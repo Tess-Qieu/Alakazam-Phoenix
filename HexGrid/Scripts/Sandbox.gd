@@ -2,7 +2,7 @@ extends Control
 
 enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, 
 					MapTool_DrawCircle, MapTool_ResizeArena,
-					MapTool_SelectKind, MapTool_CircleAnim}
+					MapTool_SelectKind, MapTool_CircleAnim, MapTool_SpiralAnim}
 
 # Node variables ###############################################################
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -37,6 +37,12 @@ onready var CirclesAnimBt         = $PanelContainer/VBoxContainer/HBoxContainer/
 onready var CirclesAnimRadiusSBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/Radius_SpinBox
 onready var CirclesAnimWidth_SBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/WaveWidth_SpinBox
 onready var CirclesAnimModeGroup  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector/Both_CircleCBox.group
+
+# Animation // spiral
+onready var SpiralAnimBt         = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/SpiralWidget/SpiralAnimBt
+onready var SpiralAnimRadiusSBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/SpiralWidget/Radius_SpinBox
+onready var SpiralAnimWidth_SBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/SpiralWidget/WaveWidth_SpinBox
+onready var SpiralAnimModeGroup  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/SpiralWidget/AnimationMode_Selector/Both_SpiralCBox.group
 ################################################################################
 
 # Ressources references
@@ -94,6 +100,8 @@ func _ready():
 	## Animation Widget ##
 	CirclesAnimBt.connect("toggled", self, "_on_Button_Toggled", [CirclesAnimBt])
 	CirclesAnimModeGroup.get_buttons()[0].pressed = true
+	SpiralAnimBt.connect("toggled", self, "_on_Button_Toggled", [SpiralAnimBt])
+	SpiralAnimModeGroup.get_buttons()[0].pressed = true
 	
 	## PopUps
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
@@ -215,7 +223,7 @@ func _on_cell_hovered(cell):
 				myMap.change_cell_color(cells_set[0], 'darkgreen')
 				myMap.display_circle(cells_set[0], radius)
 		
-		actions.MapTool_CircleAnim:
+		actions.MapTool_CircleAnim, actions.MapTool_SpiralAnim:
 			if cells_set.empty() and myMap.is_cell_selectible(cell):
 				# If no cell is selected, only the hovered cell is highlighted
 				myMap.clear()
@@ -274,6 +282,25 @@ func _on_cell_clicked(cell):
 							anim_mode = myMap.anim_mode.IN_OUT
 					myMap.animate_cirles(cell, CirclesAnimRadiusSBox.value, anim_mode, CirclesAnimWidth_SBox.value)
 					cells_set = [cell]
+		
+		actions.MapTool_SpiralAnim:
+			if myMap.is_cell_selectible(cell) and cells_set.empty():
+				myMap.clear()
+				myMap.change_cell_color(cell, "blue")
+				# Unselect button at animation ending. 
+				# Animation is started only if the connection did go well
+				if myMap.connect("animation_ended", SpiralAnimBt, "set_pressed", [false]) == OK:
+					# Get animation mode
+					var anim_mode
+					match SpiralAnimModeGroup.get_pressed_button().name:
+						"OutIn_SpiralCBox":
+							anim_mode = myMap.anim_mode.OUT_IN
+						"Both_SpiralCBox":
+							anim_mode = myMap.anim_mode.BOTH
+						_,"InOut_SpiralCBox":
+							anim_mode = myMap.anim_mode.IN_OUT
+					myMap.animate_spiral(cell, SpiralAnimRadiusSBox.value, anim_mode, SpiralAnimWidth_SBox.value)
+					cells_set = [cell]
 
 
 func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
@@ -296,6 +323,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				current_action = actions.MapTool_SelectKind
 			CirclesAnimBt:
 				current_action = actions.MapTool_CircleAnim
+			SpiralAnimBt:
+				current_action = actions.MapTool_SpiralAnim
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button
@@ -324,6 +353,10 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				# Disconnect the callback when animation has ended to avoid
 				#  conflicts between various animations
 				myMap.disconnect("animation_ended", CirclesAnimBt, "set_pressed")
+			actions.MapTool_SpiralAnim:
+				# Disconnect the callback when animation has ended to avoid
+				#  conflicts between various animations
+				myMap.disconnect("animation_ended", SpiralAnimBt, "set_pressed")
 		
 		current_action = actions.None
 		current_bt = null
@@ -373,6 +406,12 @@ func _input(event):
 					CellKindBt.pressed = false
 				actions.MapTool_DrawCircle:
 					circleBt.pressed = false
+				actions.MapTool_CircleAnim:
+					CirclesAnimBt.pressed = false
+				actions.MapTool_ResizeArena:
+					ArenaSizeBt.pressed = false
+				actions.MapTool_SpiralAnim:
+					SpiralAnimBt.pressed = false
 
 func _on_file_selected(file_selected: String):
 	myWorldSave = file_selected
