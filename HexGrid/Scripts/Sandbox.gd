@@ -22,8 +22,10 @@ onready var circleBt      = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMen
 onready var ArenaSizeBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
 onready var ArenaSizeSl   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
 onready var KindSelBt     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget/KindSelectBt
-onready var CirclesAnimBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesAnimBt
-
+onready var CirclesAnimBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/CirclesAnimBt
+onready var CirclesAnimRadiusSBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/Radius_SpinBox
+onready var CirclesAnimWidth_SBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/WaveWidth_SpinBox
+onready var CirclesAnimModeGroup = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector/Both_CircleCBox.group
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
@@ -78,6 +80,7 @@ func _ready():
 	
 	## Animation Widget ##
 	CirclesAnimBt.connect("toggled", self, "_on_Button_Toggled", [CirclesAnimBt])
+	CirclesAnimModeGroup.get_buttons()[0].pressed = true
 	
 	## PopUps
 	myFileDialog.connect("file_selected", self, "_on_file_selected")
@@ -247,7 +250,16 @@ func _on_cell_clicked(cell):
 				# Unselect button at animation ending. 
 				# Animation is started only if the connection did go well
 				if myMap.connect("animation_ended", CirclesAnimBt, "set_pressed", [false]) == OK:
-					myMap.animate_cirles(cell)
+					# Get animation mode
+					var anim_mode
+					match CirclesAnimModeGroup.get_pressed_button().name:
+						"OutIn_CircleCBox":
+							anim_mode = myMap.anim_mode.OUT_IN
+						"Both_CircleCBox":
+							anim_mode = myMap.anim_mode.BOTH
+						_,"InOut_CircleCBox":
+							anim_mode = myMap.anim_mode.IN_OUT
+					myMap.animate_cirles(cell, CirclesAnimRadiusSBox.value, anim_mode, CirclesAnimWidth_SBox.value)
 					cells_set = [cell]
 
 

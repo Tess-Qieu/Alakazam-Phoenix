@@ -92,6 +92,7 @@ corner_radius_bottom_right = 20
 corner_radius_bottom_left = 50
 
 [sub_resource type="StyleBoxFlat" id=22]
+bg_color = Color( 0.0627451, 0.85098, 0.788235, 1 )
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -283,6 +284,7 @@ Button/styles/focus = SubResource( 12 )
 Button/styles/hover = SubResource( 6 )
 Button/styles/normal = SubResource( 7 )
 Button/styles/pressed = SubResource( 8 )
+HSeparator/constants/separation = 12
 HSeparator/styles/separator = SubResource( 22 )
 HSlider/icons/grabber = ExtResource( 3 )
 HSlider/icons/grabber_disabled = ExtResource( 4 )
@@ -306,4 +308,5 @@ TabContainer/styles/panel = SubResource( 11 )
 TabContainer/styles/tab_bg = SubResource( 15 )
 TabContainer/styles/tab_disabled = SubResource( 14 )
 TabContainer/styles/tab_fg = SubResource( 16 )
+VSeparator/constants/separation = 12
 VSeparator/styles/separator = SubResource( 22 )

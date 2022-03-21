@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Prefabs/GUI/Sandbox_Theme.tres" type="Theme" id=1]
 [ext_resource path="res://Scripts/GUI/Viewport_Container.gd" type="Script" id=2]
 [ext_resource path="res://Scripts/Sandbox.gd" type="Script" id=3]
 [ext_resource path="res://Scripts/GUI/PathWidget.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/GUI/AnimModeCircle.tres" type="ButtonGroup" id=5]
 
 [node name="Sandbox" type="Control"]
 anchor_right = 1.0
@@ -50,7 +51,7 @@ items = [ "New", null, 0, false, false, 0, 0, null, "", false, "", null, 0, fals
 
 [node name="VSeparator" type="VSeparator" parent="PanelContainer/VBoxContainer/MenuBar_Background/MenuBar"]
 margin_left = 54.0
-margin_right = 58.0
+margin_right = 66.0
 margin_bottom = 20.0
 
 [node name="HBoxContainer" type="HSplitContainer" parent="PanelContainer/VBoxContainer"]
@@ -141,12 +142,12 @@ __meta__ = {
 [node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
 margin_top = 123.0
 margin_right = 288.0
-margin_bottom = 127.0
+margin_bottom = 135.0
 
 [node name="CellKindWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 131.0
+margin_top = 139.0
 margin_right = 288.0
-margin_bottom = 150.0
+margin_bottom = 158.0
 
 [node name="CellKind_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget"]
 margin_right = 288.0
@@ -155,9 +156,9 @@ toggle_mode = true
 text = "Cange cell type"
 
 [node name="ArenaSizeWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 154.0
+margin_top = 162.0
 margin_right = 288.0
-margin_bottom = 209.0
+margin_bottom = 217.0
 
 [node name="ResizeArena_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget"]
 margin_right = 288.0
@@ -175,9 +176,9 @@ value = 8.0
 tick_count = 9
 
 [node name="KindSelectorWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 213.0
+margin_top = 221.0
 margin_right = 288.0
-margin_bottom = 273.0
+margin_bottom = 281.0
 
 [node name="KindSelectorLabel" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget"]
 margin_right = 288.0
@@ -196,20 +197,87 @@ items = [ "None", null, false, 0, null, "Floor", null, false, 1, null, "Full", n
 selected = 0
 
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 277.0
-margin_right = 288.0
-margin_bottom = 281.0
-
-[node name="AnimationWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
 margin_top = 285.0
 margin_right = 288.0
-margin_bottom = 304.0
+margin_bottom = 297.0
 
-[node name="CirclesAnimBt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget"]
+[node name="AnimationWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 301.0
+margin_right = 288.0
+margin_bottom = 474.0
+
+[node name="CirclesWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget"]
+margin_right = 288.0
+margin_bottom = 173.0
+
+[node name="CirclesAnimBt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget"]
 margin_right = 288.0
 margin_bottom = 19.0
 toggle_mode = true
 text = "Circles Animation"
+
+[node name="Label" type="Label" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget"]
+margin_top = 23.0
+margin_right = 288.0
+margin_bottom = 60.0
+text = "Animation mode"
+align = 1
+
+[node name="AnimationMode_Selector" type="HBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget"]
+margin_top = 64.0
+margin_right = 288.0
+margin_bottom = 83.0
+
+[node name="InOut_CircleCBox" type="CheckBox" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector"]
+margin_right = 93.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+group = ExtResource( 5 )
+text = "In out"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="OutIn_CircleCBox" type="CheckBox" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector"]
+margin_left = 97.0
+margin_right = 190.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+group = ExtResource( 5 )
+text = "Out in"
+
+[node name="Both_CircleCBox" type="CheckBox" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector"]
+margin_left = 194.0
+margin_right = 288.0
+margin_bottom = 19.0
+size_flags_horizontal = 3
+group = ExtResource( 5 )
+text = "Both"
+
+[node name="Radius_SpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget"]
+margin_top = 87.0
+margin_right = 288.0
+margin_bottom = 128.0
+min_value = 1.0
+max_value = 12.0
+value = 5.0
+rounded = true
+prefix = "Radius:"
+suffix = "cells"
+
+[node name="WaveWidth_SpinBox" type="SpinBox" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget"]
+margin_top = 132.0
+margin_right = 288.0
+margin_bottom = 173.0
+min_value = 1.0
+max_value = 12.0
+value = 1.0
+rounded = true
+prefix = "Wave width:"
+suffix = "cells"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="DrawPathPanel" type="PopupPanel" parent="."]
 visible = true

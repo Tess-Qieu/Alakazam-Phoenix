@@ -825,7 +825,11 @@ func change_arena_size(new_size, handler = null):
 ## ANIMATION SECTION ##
 signal animation_ended
 
-func animate_cirles(center_cell, radius = 5, animation_mode = 10, color = "skyblue"):
+enum anim_mode {IN_OUT, OUT_IN, BOTH}
+
+func animate_cirles(center_cell, radius = 5, 
+					animation_mode = anim_mode.IN_OUT, wave_width = 1, 
+					color = "skyblue"):
 	# Animation modes : 
 	#  00: expanding step, inside --> outise
 	#  01: expanding pulse (3 rows)
@@ -865,32 +869,31 @@ func animate_cirles(center_cell, radius = 5, animation_mode = 10, color = "skybl
 		delay_t.connect("timeout", duration_t, "start")
 		
 		# Compute durations, given the animation mode
+		duration_t.wait_time = wave_width*tau
+		
 		match animation_mode:
-			10:
+			
+			anim_mode.OUT_IN:
 				delay_t.wait_time = delta*(radius +1 -step)
-				duration_t.wait_time = tau
 				if step == 1:
 					# End of animation on first circle timeout
 					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
-			2:
+				
+			anim_mode.BOTH:
+				# Specific duration for animation mode both
+				duration_t.wait_time = 2*tau*(radius+1-step)
 				delay_t.wait_time = delta*step
-				duration_t.wait_time = radius*tau
-				if step == radius+1:
+				if step == 1:
 					# End of animation on last circle timeout
 					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
-			1:
-				delay_t.wait_time = delta*step
-				duration_t.wait_time = 3*tau
-				if step == radius+1:
-					# End of animation on last circle timeout
-					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
-			_, 0:
+				
+			_, anim_mode.IN_OUT:
 				# Default mode
 				delay_t.wait_time = delta*step
-				duration_t.wait_time = tau
-				if step == radius+1:
+				if step == radius:
 					# End of animation on last circle timeout
 					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+		
 		
 		# Connect all cells in the circle to the timers
 		for cell in _compute_circle(center_cell, step):
