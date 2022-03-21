@@ -4,28 +4,41 @@ enum actions {None, MapTool_DrawPath, MapTool_CellKindChange,
 					MapTool_DrawCircle, MapTool_ResizeArena,
 					MapTool_SelectKind, MapTool_CircleAnim}
 
-# Node variables
+# Node variables ###############################################################
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
 onready var MenuPopup : PopupMenu
+onready var ToolsMenu = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
+onready var myFileDialog  = $FileDialog
 
-onready var PathWidget    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget
-onready var Pathbutton    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/Button
-onready var PathSlider    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/PathWidget/HSlider
-onready var ToolsMenu     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu
-onready var CellKindBt    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/CellKindWidget/CellKind_Bt
+# Path
+onready var PathWidget = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/PathWidget
+onready var Pathbutton = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/PathWidget/Button
+onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/PathWidget/HSlider
+
+# Shapes
+onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/ShapeDrawingWidget/CircleButton
+
+# Arena size
+onready var ArenaSizeBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
+onready var ArenaSizeSl   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
+
+# Kind change
+onready var CellKindBt    = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer/CellKindWidget/CellKind_Bt
 onready var CellKindPopup = $CellKindPopup
 onready var kindHoleBt    = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Hole
 onready var kindFloorBt   = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Floor
 onready var kindWallBt    = $CellKindPopup/VBoxContainer/HBoxContainer/KindBt_Wall
-onready var myFileDialog  = $FileDialog
-onready var circleBt      = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ShapeDrawingWidget/CircleButton
-onready var ArenaSizeBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
-onready var ArenaSizeSl   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ArenaSize_Slider
-onready var KindSelBt     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/KindSelectorWidget/KindSelectBt
-onready var CirclesAnimBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/CirclesAnimBt
+
+# Kind selection
+onready var KindSelBt     = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer/KindSelectorWidget/KindSelectBt
+
+# Animation // circles
+onready var CirclesAnimBt         = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/CirclesAnimBt
 onready var CirclesAnimRadiusSBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/Radius_SpinBox
 onready var CirclesAnimWidth_SBox = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/WaveWidth_SpinBox
-onready var CirclesAnimModeGroup = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector/Both_CircleCBox.group
+onready var CirclesAnimModeGroup  = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget/CirclesWidget/AnimationMode_Selector/Both_CircleCBox.group
+################################################################################
+
 # Ressources references
 const MapClass = preload("res://Scenes/Map.tscn")
 
