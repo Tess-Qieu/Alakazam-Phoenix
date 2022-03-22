@@ -744,7 +744,7 @@ func is_cell_selectible(cell):
 	
 	return false
 
-func get_cell(q, r):
+func get_cell(q:int, r:int):
 	return grid[q][r]
 
 func get_all_cells(kind = 'floor'):
@@ -808,10 +808,17 @@ func change_arena_size(new_size, handler = null):
 #			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
 			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
 	else:
-		new_kind = "floor"
+		new_kind = {}#"floor"
 		for i in range(Arena_Radius+1, new_size+1):
 #			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
 			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
+		
+		for cell in cells_to_change:
+			if not new_kind.has(cell):
+				new_kind[cell] = _random_kind()
+#				var q = -Map_Radius -cell.r if cell.r <= 0 else -Map_Radius
+#				new_kind[get_cell(q, cell.r)] = new_kind[cell]
+			
 	
 	# Size info change
 	Arena_Radius = new_size
@@ -819,7 +826,10 @@ func change_arena_size(new_size, handler = null):
 	
 	# Change each map within modified ranges
 	for cell in cells_to_change:
-		change_cell_kind(cell, new_kind, handler)
+		if new_kind is Dictionary:
+			change_cell_kind(cell, new_kind[cell], handler)
+		else:
+			change_cell_kind(cell, new_kind, handler)
 
 
 ## ANIMATION SECTION ##
