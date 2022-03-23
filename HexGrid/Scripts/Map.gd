@@ -93,16 +93,52 @@ func _generate_one_gridline(line_size, r):
 			_add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
 		q += 1
 
-func generate_grid(random = false):
+func generate_grid(random = false, symmetry = "rotation_r"):
 	if random:
 		rng.randomize()
-	var nb_cell = Map_Radius + 1
-	for r in range(-Map_Radius, 0) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell += 1
-	for r in range(Map_Radius + 1) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell -= 1
+	match symmetry:
+		"mirror":
+			var nb_cell = Map_Radius + 1
+			for r in range(-Map_Radius, 0) :
+				_generate_one_gridline(nb_cell, r)
+				nb_cell += 1
+			for r in range(Map_Radius + 1) :
+				_generate_one_gridline(nb_cell, r)
+				nb_cell -= 1
+		"rotation_q":
+			var N = Map_Radius+1
+			for q in range(N):
+				var r_range 
+				if q == 0:
+					r_range = range(N)
+				else:
+					r_range = range(-N, N-q)
+				
+				for r in r_range:
+					var kind
+					if distance_coord(q, r, 0, 0) > Arena_Radius:
+						kind = 'border'
+					else:
+						kind = _random_kind()
+					_add_instance_to_grid(kind, q, r)
+					_add_instance_to_grid(kind, -q, -r)
+		"rotation_r":
+			var N = Map_Radius+1
+			for r in range(N):
+				var q_range 
+				if r == 0:
+					q_range = range(N)
+				else:
+					q_range = range(-N, N-r)
+				
+				for q in q_range:
+					var kind
+					if distance_coord(q, r, 0, 0) > Arena_Radius:
+						kind = 'border'
+					else:
+						kind = _random_kind()
+					_add_instance_to_grid(kind, q, r)
+					_add_instance_to_grid(kind, -q, -r)
 
 
 ## HANDLE GRID INSTANCIATION
