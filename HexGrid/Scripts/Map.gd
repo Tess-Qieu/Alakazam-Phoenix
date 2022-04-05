@@ -799,6 +799,24 @@ func save():
 			grid_serialized[q][r] = get_cell(q, r).kind
 	return grid_serialized
 
+enum SYMMETRY_TYPE {Point, Axial_Horizontal, Axial_Vertical}
+
+func get_symmetrical_cell(origin_cell, sym_type = SYMMETRY_TYPE.Point ):
+	if origin_cell is Array:
+		origin_cell = get_cell(origin_cell[0], origin_cell[1])
+	elif origin_cell is Dictionary:
+		origin_cell = get_cell(origin_cell['q'], origin_cell['r'])
+	
+	match sym_type:
+		SYMMETRY_TYPE.Axial_Vertical:
+			return get_cell(origin_cell.z, origin_cell.r)
+		SYMMETRY_TYPE.Point:
+			return get_cell(-origin_cell.q, -origin_cell.r)
+		SYMMETRY_TYPE.Axial_Horizontal:
+			return get_symmetrical_cell(get_symmetrical_cell(origin_cell, SYMMETRY_TYPE.Axial_Vertical), SYMMETRY_TYPE.Point)
+
+
+
 
 ## HANDLING MAP TRANSFORMATION ##
 
@@ -869,7 +887,8 @@ func change_arena_size(new_size, handler = null):
 
 
 ## ANIMATION SECTION ##
-signal animation_ended
+# warning-ignore:unused_signal
+signal animation_ended # emitted throught callback
 
 enum anim_mode {IN_OUT, OUT_IN, BOTH}
 

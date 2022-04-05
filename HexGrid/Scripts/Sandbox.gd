@@ -2,7 +2,8 @@ extends Control
 
 enum actions {None, MapTool_DrawPath, MapTool_CellKindChange, 
 					MapTool_DrawCircle, MapTool_ResizeArena,
-					MapTool_SelectKind, MapTool_CircleAnim, MapTool_SpiralAnim}
+					MapTool_SelectKind, MapTool_CircleAnim, MapTool_SpiralAnim,
+					MapTool_Symmetry }
 
 # Node variables ###############################################################
 onready var MenuBt = $PanelContainer/VBoxContainer/MenuBar_Background/MenuBar/MenuButton
@@ -17,6 +18,10 @@ onready var PathSlider = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/M
 
 # Shapes
 onready var circleBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/ShapeDrawingWidget/CircleButton
+
+# Symmetry
+onready var SymmetryBt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/SymmetryWidget/SymmetryBt
+onready var SymOpti_Bt = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/SymmetryWidget/SymOptionButton
 
 # Arena size
 onready var ArenaSizeBt   = $PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget/ResizeArena_Bt
@@ -79,6 +84,10 @@ func _ready():
 	Pathbutton.connect("toggled", self, "_on_Button_Toggled", [Pathbutton])
 	# Popup link
 	PathWidget.popUp = $DrawPathPanel
+	
+	## Symmetry widget connections ##
+	# Button action
+	SymmetryBt.connect("toggled", self, "_on_Button_Toggled", [SymmetryBt])
 	
 	## Cell Kind Widget connections ##
 	# Button action
@@ -228,6 +237,12 @@ func _on_cell_hovered(cell):
 				# If no cell is selected, only the hovered cell is highlighted
 				myMap.clear()
 				myMap.change_cell_color(cell, 'skyblue')
+		
+		actions.MapTool_Symmetry:
+			if cells_set.empty():
+				myMap.clear_all()
+				myMap.change_cell_color(cell, 'darkgreen')
+				myMap.change_cell_color(myMap.get_symmetrical_cell(cell, SymOpti_Bt.selected), 'green')
 
 func _on_cell_clicked(cell):
 	match current_action:
@@ -325,6 +340,8 @@ func _on_Button_Toggled(button_pressed:bool, changed_bt : Button):
 				current_action = actions.MapTool_CircleAnim
 			SpiralAnimBt:
 				current_action = actions.MapTool_SpiralAnim
+			SymmetryBt:
+				current_action = actions.MapTool_Symmetry
 		
 		# If a button was already pressed, it is unpressed. The currently active
 		# button is now the clicked button

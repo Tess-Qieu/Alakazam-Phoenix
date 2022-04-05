@@ -4,6 +4,7 @@ signal cell_clicked
 
 var q
 var r
+var z setget , get_z
 var kind
 var character_on setget set_character
 
@@ -51,8 +52,11 @@ func set_character(new_character):
 	else:
 		kind = 'floor'
 
+func get_z():
+	return -q-r
+
 func get_coord_vect3():
-	return Vector3(q, r, -q-r)
+	return Vector3(q, r, get_z())
 
 func has_character_on():
 	return character_on != null
