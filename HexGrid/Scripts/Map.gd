@@ -802,19 +802,39 @@ func save():
 enum SYMMETRY_TYPE {Point, Axial_Horizontal, Axial_Vertical}
 
 func get_symmetrical_cell(origin_cell, sym_type = SYMMETRY_TYPE.Point ):
-	if origin_cell is Array:
-		origin_cell = get_cell(origin_cell[0], origin_cell[1])
-	elif origin_cell is Dictionary:
-		origin_cell = get_cell(origin_cell['q'], origin_cell['r'])
+	var coords
+	if origin_cell is Array and origin_cell.size == 2:
+		coords = origin_cell
+	elif origin_cell is Dictionary \
+							and origin_cell.has("q") and origin_cell.has("r"):
+		coords = [origin_cell['q'], origin_cell['r']]
+	elif "q" in origin_cell and "r" in origin_cell :
+		coords = [origin_cell.q, origin_cell.r]
+	else:
+		print("Invalid cell format in symmetry")
+		return get_cell(0, 0)
+	
+	coords = _compute_symmetrical_cell(coords, sym_type)
+	return get_cell(coords[0], coords[1])
+
+func _compute_symmetrical_cell(qr_coords, sym_type = SYMMETRY_TYPE.Point):
+	if not qr_coords is Array:
+		print("Coordinates must be passed as Array")
+		return [0,0]
+	
+	var q = qr_coords[0]
+	var r = qr_coords[1]
 	
 	match sym_type:
 		SYMMETRY_TYPE.Axial_Vertical:
-			return get_cell(origin_cell.z, origin_cell.r)
+			return [-q-r, r]
 		SYMMETRY_TYPE.Point:
-			return get_cell(-origin_cell.q, -origin_cell.r)
+			return [-q, -r]
 		SYMMETRY_TYPE.Axial_Horizontal:
-			return get_symmetrical_cell(get_symmetrical_cell(origin_cell, SYMMETRY_TYPE.Axial_Vertical), SYMMETRY_TYPE.Point)
-
+			return _compute_symmetrical_cell(
+					_compute_symmetrical_cell(	[q,r], 
+												SYMMETRY_TYPE.Axial_Vertical), 
+					SYMMETRY_TYPE.Point)
 
 
 
