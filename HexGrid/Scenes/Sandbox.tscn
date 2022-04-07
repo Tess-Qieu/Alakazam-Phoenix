@@ -100,7 +100,7 @@ text = "Generic tools"
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
 margin_right = 288.0
-margin_bottom = 134.0
+margin_bottom = 203.0
 custom_constants/separation = 15
 
 [node name="PathWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2"]
@@ -146,15 +146,38 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 139.0
+[node name="SymmetryWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2"]
+margin_top = 149.0
 margin_right = 288.0
-margin_bottom = 151.0
+margin_bottom = 203.0
+
+[node name="SymmetryBt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/SymmetryWidget"]
+margin_right = 288.0
+margin_bottom = 25.0
+toggle_mode = true
+text = "Symmetry"
+
+[node name="SymOptionButton" type="OptionButton" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer2/SymmetryWidget"]
+margin_top = 29.0
+margin_right = 288.0
+margin_bottom = 54.0
+text = "Point"
+align = 1
+items = [ "Point", null, false, 0, null, "Axial Vertical", null, false, 1, null, "Axial Horizontal", null, false, 2, null ]
+selected = 0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
+margin_top = 208.0
+margin_right = 288.0
+margin_bottom = 220.0
 
 [node name="ArenaSizeWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 156.0
+margin_top = 225.0
 margin_right = 288.0
-margin_bottom = 217.0
+margin_bottom = 286.0
 
 [node name="ResizeArena_Bt" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/ArenaSizeWidget"]
 margin_right = 288.0
@@ -172,14 +195,14 @@ value = 8.0
 tick_count = 9
 
 [node name="HSeparator5" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 222.0
+margin_top = 291.0
 margin_right = 288.0
-margin_bottom = 234.0
+margin_bottom = 303.0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 239.0
+margin_top = 308.0
 margin_right = 288.0
-margin_bottom = 337.0
+margin_bottom = 406.0
 custom_constants/separation = 15
 
 [node name="CellKindWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/VBoxContainer"]
@@ -214,14 +237,14 @@ items = [ "None", null, false, 0, null, "Floor", null, false, 1, null, "Full", n
 selected = 0
 
 [node name="HSeparator2" type="HSeparator" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 342.0
+margin_top = 411.0
 margin_right = 288.0
-margin_bottom = 354.0
+margin_bottom = 423.0
 
 [node name="AnimationWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools"]
-margin_top = 359.0
+margin_top = 428.0
 margin_right = 288.0
-margin_bottom = 688.0
+margin_bottom = 757.0
 
 [node name="CirclesWidget" type="VBoxContainer" parent="PanelContainer/VBoxContainer/HBoxContainer/ToolsMenu/MapTools/AnimationWidget"]
 margin_right = 288.0
