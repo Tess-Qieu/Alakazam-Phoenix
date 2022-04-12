@@ -78,22 +78,26 @@ func _random_kind():
 		return 'hole'
 	return 'floor'
 
-func generate_grid(random = false, symmetry = "point_split_horizontal"):
+func generate_grid(random = false, symmetry = SYMMETRY_TYPE.Point):
 	if random:
 		rng.randomize()
 	
 	var N = Map_Radius+1
 	
 	match symmetry:
-		"axial_vertical":
+		SYMMETRY_TYPE.Axial_Vertical:
 			# Axial reflexion, around vertical axis
-			# / \ / \ / \ / \
+			#        | Vertical axis
+			#        |
+			# / \ / \|/ \ / \
 			#| B | A | A | B |
-			# \ / \ / \ / \ /
+			# \ / \ /|\ / \ /
 			#  | C | O | C |
-			# / \ / \ / \ / \
+			# / \ / \|/ \ / \
 			#| D | E | E | D |
-			# \ / \ / \ / \ /
+			# \ / \ /|\ / \ /
+			#        |
+			#        |
 			for r in range(-N,N+1):
 				var q_max
 				if r <= 0:
@@ -111,15 +115,15 @@ func generate_grid(random = false, symmetry = "point_split_horizontal"):
 					var sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Axial_Vertical)
 					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
 		
-		"axial_horizontal":
+		SYMMETRY_TYPE.Axial_Horizontal:
 			# Axial reflexion, around horizontal axis
-			# / \ / \ / \ / \
-			#| E | D | C | B |
-			# \ / \ / \ / \ /
-			#  | A | O | A |
-			# / \ / \ / \ / \
-			#| E | D | C | B |
-			# \ / \ / \ / \ /
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
+			#---|-A-|-O-|-A-|--- Horizontal Axis
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
 			for r in range(0, N+1):
 				var q_range
 				if r == 0:
@@ -147,41 +151,15 @@ func generate_grid(random = false, symmetry = "point_split_horizontal"):
 					
 					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
 		
-		"point_split_vertical":
-			# Point reflexion around (0,0), splitting vertical axis
-			# / \ / \ / \ / \
-			#| D | E | A | B |
-			# \ / \ / \ / \ /
-			#  | C | O | C |
-			# / \ / \ / \ / \
-			#| B | A | E | D |
-			# \ / \ / \ / \ /
-			# TODO : CURRENTLY SPLITTING ON Q AXIS : NOT VERTICAL BUT INCLINED
-			for q in range(N):
-				var r_range 
-				if q == 0:
-					r_range = range(N)
-				else:
-					r_range = range(-N, N-q)
-				
-				for r in r_range:
-					var kind
-					if distance_coord(q, r, 0, 0) > Arena_Radius:
-						kind = 'border'
-					else:
-						kind = _random_kind()
-					_add_instance_to_grid(kind, q, r)
-					_add_instance_to_grid(kind, -q, -r)
-		
-		"point_split_horizontal":
-			# Point reflexion around (0,0), splitting on horizontal axis
-			# / \ / \ / \ / \
-			#| B | C | D | E |
-			# \ / \ / \ / \ /
-			#  | A | O | A |
-			# / \ / \ / \ / \
-			#| E | D | C | B |
-			# \ / \ / \ / \ /
+		SYMMETRY_TYPE.Point:
+			# Point reflexion around (0,0), splitting on R = 0 line
+			#  / \ / \ / \ / \
+			# | B | C | D | E |
+			#  \ / \ / \ / \ /
+			#---|-A-|-O-|-A-|--- R=0 line
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
 			for r in range(N):
 				var q_range 
 				if r == 0:
@@ -196,8 +174,10 @@ func generate_grid(random = false, symmetry = "point_split_horizontal"):
 						kind = 'border'
 					else:
 						kind = _random_kind()
+					
 					_add_instance_to_grid(kind, q, r)
-					_add_instance_to_grid(kind, -q, -r)
+					var sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Point)
+					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
 
 
 ## HANDLE GRID INSTANCIATION
