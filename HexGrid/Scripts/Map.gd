@@ -180,6 +180,7 @@ func generate_grid(random = false, symmetry = SYMMETRY_TYPE.Point):
 					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
 
 
+
 ## HANDLE GRID INSTANCIATION
 func _add_instance_to_grid(instance, q, r):
 	if not q in grid.keys():
