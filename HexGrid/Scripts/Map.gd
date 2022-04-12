@@ -200,6 +200,7 @@ func generate_grid(random = false, symmetry = "point_split_horizontal"):
 					_add_instance_to_grid(kind, -q, -r)
 
 
+
 ## HANDLE GRID INSTANCIATION
 func _add_instance_to_grid(instance, q, r):
 	if not q in grid.keys():
