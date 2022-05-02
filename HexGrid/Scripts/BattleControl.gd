@@ -11,6 +11,9 @@ func _ready():
 	node_battle = get_parent()
 	$Debug_Button.connect("toggled", self, "_on_Debug_Button_toggled")
 
+
+
+
 ## BUTTON EVENT MANAGEMENT
 func _on_SpellButton_toggled(button_pressed, spell_button ):
 	# Spell Activation
