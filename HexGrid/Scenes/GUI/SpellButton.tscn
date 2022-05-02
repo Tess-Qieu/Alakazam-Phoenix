@@ -32,6 +32,7 @@ corner_radius_bottom_left = 2
 [node name="SpellButton" type="Button"]
 margin_right = 76.0
 margin_bottom = 70.0
+toggle_mode = true
 icon = ExtResource( 1 )
 script = ExtResource( 2 )
 __meta__ = {

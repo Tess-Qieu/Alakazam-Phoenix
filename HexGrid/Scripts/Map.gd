@@ -1,4 +1,5 @@
 extends Spatial
+class_name HexMap
 
 var Cell = preload("res://Scripts/Cell.gd")
 var CellSize1 = preload("res://Scenes/Cells/CellSize1.tscn")
@@ -6,24 +7,60 @@ var CellSize2 = preload("res://Scenes/Cells/CellSize2.tscn")
 var CellSize3 = preload("res://Scenes/Cells/CellSize3.tscn")
 var CellSize4 = preload("res://Scenes/Cells/CellSize4.tscn")
 var CellSize5 = preload("res://Scenes/Cells/CellSize5.tscn")
+var kind_to_scene = {'hole'  : CellSize1,
+					'floor'  : CellSize2,
+					'blocked': CellSize2,
+					'full'   : CellSize3,
+					'border' : [CellSize3, CellSize4, CellSize5] }
 
 var rng = RandomNumberGenerator.new()
 var grid = {}
 var cells_floor = []
 var last_mouse_position = Vector2(-1, -1)
 
-const SELECTABLE_CELLS = ['floor', 'blocked']
+const ALL_KINDS = ['floor', 'blocked', 'full', 'hole', 'border']
+const SELECTIBLE_CELLS = ['floor', 'blocked']
 const BLOCKING_VIEW = ['full', 'border']
 
+# In the map, cells are handled with axial coordinates as coord = (q,r) with a
+# placement as shown :
+#     /   \   /   \
+#   _| 0,-1| |+1,-1|_
+# /   \   /   \   /   \
+#|-1,0 | | Q,R | |+1,0 |
+# \ _ /   \   /   \ _ /
+#    |-1,+1| | 0,+1|
+#     \ _ /   \ _ /
+# Direction vectors, used to compute a circle. 
+# This order allows to travel in a circle, starting from the DownRight position
+#  and going anti-clockwise, as shown below
+#   / \ / \ 
+#  | 4 | 3 |
+# / \ / \ / \ 
+#| 5 |   | 2 |
+# \ / \ / \ / 
+#  | 6 | 1 |
+#   \ / \ / 
+const DIRECTIONS = {'UpRight'  : {'q':+1, 'r':-1},
+					'UpLeft'   : {'q': 0, 'r':-1},
+					'Left'     : {'q':-1, 'r': 0},
+					'DownLeft' : {'q':-1, 'r':+1},
+					'DownRight': {'q': 0, 'r':+1},
+					'Right'    : {'q':+1, 'r': 0} }
+
+# Cell types probability
 const PROBA_CELL_FULL = 0.1
 const PROBA_CELL_HOLE = 0.1
-const LENGTH_BORDER = 8
-const RAY_ARENA = 8
-const RAY = LENGTH_BORDER + RAY_ARENA
+
+# Map size variables.
+# Arena  coordinates in [0; Arena_Radius]
+# Border coordinates in [Arena_Radius +1; Arena_Radius +Map_Radius]
+var Border_Width = 8
+var Arena_Radius = 8
+var Map_Radius = Border_Width + Arena_Radius
 
 # Littlest step the camera can do on the Zoom 3D Curve, on unit_offset
 export var camera_sensibility = 0.05
-
 
 func _ready():
 	rng.randomize()
@@ -40,30 +77,108 @@ func _random_kind():
 	if value < lim:
 		return 'hole'
 	return 'floor'
-	
-func _generate_one_gridline(line_size, r):
-	var kind = ''
-	var half = line_size / 2  if (line_size / 2.0)  == (line_size / 2) else (line_size / 2 + 1)
-	var q = -RAY -r if r <= 0 else -RAY
-	# first part : random
-	for i in range(half):
-		if distance_coord(q, r, 0, 0) > RAY_ARENA:
-			kind = 'border'
-		else:
-			kind = _random_kind()
-		_add_instance_to_grid(kind, q, r)
-		if line_size / 2.0 == line_size / 2 or i + 1 != half :
-			_add_instance_to_grid(kind, line_size - 2*i + q - 1, r)
-		q += 1
 
-func generate_grid():
-	var nb_cell = RAY + 1
-	for r in range(-RAY, 0) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell += 1
-	for r in range(RAY + 1) :
-		_generate_one_gridline(nb_cell, r)
-		nb_cell -= 1
+func generate_grid(random = false, symmetry = SYMMETRY_TYPE.Point):
+	if random:
+		rng.randomize()
+	
+	var N = Map_Radius+1
+	
+	match symmetry:
+		SYMMETRY_TYPE.Axial_Vertical:
+			# Axial reflexion, around vertical axis
+			#        | Vertical axis
+			#        |
+			# / \ / \|/ \ / \
+			#| B | A | A | B |
+			# \ / \ /|\ / \ /
+			#  | C | O | C |
+			# / \ / \|/ \ / \
+			#| D | E | E | D |
+			# \ / \ /|\ / \ /
+			#        |
+			#        |
+			for r in range(-N,N+1):
+				var q_max
+				if r <= 0:
+					q_max = N
+				else:
+					q_max = N - r
+				for q in range(floor(0.5*(1-r)), q_max+1):
+					# Strange range formula to handle the inclined Q axis.
+					var kind
+					if distance_coord(q, r, 0, 0) > Arena_Radius:
+						kind = 'border'
+					else:
+						kind = _random_kind()
+					_add_instance_to_grid(kind, q, r)
+					var sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Axial_Vertical)
+					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
+		
+		SYMMETRY_TYPE.Axial_Horizontal:
+			# Axial reflexion, around horizontal axis
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
+			#---|-A-|-O-|-A-|--- Horizontal Axis
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
+			for r in range(0, N+1):
+				var q_range
+				if r == 0:
+					# Splitted line, only half line needs to be computed
+					q_range = range(N)
+				else:
+					q_range = range(-N, N-r)
+				
+				for q in q_range:
+					var kind
+					if distance_coord(q, r, 0, 0) > Arena_Radius:
+						kind = 'border'
+					else:
+						kind = _random_kind()
+					_add_instance_to_grid(kind, q, r)
+					
+					var sym_cell_coords
+					if r != 0:
+						sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Axial_Horizontal)
+					else:
+						# The central horizontal cell line has no symmetry around
+						#  the horizontal axis, so a symmetry is done around the 
+						#  vertical one.
+						sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Axial_Vertical)
+					
+					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
+		
+		SYMMETRY_TYPE.Point:
+			# Point reflexion around (0,0), splitting on R = 0 line
+			#  / \ / \ / \ / \
+			# | B | C | D | E |
+			#  \ / \ / \ / \ /
+			#---|-A-|-O-|-A-|--- R=0 line
+			#  / \ / \ / \ / \
+			# | E | D | C | B |
+			#  \ / \ / \ / \ /
+			for r in range(N):
+				var q_range 
+				if r == 0:
+					# Splitted line, only half line needs to be computed
+					q_range = range(N)
+				else:
+					q_range = range(-N, N-r)
+				
+				for q in q_range:
+					var kind
+					if distance_coord(q, r, 0, 0) > Arena_Radius:
+						kind = 'border'
+					else:
+						kind = _random_kind()
+					
+					_add_instance_to_grid(kind, q, r)
+					var sym_cell_coords = _compute_symmetrical_cell([q,r], SYMMETRY_TYPE.Point)
+					_add_instance_to_grid(kind, sym_cell_coords[0], sym_cell_coords[1])
+
 
 
 ## HANDLE GRID INSTANCIATION
@@ -72,29 +187,33 @@ func _add_instance_to_grid(instance, q, r):
 		grid[q] = {}
 	grid[q][r] = instance
 	
-func _instance_cell(cell_type, q, r, kind):
-	var cell = cell_type.instance()
-	cell.init(q, r, kind, get_parent())
+func _instance_cell(cell_scene, q, r, kind, handler_node = null):
+	# Protection in case of null handler
+	if handler_node == null:
+		handler_node = get_parent()
+	
+	var cell = cell_scene.instance()
+	cell.init(q, r, kind, handler_node)
 	add_child(cell)
 	_add_instance_to_grid(cell, q, r)
-	if kind in SELECTABLE_CELLS:
+	if kind in SELECTIBLE_CELLS:
 		cells_floor += [cell]
 
-func instance_map(new_grid):
+func instance_map(new_grid, handler_node = null):
 	grid = new_grid
 	for q in grid.keys():
 		for r in grid[q].keys():
 			var kind = grid[q][r]
-			if kind == 'hole':
-				_instance_cell(CellSize1, q, r, kind)
-			elif kind == 'floor' or kind == 'blocked': 
-				_instance_cell(CellSize2, q, r, kind)
-			elif kind == 'full':
-				_instance_cell(CellSize3, q, r, kind)
+			if kind in ['hole', "blocked", "floor", 'full']:
+				_instance_cell(kind_to_scene[kind], q, r, kind, handler_node)
 			elif kind == 'border':
 				var height = rng.randi() % 3
-				var choices = {0: CellSize3, 1: CellSize4, 2:CellSize5}
-				_instance_cell(choices[height], q, r, kind)
+				_instance_cell(kind_to_scene[kind][height], q, r, kind, handler_node)
+	
+	# Update arena size
+	Arena_Radius = _compute_arena_radius()
+	Border_Width = Map_Radius - Arena_Radius
+#	print("Arena Radius: {0}, Map Radius: {1}".format([Arena_Radius, Map_Radius]))
 
 
 
@@ -181,7 +300,7 @@ func is_in_fov(observer_cell, max_dist, target_cell, min_dist = 0):
 
 func _compute_straight_lines_fov(cell_start, max_dist, min_dist = 0, \
 									block_filter = BLOCKING_VIEW, \
-									select_filter = SELECTABLE_CELLS ):
+									select_filter = SELECTIBLE_CELLS ):
 	## Computes a field of view composed of 6 straight lines
 	# from a given cell and within a range of distance
 	var paths = {}
@@ -276,7 +395,7 @@ func _compute_zone(center, radius):
 		for r in range( \
 				max(center.r-radius, -q-z-radius), \
 				min(center.r+radius, -q-z+radius) +1):
-			if grid[q][r].kind in SELECTABLE_CELLS:
+			if grid[q][r].kind in SELECTIBLE_CELLS:
 				zone.append(grid[q][r])
 	return zone
 
@@ -307,7 +426,7 @@ func _compute_triangle_recursive(current_cell, cell_ref, height, direction, \
 
 func _compute_triangle(cell_top, cell_target, height, \
 									block_filter = BLOCKING_VIEW, \
-									select_filter = SELECTABLE_CELLS):
+									select_filter = SELECTIBLE_CELLS):
 	# Computes a triangle from a given cell to a target cell
 	
 	var direction = cell_target.get_coord_vect3() - cell_top.get_coord_vect3()
@@ -331,7 +450,8 @@ func _compute_triangle(cell_top, cell_target, height, \
 	# Resize of the direction vect
 	direction = (direction*2)/distance_cells(cell_target, cell_top)
 	
-	var triangle = [cell_top]
+	# the start of the triangle is not included : avoid casting on caster's cell
+	var triangle = []
 	_compute_triangle_recursive(cell_top, cell_top, height, direction, triangle, \
 								block_filter, select_filter)
 	return triangle
@@ -347,7 +467,7 @@ func display_triangle(cell_top, cell_target, height, color_key):
 
 
 func _compute_hexa_points(cell_origin, radius, isEvenRangePointy = true, \
-							 select_filter = SELECTABLE_CELLS):
+							 select_filter = SELECTIBLE_CELLS):
 	# Computes the 6 corners of an hexagon, based on a given cell and a radius
 	# By default, even and odd radius are not managed the same way :
 	# For an odd range, the returned cells have a side parallel to the origin cell
@@ -415,32 +535,86 @@ func display_hexa_points(cell_origin, radius, color_key):
 	
 	return points
 
+func display_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = ""):
+	if color.empty():
+		color = 'green'
+	
+	return _compute_circle(center, radius, filter_select, color)
+	
+func _compute_circle(center, radius, filter_select = SELECTIBLE_CELLS, color = ""):
+	# Initialize output array
+	var circle = []
+	
+	if radius == 0:
+		circle.append(center)
+	elif radius > 0:
+		# Select initial cell at down right corner from the center
+		var q_init = center.q + radius*DIRECTIONS['DownRight']['q']
+		var r_init = center.r + radius*DIRECTIONS['DownRight']['r']
+		
+		# store the initial cell coordinates
+		var coords = {'q':q_init, 'r':r_init}
+		
+		# A circle has the particularity of having a number of cell equal to
+		# its radius on each side.
+		#
+		# Starting from the downright corner of the circle, loop on each circle
+		#  side a number of time equal to radius. For each coordinate tests if
+		#  the cell exists. If so, the cell is added and its color changed
+		for side in DIRECTIONS:
+			for _step in range(radius):
+				coords['q'] = coords['q']+DIRECTIONS[side]['q']
+				coords['r'] = coords['r']+DIRECTIONS[side]['r']
+				
+				if has_cell(coords['q'], coords['r']):
+					var cell = grid[coords['q']][coords['r']] 
+					if cell.kind in filter_select:
+						if not cell in circle:
+							circle.append(cell)
+						if not color.empty():
+							change_cell_color(cell, color)
+	
+	return circle
+
+func _compute_arena_radius():
+	# Returns the size of the arena.
+	# Considering X as (0;0) and B cells as border, the functions travels along
+	#  each cell of a line until stumble upon a border cell
+	#    
+	# / \ / \ / \ / \ / \ / \ / \ / \
+	#| X | 1 | 2 | 3 | 4 | 5 | B | B |
+	# \ / \ / \ / \ / \ / \ / \ / \ /
+	var radius = _compute_line(grid[0][0], grid[Map_Radius][0])
+	var cell_index = 0
+	while radius[cell_index].kind != 'border' and cell_index in grid.keys():
+		cell_index = cell_index +1
+	return cell_index -1
+
 
 
 ## HANDLE PATH FINDING ##
-func _neighbors (cell):
+func _neighbors(cell):
 	# Function returning every neighbor of a cell, of any kind	
+	# Cells are returned in this order :
+	#   / \ / \ 
+	#  | 3 | 2 |
+	# / \ / \ / \
+	#| 4 |   | 1 |
+	# \ / \ / \ / 
+	#  | 5 | 0 |
+	#   \ / \ / 
 	var list = []
 	
-	if grid[cell.q][cell.r +1] != null:
-		list.append(grid[cell.q][cell.r+1])
-	
-	if grid[cell.q +1][cell.r] != null:
-		list.append(grid[cell.q +1][cell.r])
-	
-	if grid[cell.q +1][cell.r -1] != null:
-		list.append(grid[cell.q +1][cell.r -1])
-	
-	if grid[cell.q][cell.r -1] != null:
-		list.append(grid[cell.q][cell.r -1])
-	
-	if grid[cell.q -1][cell.r] != null:
-		list.append(grid[cell.q -1][cell.r])
-	
-	if grid[cell.q -1][cell.r +1] != null:
-		list.append(grid[cell.q -1][cell.r +1])
+	for d in DIRECTIONS:
+		var neighbor_q = cell.q + DIRECTIONS[d]['q']
+		var neighbor_r = cell.r + DIRECTIONS[d]['r']
+		if has_cell(neighbor_q, neighbor_r):
+			list.append(grid[neighbor_q][neighbor_r])
 	
 	return list
+
+func has_cell(cell_q, cell_r):
+	return cell_q in grid.keys() and cell_r in grid[cell_q].keys()
 	
 func _serialize_path(path):
 	var path_serialized = []
@@ -501,11 +675,15 @@ func _compute_path(start, end, distance_max):
 	
 	return _path
 
-func display_path(start, end, distance_max):
+func display_path(start, end, distance_max, as_object = false):
 	var path = _compute_path(start, end, distance_max)
 	for elt in path:
 		elt.change_material('green')
-	return _serialize_path(path)
+	
+	if as_object:
+		return path
+	else:
+		return _serialize_path(path)
 
 
 func _compute_displacement_range(start, distance_max):
@@ -586,6 +764,11 @@ func clear():
 	for c in cells_floor:
 		c.change_material('floor')
 
+func clear_all():
+	for r in grid.keys():
+		for q in grid[r].keys():
+			grid[r][q].change_material(grid[r][q].kind)
+
 func manage_fov(spell : Spell, origin_cell, color_key):
 	var fov = []
 	match spell.fov_type:
@@ -624,3 +807,306 @@ func get_impact(spell : Spell, origin_cell, target_cell):
 			cells.append(grid[0][0]) 
 		
 	return cells
+
+func change_cell_color(cell, new_color):
+	if cell.has_method("change_material"):
+		cell.change_material(new_color)
+	elif cell is Array:
+		grid[cell[0]][cell[1]].change_material(new_color)
+
+func is_cell_selectible(cell):
+	if "kind" in cell:
+		if cell.kind in SELECTIBLE_CELLS:
+			return true
+	
+	return false
+
+func get_cell(q:int, r:int):
+	return grid[q][r]
+
+func get_all_cells(kind = 'floor'):
+	var list = []
+	for q in grid.keys():
+		for r in grid[q].keys():
+			if grid[q][r].kind == kind:
+				list.append(grid[q][r])
+	return list
+
+func save():
+	var grid_serialized : Dictionary = {}
+	for q in grid.keys():
+		grid_serialized[q] = {}
+		for r in grid[q].keys():
+			grid_serialized[q][r] = get_cell(q, r).kind
+	return grid_serialized
+
+enum SYMMETRY_TYPE {Point, Axial_Horizontal, Axial_Vertical}
+
+func get_symmetrical_cell(origin_cell, sym_type = SYMMETRY_TYPE.Point ):
+	var coords
+	if origin_cell is Array and origin_cell.size == 2:
+		coords = origin_cell
+	elif origin_cell is Dictionary \
+							and origin_cell.has("q") and origin_cell.has("r"):
+		coords = [origin_cell['q'], origin_cell['r']]
+	elif "q" in origin_cell and "r" in origin_cell :
+		coords = [origin_cell.q, origin_cell.r]
+	else:
+		print("Invalid cell format in symmetry")
+		return get_cell(0, 0)
+	
+	coords = _compute_symmetrical_cell(coords, sym_type)
+	return get_cell(coords[0], coords[1])
+
+func _compute_symmetrical_cell(qr_coords, sym_type = SYMMETRY_TYPE.Point):
+	if not qr_coords is Array:
+		print("Coordinates must be passed as Array")
+		return [0,0]
+	
+	var q = qr_coords[0]
+	var r = qr_coords[1]
+	
+	match sym_type:
+		SYMMETRY_TYPE.Axial_Vertical:
+			return [-q-r, r]
+		SYMMETRY_TYPE.Point:
+			return [-q, -r]
+		SYMMETRY_TYPE.Axial_Horizontal:
+			return _compute_symmetrical_cell(
+					_compute_symmetrical_cell(	[q,r], 
+												SYMMETRY_TYPE.Axial_Vertical), 
+					SYMMETRY_TYPE.Point)
+
+
+
+## HANDLING MAP TRANSFORMATION ##
+
+func change_cell_kind(cell, new_kind:String, handler = null):
+	if handler == null:
+		handler = cell.get_parent()
+	
+	if cell is Array:
+		cell = grid[cell[0]][cell[1]]
+	
+	if "kind" in cell:
+		if cell.kind != new_kind and new_kind != "blocked" and cell.kind != "blocked":
+			# Removing cell from map
+			if cell.kind == "floor":
+				cells_floor.erase(cell)
+			remove_child(cell)
+			# Instantiating a new cell from previous one
+			if new_kind == "border":
+				# border kind in chosen randomly in various sizes
+				var height = rng.randi() % 3
+				_instance_cell(kind_to_scene[new_kind][height], cell.q, cell.r, new_kind, handler)
+			else :
+				_instance_cell(kind_to_scene[new_kind], cell.q, cell.r, new_kind, handler)
+
+func change_arena_size(new_size, handler = null):
+	### Method allowing to change the arena size, within the map size.
+	# If size increases, new cells are set as floor, if size decreases, new cells
+	# are set as border
+	
+	var new_kind
+	var cells_to_change = []
+	
+	if new_size < 0 or new_size == null or new_size >= Map_Radius:
+		# Data integrity protection
+		print("Invalid size {0}".format(['null' if new_size == null else new_size]))
+		return
+	elif new_size == Arena_Radius:
+		# Nothing to do if sized not changed
+		return
+	elif new_size < Arena_Radius:
+		new_kind = "border"
+		for i in range(new_size+1, Arena_Radius+1):
+#			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
+			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
+	else:
+		new_kind = {}#"floor"
+		for i in range(Arena_Radius+1, new_size+1):
+#			print("Changing circle r={0}, to kind '{1}'".format([i, new_kind]))
+			cells_to_change.append_array(_compute_circle(grid[0][0], i, ALL_KINDS))
+		
+		for cell in cells_to_change:
+			if not new_kind.has(cell):
+				new_kind[cell] = _random_kind()
+#				var q = -Map_Radius -cell.r if cell.r <= 0 else -Map_Radius
+#				new_kind[get_cell(q, cell.r)] = new_kind[cell]
+			
+	
+	# Size info change
+	Arena_Radius = new_size
+	Border_Width = Map_Radius - Arena_Radius
+	
+	# Change each map within modified ranges
+	for cell in cells_to_change:
+		if new_kind is Dictionary:
+			change_cell_kind(cell, new_kind[cell], handler)
+		else:
+			change_cell_kind(cell, new_kind, handler)
+
+
+## ANIMATION SECTION ##
+# warning-ignore:unused_signal
+signal animation_ended # emitted throught callback
+
+enum anim_mode {IN_OUT, OUT_IN, BOTH}
+
+func animate_cirles(center_cell, radius = 5, 
+					animation_mode = anim_mode.IN_OUT, wave_width = 1, 
+					color = "skyblue", selection_filter = ALL_KINDS):
+	# Animation modes : 
+	#  IN_OUT: Circles are colored with increasing radius
+	#  OUT_IN: Circles are colored with decreasing radius
+	#  BOTH  : Circles are colored from the center to the outside, then going 
+	#          then going back to their original color from the outside to the
+	#          indisde
+	
+	if radius < 1:
+		# Nothing to animate
+		return
+	
+	if center_cell is Array:
+		# conversion from coordinates to object
+		center_cell = get_cell(center_cell[0], center_cell[1])
+		
+	# Animation constant
+	# Delta : base delay before coloring a cell
+	# Tau   : base time during which the cell is colored
+	var delta = 0.2
+	var tau   = delta
+	
+	for step in range(1, radius+1):
+		# Each circle is timed the same way: two timers are created for each
+		
+		# Timer for the colored duration
+		var duration_t = Timer.new()
+		duration_t.one_shot = true
+		duration_t.autostart = false # started by the delay Timer
+		
+		# Timer for the delay before coloring the cell
+		var delay_t = Timer.new()
+		delay_t.one_shot = true
+		delay_t.autostart = true
+		# Timers chaining
+		delay_t.connect("timeout", duration_t, "start")
+		
+		# Compute durations, given the animation mode
+		duration_t.wait_time = wave_width*tau
+		
+		match animation_mode:
+			
+			anim_mode.OUT_IN:
+				delay_t.wait_time = delta*(radius +1 -step)
+				if step == 1:
+					# End of animation on first circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+				
+			anim_mode.BOTH:
+				# Specific duration for animation mode both
+				duration_t.wait_time = 2*tau*(radius+1-step)
+				delay_t.wait_time = delta*step
+				if step == 1:
+					# End of animation on last circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+				
+			_, anim_mode.IN_OUT:
+				# Default mode
+				delay_t.wait_time = delta*step
+				if step == radius:
+					# End of animation on last circle timeout
+					duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+		
+		
+		# Connect all cells in the circle to the timers
+		for cell in _compute_circle(center_cell, step, selection_filter):
+			# Change the color after the first delay
+			delay_t.connect("timeout", cell, "change_material", [color])
+			
+			# Change back to default color after the second timer
+			duration_t.connect("timeout", cell, "change_material", [cell.kind])
+		
+		# Remove timers at last timeout
+		duration_t.connect("timeout", duration_t, "queue_free")
+		duration_t.connect("timeout", delay_t, "queue_free")
+		
+		# Timers addition to tree. Delay_t will start directly
+		add_child(duration_t)
+		add_child(delay_t)
+
+func animate_spiral(center_cell, radius = 5, 
+					animation_mode = anim_mode.IN_OUT, wave_width = 6, 
+					color = "skyblue", selection_filter = ALL_KINDS):
+	if radius < 1:
+		# Nothing to animate
+		return
+	
+	if center_cell is Array:
+		# conversion from coordinates to object
+		center_cell = get_cell(center_cell[0], center_cell[1])
+	
+	# Animation constant
+	# Delta : base delay before coloring a cell
+	# Tau   : base time during which the cell is colored
+	var delta = 0.07
+	var tau   = delta
+	# Number of neighbors in a spiral of a given radius: 6i neighbors on each circle
+	var neighbors_sum = radius*(radius+1)*3
+	# Count of the current cell on the total number of cells in the spiral
+	var total_index = 0
+	
+	# Compute the full spiral
+	for step in range(1, radius+1):
+		var cells = _compute_circle(center_cell, step, ALL_KINDS)
+		
+		for c in cells:
+			# Increment to total index
+			total_index += 1
+			
+			# Timer for the colored duration
+			var duration_t = Timer.new()
+			duration_t.one_shot = true
+			duration_t.autostart = false # started by the delay Timer
+			
+			# Timer for the delay before coloring the cell
+			var delay_t = Timer.new()
+			delay_t.one_shot = true
+			delay_t.autostart = true
+			# Timers chaining
+			delay_t.connect("timeout", duration_t, "start")
+			
+			# Compute durations, given the animation mode
+			duration_t.wait_time = wave_width*tau
+			
+			match animation_mode:
+				
+				anim_mode.OUT_IN:
+					delay_t.wait_time = delta*(neighbors_sum +1 - total_index)
+					if step == 1 and cells[0] == c:
+						# End of animation on first cell of first circle timeout
+						duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+					
+				_, anim_mode.IN_OUT:
+					# Default mode
+					delay_t.wait_time = delta*total_index
+					if step == radius and c == cells[-1]:
+						# End of animation on last cell of last circle timeout
+						duration_t.connect("timeout", self, "emit_signal", ["animation_ended"])
+			
+			if c.kind in selection_filter:
+				# Change the color after the first delay
+				delay_t.connect("timeout", c, "change_material", [color])
+				
+				# Change back to default color after the second timer
+				duration_t.connect("timeout", c, "change_material", [c.kind])
+				
+			# Remove timers at last timeout
+			duration_t.connect("timeout", duration_t, "queue_free")
+			duration_t.connect("timeout", delay_t, "queue_free")
+			
+			# Timers addition to tree. Delay_t will start directly
+			add_child(duration_t)
+			add_child(delay_t)
+			
+#			print("For cell {0}, index: {1}, delay:{2}".format([c.get_coords_string(), total_index, delay_t.wait_time]))
