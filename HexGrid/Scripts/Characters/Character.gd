@@ -10,9 +10,13 @@ signal character_die
 signal character_selected
 signal character_movement_finished
 
-# Movement margin used to discriminate if the character has arrived on a cell
-const MVT_MARGIN = 0.02 
-const speed = 3.35
+## Movement management ##
+# Time to move from a cell to an other
+const MVT_TIME = 0.75
+# Node computing and animating the translation from a cell to an other
+onready var my_tween
+var moving = false
+var destination_cell = null
 
 ## ID informations ##
 var id_character
@@ -27,8 +31,6 @@ var current_range_displacement
 
 ## Battle informations ##
 var current_cell
-var moving = false
-var destination_cell
 
 ## Spells List ##
 var Spells = {'CannonBall' : "res://Scenes/Spells/RaySpell.tscn",
@@ -73,10 +75,11 @@ func init(cell, c_team, c_id_character, c_user_id, health, range_displacement,  
 	#  during a game
 	for k in Spells.keys():
 		Spells[k] = load(Spells[k]).instance()
-
-func _physics_process(delta):
-	if moving:
-		_process_movement_one_cell(delta)
+	
+	# tween instatiation for computing movement
+	my_tween = Tween.new()
+	add_child(my_tween)
+	my_tween.connect("tween_completed", self, "_on_tween_completed")
 
 func unselect():
 	$AnimationPlayer.stop()
@@ -136,36 +139,36 @@ func receive_damage(dmg_amount, is_dead):
 
 
 ## MOVEMENT SECTION ##
-func teleport_to(cell):
-	translation.x = cell.translation.x
-	translation.z = cell.translation.z
-	emit_signal("character_movement_finished", self, cell)
+func _on_tween_completed(_obj, _key):
+	# At in_between animation completion, signal the movement completion.
+	#  This signal is handled outside the character 
+	emit_signal("character_movement_finished", self, destination_cell)
 
 func move_to(cell):
+	# Memorizing destination cell
 	destination_cell = cell
-	moving = true
-	$AnimationPlayer.play("Walking")
-
-func _process_movement_one_cell(delta):
-	# First, the distance between the destination cell and the character 
-	#  position is calculated
-	var dist = destination_cell.translation - translation
-	dist.y = 0 # Distance is only considered in (x,z) plan
 	
-	# if the character has not reached the destination cell
-	if dist.length() > MVT_MARGIN:
-		# character orientation to the destination cell
-		var to_look = destination_cell.translation
-		to_look.y = translation.y
-		look_at(to_look, Vector3(0,1,0))
-		
-		var new_pos = translation + dist.normalized() * delta * speed
-		translation = new_pos
-		
-	else: # If the character has reached the cell (within a margin)
-		# The character is teleported to the exact cell location
-		#  in order to avoid an error accumulation
-		teleport_to(destination_cell)
+	# Direction change, rotating on Y axis
+	var to_look = destination_cell.translation
+	to_look.y = translation.y
+	look_at(to_look, Vector3(0,1,0))
+	
+	# Movement animation
+	if not moving:
+		$AnimationPlayer.play("Walking")
+		moving = true
+	
+	# The movement is computed from the origin cell to the destination cell,
+	#  at character's height
+	var init_pos = Vector3(current_cell.translation.x, 
+						translation.y, 
+						current_cell.translation.z)
+	var final_pos = Vector3(destination_cell.translation.x, 
+							translation.y, 
+							destination_cell.translation.z)
+	my_tween.interpolate_property(self, "translation", init_pos, final_pos, 
+								MVT_TIME)
+	my_tween.start()
 
 func stop_movement():
 	moving = false

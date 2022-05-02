@@ -11,6 +11,10 @@ func _ready():
 	node_battle = get_parent()
 	$Debug_Button.connect("toggled", self, "_on_Debug_Button_toggled")
 
+
+
+
+
 ## BUTTON EVENT MANAGEMENT
 func _on_SpellButton_toggled(button_pressed, spell_button ):
 	# Spell Activation
@@ -41,7 +45,7 @@ func _on_ButtonEndTurn_pressed():
 	
 	# Ticking stopped
 	$EndTurn_Widget.set_physics_process(false)
-	
+
 	# New turn
 	node_battle.ask_end_turn()
 
@@ -122,7 +126,7 @@ func update_spell_list(character : Character):
 		$PanelRight/SpellListContainer.add_child(spell_bt)
 		
 		# Signal connections
-		spell_bt.initialize(spell_key, character.Spells[spell_key])
+		spell_bt.initialize(spell_key, character.Spells[spell_key].miniature)
 		spell_bt.connect("toggled", self, "_on_SpellButton_toggled", [spell_bt])
 
 func toggle_spell_buttons(disabled : bool):

@@ -20,6 +20,7 @@ var state = 'normal' # ['normal', 'cast_spell', 'movement']
 var memory_on_turn = {'move': {}, 'cast spell': {}} 
 
 
+onready var myMap : HexMap = $Map
 
 
 ## INITIALISATION / CONTROL GAME ##
@@ -186,16 +187,16 @@ func _on_character_clicked(character):
 		_select_character(character)
 
 func _on_cell_clicked(cell):
-#	print(state)
-	if state == 'normal':
-		if len(path_serialized) > 0 :
-			_ask_move(selected_character, path_serialized)
-	
-	elif state == 'cast_spell':
-		if cell in fov:
-			_ask_cast_spell(selected_character, current_spell, cell)
-		else:
-			$BattleControl.deselect_spell()
+	if myMap.is_cell_selectible(cell):
+		if state == 'normal':
+			if len(path_serialized) > 0 :
+				_ask_move(selected_character, path_serialized)
+		
+		elif state == 'cast_spell':
+			if cell in fov:
+				_ask_cast_spell(selected_character, current_spell, cell)
+			else:
+				$BattleControl.deselect_spell()
 			fov = []
 			state = 'normal'
 			clear_arena()
@@ -204,21 +205,19 @@ func _on_cell_clicked(cell):
 
 
 func _on_cell_hovered(cell):
-	if state == 'normal' and _has_not_already_done_action(selected_character, 'move'):
-		clear_arena()
-		path_serialized = $Map.display_path(selected_character.current_cell, 
-								cell, 
-								selected_character.current_range_displacement)
-	elif state == 'cast_spell':
-		clear_arena()
-		if cell in fov:
-			$Map.display_impact(selected_character.Spells[current_spell], 
-							selected_character.current_cell, cell, 'royalblue')
-							
-#	elif state == 'test':
-#		clear_arena()
-#		cell.change_material('green')
-	
+	if myMap.is_cell_selectible(cell):
+		if state == 'normal' and _has_not_already_done_action(selected_character, 'move'):
+			clear_arena()
+			path_serialized = $Map.display_path(selected_character.current_cell, 
+									cell, 
+									selected_character.current_range_displacement)
+		elif state == 'cast_spell':
+			clear_arena()
+			if cell in fov:
+				$Map.display_impact(selected_character.Spells[current_spell], 
+								selected_character.current_cell, cell, 'royalblue')
+
+
 func _on_character_hovered(character):
 	if state == 'normal' and _has_not_already_done_action(character, 'move'):
 		clear_arena()
