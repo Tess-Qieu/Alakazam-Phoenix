@@ -126,7 +126,7 @@ func update_spell_list(character : Character):
 		$PanelRight/SpellListContainer.add_child(spell_bt)
 		
 		# Signal connections
-		spell_bt.initialize(spell_key, character.Spells[spell_key].miniature)
+		spell_bt.initialize(spell_key, character.Spells[spell_key])
 		spell_bt.connect("toggled", self, "_on_SpellButton_toggled", [spell_bt])
 
 func toggle_spell_buttons(disabled : bool):
