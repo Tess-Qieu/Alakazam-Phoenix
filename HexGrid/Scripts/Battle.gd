@@ -38,7 +38,16 @@ func choose_next_selected_character():
 	# if the current_team belongs to the client then we choose the first character from its team
 	# else we have to find its team to select a character from it
 	if current_team.user_id == Global.user_id:
-		_select_character(current_team.get_member(0))
+		var char_index = 0
+		while (char_index < current_team.size \
+			and not(current_team.get_member(char_index).is_alive()) ):
+			char_index += 1
+		
+		if char_index < current_team.size:
+			_select_character(current_team.get_member(char_index))
+		else:
+			print("NO CHARACTER TO CHOOSE : YOU LOST")
+			get_tree().quit()
 	else:
 		for team in teams.values():
 			if team.user_id == Global.user_id:
@@ -173,8 +182,8 @@ func _on_cell_clicked(cell):
 		elif state == 'cast_spell':
 			if cell in fov:
 				_ask_cast_spell(selected_character, current_spell, cell)
-            else:
-                $BattleControl.deselect_spell()
+			else:
+				$BattleControl.deselect_spell()
 			fov = []
 			state = 'normal'
 			clear_arena()

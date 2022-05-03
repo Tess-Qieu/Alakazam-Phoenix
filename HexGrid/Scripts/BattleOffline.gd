@@ -75,25 +75,26 @@ func choose_next_current_team(data=null):
 
 
 func get_teams_infos():
+	var default_health = 25
 	return {'Local redz': 
 						{	'user id': -1,
 							'color': 'red',
 							'characters': 
-								[ {	'health':100, 
+								[ {	'health':default_health, 
 									'id character':1, 
 									'q':0, 
 									'r':0, 
 									'range displacement':5, 
 									'team_color':'red'
 									},
-								{	'health':100, 
+								{	'health':default_health, 
 									'id character':4, 
 									'q':1, 
 									'r':3, 
 									'range displacement':5, 
 									'team_color':'red'
 									},
-								{	'health':100, 
+								{	'health':default_health, 
 									'id character':5, 
 									'q':3, 
 									'r':5, 
@@ -106,21 +107,21 @@ func get_teams_infos():
 						{	'user id': -1,
 							'color': 'blue',
 							'characters': 
-								[ {	'health':100, 
+								[ {	'health':default_health, 
 									'id character':0,
 									'q':1, 
 									'r':-5, 
 									'range displacement':5, 
 									'team_color':'blue'
 									},
-								{	'health':100, 
+								{	'health':default_health, 
 									'id character':2,
 									'q':6, 
 									'r':-5, 
 									'range displacement':5, 
 									'team_color':'blue'
 									},
-								{	'health':100, 
+								{	'health':default_health, 
 									'id character':3,
 									'q':6, 
 									'r':-4, 
