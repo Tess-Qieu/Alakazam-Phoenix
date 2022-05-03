@@ -2,7 +2,7 @@ extends Control
 class_name BlurredBackground_Widget
 
 # Configuration var
-export var message = "[DEFAULT]Your message here"
+export var message = "[DEFAULT]Your message here" setget set_message
 
 # Children reference var
 onready var MsgLbl = $WidgetBackground/VBoxContainer/Message_Label
@@ -20,17 +20,22 @@ var actions = \
 			"action_method"	: "change_scene_to",
 			"action_args"  	: [Global.MainMenu] 
 		}
-	]
+	] setget set_actions
 
 func _ready():
-	MsgLbl.text = message
+	set_message(message)
+	set_actions(actions)
+
+func set_actions(new_actions):
+	actions = new_actions
+	
 	# Cleaning phase
 	for child in buttonsContainer.get_children():
 		buttonsContainer.remove_child(child)
 	for action in actions:
 		if action["action_target"] == SceneTree:
 			action["action_target"] = get_tree()
-	
+
 	# instanciating buttons
 	for action in actions:
 		var new_bt = Button.new()
@@ -46,3 +51,7 @@ func _ready():
 					action["action_target"], action["action_method"])
 		
 		buttonsContainer.add_child(new_bt)
+
+func set_message(msg):
+	message = msg
+	MsgLbl.text = msg

@@ -34,11 +34,15 @@ func get_member(index : int):
 func get_all_members():
 	return get_children()
 
-func is_team_dead():
-	var is_team_dead = false
+func is_team_alive():
+	var is_team_alive = false
 	for member in get_all_members():
-		is_team_dead = is_team_dead or member.is_alive()
-	return is_team_dead
+		is_team_alive = is_team_alive or member.is_alive()
+#		print("Team {0} alive? {1}, member {2}".format([name, is_team_alive, member.name]))
+	return is_team_alive
+
+func is_team_dead():
+	return not is_team_alive()
 
 func get_size():
 	return get_all_members().size()

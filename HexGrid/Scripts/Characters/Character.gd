@@ -89,6 +89,7 @@ func select():
 	$AnimationPlayer.play("Wait")
 
 func is_alive():
+#	print("Character {0}, remaining health {1}".format([name, current_health]))
 	return current_health > 0
 
 

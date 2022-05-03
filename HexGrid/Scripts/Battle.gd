@@ -112,6 +112,8 @@ func _on_character_die(character):
 	
 	# Check if character's team is dead
 	if get_character_team(character).is_team_dead():
+#		print("Team {0} dead. u_u".format([get_character_team(character).name]))
+		
 		# If team is dead, check if any remaining team is alive
 		var alive_team_count = teams.values().size()
 		for team in teams.values():
@@ -120,6 +122,8 @@ func _on_character_die(character):
 		# If only one team remaining, end game
 		if alive_team_count == 1:
 			end_game({"team_name":current_team.name})
+#	else:
+#		print("Team {0} not dead yet. n_n".format([get_character_team(character).name]))
 
 
 
