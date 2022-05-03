@@ -6,6 +6,8 @@ var SpellButton = preload("res://Scenes/GUI/SpellButton.tscn")
 var node_battle : Node
 var selected_button : Button
 
+onready var Endgame_Widget = $Endgame_Widget
+
 
 func _ready():
 	node_battle = get_parent()
@@ -127,3 +129,12 @@ func deselect_spell():
 	# Function used to deselect a spell button 
 	if selected_button != null:
 		selected_button.pressed = false
+
+func show_endgame_widget(data=null):
+	if data == null:
+		return
+	elif "team_name" in data.keys():
+		Endgame_Widget.message = "{0} team wins!".format([data["team_name"]])
+		Endgame_Widget.show()
+	else:
+		return

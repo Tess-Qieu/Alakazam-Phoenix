@@ -62,14 +62,31 @@ func ask_move(character, path):
 
 # warning-ignore:unused_argument
 func choose_next_current_team(data=null):
-	var list_keys = teams.keys()
-	var next_index = -1
+	var teams_id = teams.keys()
+	
+	# Default selected team
+	var next_index = 0
+	
+	# If a team is already selected, select the following one
 	if current_team != null:
-		next_index = (list_keys.find(current_team.name) + 1) % len(list_keys)
-	else:
-		next_index = 0
-	current_team = teams[list_keys[next_index]]
+		next_index = (teams_id.find(current_team.name) + 1) % len(teams_id)
+	
+	current_team = teams[teams_id[next_index]]
 
+func get_character_team(character):
+	for team in teams.values():
+		if team.has_member(character):
+			return team
+	
+	return null
+
+func end_game(data=null):
+	if data == null:
+		return
+	elif "team_name" in data.keys():
+		$BattleControl.show_endgame_widget(data)
+	else:
+		return
 
 # ------------------
 

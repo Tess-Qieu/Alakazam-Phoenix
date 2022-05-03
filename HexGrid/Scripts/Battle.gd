@@ -46,7 +46,7 @@ func choose_next_selected_character():
 		if char_index < current_team.size:
 			_select_character(current_team.get_member(char_index))
 		else:
-			print("NO CHARACTER TO CHOOSE : YOU LOST")
+			print("ERROR: NO ALIVE CHARACTER TO CHOOSE IN TEAM {0}".format([current_team]))
 			get_tree().quit()
 	else:
 		for team in teams.values():
@@ -107,8 +107,19 @@ func _update_character_cell_references(character, new_cell):
 	new_cell.character_on = character
 
 func _on_character_die(character):
-	print('Character {0} dead'.format([character.name]))
+	#print('Character {0} dead'.format([character.name]))
 	character.die(self)
+	
+	# Check if character's team is dead
+	if get_character_team(character).is_team_dead():
+		# If team is dead, check if any remaining team is alive
+		var alive_team_count = teams.values().size()
+		for team in teams.values():
+			if team.is_team_dead():
+				alive_team_count -= 1
+		# If only one team remaining, end game
+		if alive_team_count == 1:
+			end_game({"team_name":current_team.name})
 
 
 
@@ -250,9 +261,7 @@ func _ask_move(character, path):
 
 
 ## INHERITABLED FUNCTIONS ##
-# warning-ignore:unused_argument
-# warning-ignore:unused_argument
-func ask_cast_spell(character, spell_name, cell):
+func ask_cast_spell(_character, _spell_name, _cell):
 	pass
 	
 # warning-ignore:unused_argument
@@ -267,8 +276,11 @@ func ask_end_turn():
 func choose_next_current_team(data=null):
 	pass
 
+func end_game(_data=null):
+	pass
 
-
+func get_character_team(_character):
+	pass
 
 
 
