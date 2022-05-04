@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/GUI/Widgets/AutoPopup.gd" type="Script" id=1]
+[ext_resource path="res://Prefabs/GUI/Sandbox_Theme.tres" type="Theme" id=2]
+
+[node name="PopupPanel" type="PopupPanel"]
+visible = true
+self_modulate = Color( 1, 1, 1, 0.74902 )
+margin_right = 150.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 150, 50 )
+theme = ExtResource( 2 )
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 155.0
+margin_bottom = 55.0
+rect_min_size = Vector2( 150, 50 )
+text = "PLACEHOLDER"
+valign = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Timer" type="Timer" parent="."]
